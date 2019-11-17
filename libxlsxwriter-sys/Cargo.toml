@@ -13,6 +13,8 @@ keywords = ["excel", "xlsx", "ffi"]
 categories = ["external-ffi-bindings"]
 license = "MIT"
 
+exclude = ["third_party/libxlsxwriter/docs", "third_party/libxlsxwriter/test", "third_party/zlib/contrib"]
+
 [dependencies]
 
 [build-dependencies]
