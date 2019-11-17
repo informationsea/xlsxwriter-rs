@@ -1,4 +1,4 @@
-use super::DateTime;
+use super::{convert_bool, DateTime};
 use std::ffi::CString;
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
@@ -296,15 +296,6 @@ impl DataValidation {
             error_message,
         }
     }
-}
-
-fn convert_bool(value: bool) -> u8 {
-    let result = if value {
-        libxlsxwriter_sys::lxw_boolean_LXW_TRUE
-    } else {
-        libxlsxwriter_sys::lxw_boolean_LXW_FALSE
-    };
-    result as u8
 }
 
 #[derive(Debug, Clone)]

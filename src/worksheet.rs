@@ -1,4 +1,4 @@
-use super::{DataValidation, Format, Workbook, XlsxError};
+use super::{convert_bool, DataValidation, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
@@ -73,6 +73,163 @@ impl Into<libxlsxwriter_sys::lxw_image_options> for &ImageOptions {
             list_pointers: libxlsxwriter_sys::lxw_image_options__bindgen_ty_1 {
                 stqe_next: std::ptr::null_mut(),
             },
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+pub enum PaperType {
+    PrinterDefault,
+    Letter,
+    Tabloid,
+    Ledger,
+    Legal,
+    Statement,
+    Executive,
+    A3,
+    A4,
+    A5,
+    B4,
+    B5,
+    Folio,
+    Quarto,
+    Other(u8),
+}
+
+impl PaperType {
+    fn value(self) -> u8 {
+        let value = match self {
+            PaperType::PrinterDefault => 0,
+            PaperType::Letter => 1,
+            PaperType::Tabloid => 3,
+            PaperType::Ledger => 4,
+            PaperType::Legal => 5,
+            PaperType::Statement => 6,
+            PaperType::Executive => 7,
+            PaperType::A3 => 8,
+            PaperType::A4 => 9,
+            PaperType::A5 => 11,
+            PaperType::B4 => 12,
+            PaperType::B5 => 13,
+            PaperType::Folio => 14,
+            PaperType::Quarto => 15,
+            PaperType::Other(x) => x.into(),
+        };
+        value as u8
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
+pub struct HeaderFooterOptions {
+    margin: f64,
+}
+
+impl Into<libxlsxwriter_sys::lxw_header_footer_options> for &HeaderFooterOptions {
+    fn into(self) -> libxlsxwriter_sys::lxw_header_footer_options {
+        libxlsxwriter_sys::lxw_header_footer_options {
+            margin: self.margin,
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+pub enum GridLines {
+    HideAllGridLines,
+    ShowScreenGridLines,
+    ShowPrintGridLines,
+    ShowAllGridLines,
+}
+
+impl GridLines {
+    fn value(self) -> u8 {
+        let value = match self {
+            GridLines::HideAllGridLines => libxlsxwriter_sys::lxw_gridlines_LXW_HIDE_ALL_GRIDLINES,
+            GridLines::ShowScreenGridLines => {
+                libxlsxwriter_sys::lxw_gridlines_LXW_SHOW_SCREEN_GRIDLINES
+            }
+            GridLines::ShowPrintGridLines => {
+                libxlsxwriter_sys::lxw_gridlines_LXW_SHOW_PRINT_GRIDLINES
+            }
+            GridLines::ShowAllGridLines => libxlsxwriter_sys::lxw_gridlines_LXW_SHOW_ALL_GRIDLINES,
+        };
+        value as u8
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+pub struct Protection {
+    pub no_select_locked_cells: bool,
+    pub no_select_unlocked_cells: bool,
+    pub format_cells: bool,
+    pub format_columns: bool,
+    pub format_rows: bool,
+    pub insert_columns: bool,
+    pub insert_rows: bool,
+    pub insert_hyperlinks: bool,
+    pub delete_columns: bool,
+    pub delete_rows: bool,
+    pub sort: bool,
+    pub autofilter: bool,
+    pub pivot_tables: bool,
+    pub scenarios: bool,
+    pub objects: bool,
+    pub no_content: bool,
+    pub no_objects: bool,
+}
+
+impl Protection {
+    pub fn new() -> Protection {
+        Protection {
+            no_select_locked_cells: true,
+            no_select_unlocked_cells: true,
+            format_cells: false,
+            format_columns: false,
+            format_rows: false,
+            insert_columns: false,
+            insert_rows: false,
+            insert_hyperlinks: false,
+            delete_columns: false,
+            delete_rows: false,
+            sort: false,
+            autofilter: false,
+            pivot_tables: false,
+            scenarios: false,
+            objects: false,
+            no_content: false,
+            no_objects: false,
+        }
+    }
+}
+
+impl Default for Protection {
+    fn default() -> Self {
+        Protection::new()
+    }
+}
+
+impl Into<libxlsxwriter_sys::lxw_protection> for &Protection {
+    fn into(self) -> libxlsxwriter_sys::lxw_protection {
+        libxlsxwriter_sys::lxw_protection {
+            no_select_locked_cells: convert_bool(self.no_select_locked_cells),
+            no_select_unlocked_cells: convert_bool(self.no_select_unlocked_cells),
+            format_cells: convert_bool(self.format_cells),
+            format_columns: convert_bool(self.format_columns),
+            format_rows: convert_bool(self.format_rows),
+            insert_columns: convert_bool(self.insert_columns),
+            insert_rows: convert_bool(self.insert_rows),
+            insert_hyperlinks: convert_bool(self.insert_hyperlinks),
+            delete_columns: convert_bool(self.delete_columns),
+            delete_rows: convert_bool(self.delete_rows),
+            sort: convert_bool(self.sort),
+            autofilter: convert_bool(self.autofilter),
+            pivot_tables: convert_bool(self.pivot_tables),
+            scenarios: convert_bool(self.scenarios),
+            objects: convert_bool(self.objects),
+            no_content: convert_bool(self.no_content),
+            no_objects: convert_bool(self.no_objects),
+            no_sheet: convert_bool(false),
+            is_configured: convert_bool(false),
+            hash: [0; 5],
         }
     }
 }
@@ -697,6 +854,296 @@ impl<'a> Worksheet<'a> {
     pub fn set_page_view(&mut self) {
         unsafe {
             libxlsxwriter_sys::worksheet_set_page_view(self.worksheet);
+        }
+    }
+
+    pub fn set_paper(&mut self, paper: PaperType) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_set_paper(self.worksheet, paper.value());
+        }
+    }
+
+    pub fn set_header(&mut self, header: &str) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_header(
+                self.worksheet,
+                CString::new(header).unwrap().as_c_str().as_ptr(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_footer(&mut self, footer: &str) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_footer(
+                self.worksheet,
+                CString::new(footer).unwrap().as_c_str().as_ptr(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_header_opt(
+        &mut self,
+        header: &str,
+        options: &HeaderFooterOptions,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_header_opt(
+                self.worksheet,
+                CString::new(header).unwrap().as_c_str().as_ptr(),
+                &mut options.into(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_footer_opt(
+        &mut self,
+        footer: &str,
+        options: &HeaderFooterOptions,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_footer_opt(
+                self.worksheet,
+                CString::new(footer).unwrap().as_c_str().as_ptr(),
+                &mut options.into(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_h_pagebreaks(&mut self, breaks: &[WorksheetRow]) -> Result<(), XlsxError> {
+        let mut breaks_vec = breaks.to_vec();
+        breaks_vec.push(0);
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_h_pagebreaks(
+                self.worksheet,
+                breaks_vec.as_mut_ptr(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_v_pagebreaks(&mut self, breaks: &[WorksheetCol]) -> Result<(), XlsxError> {
+        let mut breaks_vec = breaks.to_vec();
+        breaks_vec.push(0);
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_v_pagebreaks(
+                self.worksheet,
+                breaks_vec.as_mut_ptr(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn print_across(&mut self) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_print_across(self.worksheet);
+        }
+    }
+
+    pub fn set_zoom(&mut self, scale: u16) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_set_zoom(self.worksheet, scale);
+        }
+    }
+
+    pub fn gridlines(&mut self, option: GridLines) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_gridlines(self.worksheet, option.value());
+        }
+    }
+
+    pub fn center_horizontally(&mut self) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_center_horizontally(self.worksheet);
+        }
+    }
+
+    pub fn center_vertically(&mut self) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_center_vertically(self.worksheet);
+        }
+    }
+
+    pub fn print_row_col_headers(&mut self) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_print_row_col_headers(self.worksheet);
+        }
+    }
+
+    pub fn repeat_rows(
+        &mut self,
+        first_row: WorksheetRow,
+        last_row: WorksheetRow,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result =
+                libxlsxwriter_sys::worksheet_repeat_rows(self.worksheet, first_row, last_row);
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn repeat_columns(
+        &mut self,
+        first_col: WorksheetCol,
+        last_col: WorksheetCol,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result =
+                libxlsxwriter_sys::worksheet_repeat_columns(self.worksheet, first_col, last_col);
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn print_area(
+        &mut self,
+        first_row: WorksheetRow,
+        first_col: WorksheetCol,
+        last_row: WorksheetRow,
+        last_col: WorksheetCol,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_print_area(
+                self.worksheet,
+                first_row,
+                first_col,
+                last_row,
+                last_col,
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn fit_to_pages(&mut self, width: u16, height: u16) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_fit_to_pages(self.worksheet, width, height);
+        }
+    }
+
+    pub fn set_start_page(&mut self, start_page: u16) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_set_start_page(self.worksheet, start_page);
+        }
+    }
+
+    pub fn set_print_scale(&mut self, scale: u16) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_set_print_scale(self.worksheet, scale);
+        }
+    }
+
+    pub fn set_right_to_left(&mut self) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_right_to_left(self.worksheet);
+        }
+    }
+
+    pub fn set_hide_zero(&mut self) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_hide_zero(self.worksheet);
+        }
+    }
+
+    pub fn set_tab_color(&mut self, color: FormatColor) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_set_tab_color(self.worksheet, color.value());
+        }
+    }
+
+    pub fn protect(&mut self, password: &str, protection: &Protection) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_protect(
+                self.worksheet,
+                CString::new(password).unwrap().as_c_str().as_ptr(),
+                &mut protection.into(),
+            );
+        }
+    }
+
+    pub fn outline_settings(
+        &mut self,
+        visible: bool,
+        symbols_below: bool,
+        symbols_right: bool,
+        auto_style: bool,
+    ) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_outline_settings(
+                self.worksheet,
+                convert_bool(visible),
+                convert_bool(symbols_below),
+                convert_bool(symbols_right),
+                convert_bool(auto_style),
+            )
+        }
+    }
+
+    pub fn set_default_row(&mut self, height: f64, hide_unused_rows: bool) {
+        unsafe {
+            libxlsxwriter_sys::worksheet_set_default_row(
+                self.worksheet,
+                height,
+                convert_bool(hide_unused_rows),
+            )
+        }
+    }
+
+    pub fn set_vba_name(&mut self, name: &str) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_vba_name(
+                self.worksheet,
+                CString::new(name).unwrap().as_c_str().as_ptr(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
         }
     }
 }
