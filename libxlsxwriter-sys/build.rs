@@ -66,6 +66,12 @@ fn main() -> io::Result<()> {
         assert_file_exists(path)?;
         build.file(path);
     }
+    if cfg!(windows) {
+        build
+            .file("third_party/libxlsxwriter/third_party/minizip/iowin32.c")
+            .flag_if_supported("/utf-8")
+            .include("include");
+    }
     build.compile("libxlsxwriter.a");
 
     // The bindgen::Builder is the main entry point
@@ -73,6 +79,7 @@ fn main() -> io::Result<()> {
     // the resulting bindings.
     let bindings = bindgen::Builder::default()
         .generate_comments(false)
+        .clang_arg("-Iinclude")
         // The input header we would like to generate
         // bindings for.
         .header("wrapper.h")
