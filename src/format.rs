@@ -276,129 +276,212 @@ pub struct Format<'a> {
 }
 
 impl<'a> Format<'a> {
-    pub fn set_font_name(&mut self, font_name: &str) {
+    pub fn set_font_name(&mut self, font_name: &str) -> &mut Self {
         unsafe {
             libxlsxwriter_sys::format_set_font_name(
                 self.format,
                 CString::new(font_name).unwrap().as_c_str().as_ptr(),
-            )
+            );
         }
+        self
     }
 
-    pub fn set_font_size(&mut self, font_size: f64) {
-        unsafe { libxlsxwriter_sys::format_set_font_size(self.format, font_size) }
+    pub fn set_font_size(&mut self, font_size: f64) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_font_size(self.format, font_size);
+        }
+        self
     }
 
-    pub fn set_font_color(&mut self, font_color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_font_color(self.format, font_color.value()) }
+    pub fn set_font_color(&mut self, font_color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_font_color(self.format, font_color.value());
+        }
+        self
     }
 
-    pub fn set_bold(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_bold(self.format) }
+    pub fn set_bold(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_bold(self.format);
+        }
+        self
     }
 
-    pub fn set_italic(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_italic(self.format) }
+    pub fn set_italic(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_italic(self.format);
+        }
+        self
     }
 
-    pub fn set_underline(&mut self, underline: FormatUnderline) {
-        unsafe { libxlsxwriter_sys::format_set_underline(self.format, underline.value()) }
+    pub fn set_underline(&mut self, underline: FormatUnderline) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_underline(self.format, underline.value());
+        }
+        self
     }
 
-    pub fn set_font_strikeout(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_font_strikeout(self.format) }
+    pub fn set_font_strikeout(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_font_strikeout(self.format);
+        }
+        self
     }
 
-    pub fn set_font_script(&mut self, script: FormatScript) {
-        unsafe { libxlsxwriter_sys::format_set_font_script(self.format, script.value()) }
+    pub fn set_font_script(&mut self, script: FormatScript) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_font_script(self.format, script.value());
+        }
+        self
     }
 
-    pub fn set_num_format(&mut self, num_font: &str) {
+    pub fn set_num_format(&mut self, num_font: &str) -> &mut Self {
         unsafe {
             libxlsxwriter_sys::format_set_num_format(
                 self.format,
                 CString::new(num_font).unwrap().as_c_str().as_ptr(),
-            )
+            );
         }
+        self
     }
 
-    pub fn set_font_unlocked(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_unlocked(self.format) }
+    pub fn set_font_unlocked(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_unlocked(self.format);
+        }
+        self
     }
 
-    pub fn set_font_hidden(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_hidden(self.format) }
+    pub fn set_font_hidden(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_hidden(self.format);
+        }
+        self
     }
 
-    pub fn set_align(&mut self, align: FormatAlignment) {
-        unsafe { libxlsxwriter_sys::format_set_align(self.format, align.value()) }
+    pub fn set_align(&mut self, align: FormatAlignment) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_align(self.format, align.value());
+        }
+        self
     }
 
-    pub fn set_text_wrap(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_text_wrap(self.format) }
+    pub fn set_text_wrap(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_text_wrap(self.format);
+        }
+        self
     }
 
-    pub fn set_rotation(&mut self, angle: i16) {
-        unsafe { libxlsxwriter_sys::format_set_rotation(self.format, angle) }
+    pub fn set_rotation(&mut self, angle: i16) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_rotation(self.format, angle);
+        }
+        self
     }
 
-    pub fn set_indent(&mut self, level: u8) {
-        unsafe { libxlsxwriter_sys::format_set_indent(self.format, level) }
+    pub fn set_indent(&mut self, level: u8) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_indent(self.format, level);
+        }
+        self
     }
 
-    pub fn set_shrink(&mut self) {
-        unsafe { libxlsxwriter_sys::format_set_shrink(self.format) }
+    pub fn set_shrink(&mut self) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_shrink(self.format);
+        }
+        self
     }
 
-    pub fn set_pattern(&mut self, pattern: FormatPatterns) {
-        unsafe { libxlsxwriter_sys::format_set_pattern(self.format, pattern.value()) }
+    pub fn set_pattern(&mut self, pattern: FormatPatterns) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_pattern(self.format, pattern.value());
+        }
+        self
     }
 
-    pub fn set_bg_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_bg_color(self.format, color.value()) }
+    pub fn set_bg_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_bg_color(self.format, color.value());
+        }
+        self
     }
 
-    pub fn set_fg_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_fg_color(self.format, color.value()) }
+    pub fn set_fg_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_fg_color(self.format, color.value());
+        }
+        self
     }
 
-    pub fn set_border(&mut self, border: FormatBorder) {
-        unsafe { libxlsxwriter_sys::format_set_border(self.format, border.value()) }
+    pub fn set_border(&mut self, border: FormatBorder) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_border(self.format, border.value());
+        }
+        self
     }
 
-    pub fn set_border_bottom(&mut self, border: FormatBorder) {
-        unsafe { libxlsxwriter_sys::format_set_bottom(self.format, border.value()) }
+    pub fn set_border_bottom(&mut self, border: FormatBorder) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_bottom(self.format, border.value());
+        }
+        self
     }
 
-    pub fn set_border_top(&mut self, border: FormatBorder) {
-        unsafe { libxlsxwriter_sys::format_set_top(self.format, border.value()) }
+    pub fn set_border_top(&mut self, border: FormatBorder) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_top(self.format, border.value());
+        }
+        self
     }
 
-    pub fn set_border_left(&mut self, border: FormatBorder) {
-        unsafe { libxlsxwriter_sys::format_set_left(self.format, border.value()) }
+    pub fn set_border_left(&mut self, border: FormatBorder) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_left(self.format, border.value());
+        }
+        self
     }
 
-    pub fn set_border_right(&mut self, border: FormatBorder) {
-        unsafe { libxlsxwriter_sys::format_set_right(self.format, border.value()) }
+    pub fn set_border_right(&mut self, border: FormatBorder) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_right(self.format, border.value());
+        }
+        self
     }
 
-    pub fn set_border_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_border_color(self.format, color.value()) }
+    pub fn set_border_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_border_color(self.format, color.value());
+        }
+        self
     }
 
-    pub fn set_border_bottom_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_bottom_color(self.format, color.value()) }
+    pub fn set_border_bottom_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_bottom_color(self.format, color.value());
+        }
+        self
     }
 
-    pub fn set_border_top_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_top_color(self.format, color.value()) }
+    pub fn set_border_top_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_top_color(self.format, color.value());
+        }
+        self
     }
 
-    pub fn set_border_left_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_left_color(self.format, color.value()) }
+    pub fn set_border_left_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_left_color(self.format, color.value());
+        }
+        self
     }
 
-    pub fn set_border_right_color(&mut self, color: FormatColor) {
-        unsafe { libxlsxwriter_sys::format_set_right_color(self.format, color.value()) }
+    pub fn set_border_right_color(&mut self, color: FormatColor) -> &mut Self {
+        unsafe {
+            libxlsxwriter_sys::format_set_right_color(self.format, color.value());
+        }
+        self
     }
 }

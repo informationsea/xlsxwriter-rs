@@ -13,6 +13,9 @@ keywords = ["excel", "xlsx"]
 categories = ["api-bindings", "encoding", "text-processing"]
 license = "Apache-2.0"
 
+[badges]
+travis-ci = { repository = "informationsea/xlsxwriter-rs", branch = "master" }
+maintenance = { status = "experimental" }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
