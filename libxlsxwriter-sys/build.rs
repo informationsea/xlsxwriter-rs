@@ -80,15 +80,11 @@ fn main() -> io::Result<()> {
     let bindings = bindgen::Builder::default()
         .generate_comments(false)
         .clang_arg("-Iinclude")
-        // The input header we would like to generate
-        // bindings for.
         .header("wrapper.h")
-        // Tell cargo to invalidate the built crate whenever any of the
-        // included header files changed.
-        //.parse_callbacks(Box::new(bindgen::CargoCallbacks))
-        // Finish the builder and generate the bindings.
+        .whitelist_function("^(chart|chartsheet|workbook|worksheet|format|lxw)_.*")
+        .whitelist_type("^lxw_.*")
+        .whitelist_var("^lxw_.*")
         .generate()
-        // Unwrap the Result and panic on failure.
         .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
