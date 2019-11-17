@@ -3,6 +3,8 @@ xlsxwriter-rs
 [![Build Status](https://travis-ci.org/informationsea/xlsxwriter-rs.svg?branch=master)](https://travis-ci.org/informationsea/xlsxwriter-rs)
 ![GitHub](https://img.shields.io/github/license/informationsea/xlsxwriter-rs)
 ![GitHub top language](https://img.shields.io/github/languages/top/informationsea/xlsxwriter-rs)
+![Crates.io](https://img.shields.io/crates/v/xlsxwriter)
+![Docs.rs](https://docs.rs/xlsxwriter/badge.svg)
 
 Rust binding of [libxlsxwriter](https://github.com/jmcnamara/libxlsxwriter)
 
