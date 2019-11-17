@@ -21,6 +21,8 @@
 //! Examples
 //! --------
 //!
+//! ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/simple1.png)
+//!
 //! ```rust
 //! use xlsxwriter::*;
 //!

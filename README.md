@@ -23,7 +23,7 @@ Coming soon
 Example
 -------
 
-![Result Image](images\simple1.png)
+![Result Image](images/simple1.png)
 
 ```rust
 let workbook = Workbook::new("target/simple1.xlsx");
