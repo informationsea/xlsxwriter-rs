@@ -61,6 +61,9 @@
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! Please read [original libxlsxwriter document](https://libxlsxwriter.github.io/worksheet_8h.html) for description missing functions.
+//! Most of this document is based on libxlsxwriter document.
 
 extern crate libxlsxwriter_sys;
 
@@ -81,7 +84,7 @@ pub use validation::{
 pub use workbook::Workbook;
 pub use worksheet::{
     DateTime, GridLines, HeaderFooterOptions, ImageOptions, PaperType, Protection, RowColOptions,
-    Worksheet,
+    Worksheet, WorksheetCol, WorksheetRow,
 };
 
 fn convert_bool(value: bool) -> u8 {

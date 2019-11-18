@@ -1,9 +1,12 @@
 use super::{error, Format, Worksheet, XlsxError};
+use std::cell::RefCell;
 use std::ffi::CString;
+use std::rc::Rc;
 
 pub struct Workbook {
     workbook: *mut libxlsxwriter_sys::lxw_workbook,
     _workbook_name: CString,
+    worksheet_names: Rc<RefCell<Vec<Vec<u8>>>>,
 }
 
 impl Workbook {
@@ -17,6 +20,7 @@ impl Workbook {
             Workbook {
                 workbook: raw_workbook,
                 _workbook_name: workbook_name,
+                worksheet_names: Rc::new(RefCell::new(Vec::new())),
             }
         }
     }
@@ -24,14 +28,12 @@ impl Workbook {
         &'a self,
         sheet_name: Option<&str>,
     ) -> Result<Worksheet<'a>, XlsxError> {
+        let name_vec = sheet_name.map(|x| CString::new(x).unwrap().as_bytes_with_nul().to_vec());
         unsafe {
-            if let Some(sheet_name) = sheet_name {
+            if let Some(sheet_name) = name_vec.as_ref() {
                 let result = libxlsxwriter_sys::workbook_validate_sheet_name(
                     self.workbook,
-                    CString::new(sheet_name)
-                        .expect("Null Error")
-                        .as_c_str()
-                        .as_ptr(),
+                    sheet_name.as_ptr() as *const i8,
                 );
                 if result != libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                     return Err(XlsxError::new(result));
@@ -40,10 +42,15 @@ impl Workbook {
 
             let worksheet = libxlsxwriter_sys::workbook_add_worksheet(
                 self.workbook,
-                sheet_name
-                    .map(|x| CString::new(x).expect("Null Error").as_c_str().as_ptr())
+                name_vec
+                    .as_ref()
+                    .map(|x| x.as_ptr() as *const i8)
                     .unwrap_or(std::ptr::null()),
             );
+
+            if let Some(name) = name_vec {
+                self.worksheet_names.borrow_mut().push(name);
+            }
 
             if worksheet.is_null() {
                 return Err(XlsxError::new(error::UNKNOWN_ERROR_CODE));

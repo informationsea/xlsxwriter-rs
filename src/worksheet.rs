@@ -121,7 +121,7 @@ impl PaperType {
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct HeaderFooterOptions {
-    margin: f64,
+    pub margin: f64,
 }
 
 impl Into<libxlsxwriter_sys::lxw_header_footer_options> for &HeaderFooterOptions {
@@ -238,12 +238,61 @@ pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
 pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
 pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
 
+/// The Worksheet object represents an Excel worksheet. It handles operations such as writing data to cells or formatting worksheet layout.
+///
+/// A Worksheet object isn't created directly. Instead a worksheet is created by calling the `workbook.add_worksheet()` function from a [Workbook](struct.Workbook.html) object:
+/// ```rust
+/// use xlsxwriter::*;
+/// # fn main() { let _ = run(); }
+/// # fn run() -> Result<(), XlsxError> {
+/// let workbook = Workbook::new("test-worksheet.xlsx");
+/// let mut worksheet = workbook.add_worksheet(None)?;
+/// worksheet.write_string(0, 0, "Hello, excel", None)?;
+/// workbook.close()
+/// # }
+/// ```
+/// Please read [original libxlsxwriter document](https://libxlsxwriter.github.io/worksheet_8h.html) for description missing functions.
+/// Most of this document is based on libxlsxwriter document.
 pub struct Worksheet<'a> {
     pub(crate) _workbook: &'a Workbook,
     pub(crate) worksheet: *mut libxlsxwriter_sys::lxw_worksheet,
 }
 
 impl<'a> Worksheet<'a> {
+    /// This function writes numeric types to the cell specified by row and column:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_number-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_number(0, 0, 123456.0, None)?;
+    /// worksheet.write_number(1, 0, 2.3451, None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_number-1.png)
+    ///
+    /// The native data type for all numbers in Excel is a IEEE-754 64-bit double-precision floating point, which is also the default type used by worksheet_write_number.
+    ///
+    /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a Format object.
+    ///
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx");
+    /// let mut format = workbook.get_format();
+    /// format.set_num_format("$#,##0.00");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_number(0, 0, 1234.567, Some(&format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_number-2.png)
+    ///
+    /// ### Note
+    /// Excel doesn't support NaN, Inf or -Inf as a number value. If you are writing data that contains these values then your application should convert them to a string or handle them in some other way.
     pub fn write_number(
         &mut self,
         row: WorksheetRow,
@@ -267,6 +316,47 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function writes a string to the cell specified by row and column:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_string-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_string(0, 0, "This phrase is English!", None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_string-1.png)
+    ///
+    /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a Format object:
+    ///
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx");
+    /// let mut format = workbook.get_format();
+    /// format.set_bold();
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_string(0, 0, "This phrase is Bold!", Some(&format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_string-2.png)
+    ///
+    /// Unicode strings are supported in UTF-8 encoding.
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_string-3.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_string(0, 0, "こんにちは、世界！", None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_string-3.png)
     pub fn write_string(
         &mut self,
         row: WorksheetRow,
@@ -290,6 +380,43 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function writes a formula or function to the cell specified by row and column:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_formula-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_formula(0, 0, "=B3 + 6", None)?;
+    /// worksheet.write_formula(1, 0, "=SIN(PI()/4)", None)?;
+    /// worksheet.write_formula(2, 0, "=SUM(A1:A2)", None)?;
+    /// worksheet.write_formula(3, 0, "=IF(A3>1,\"Yes\", \"No\")", None)?;
+    /// worksheet.write_formula(4, 0, "=AVERAGE(1, 2, 3, 4)", None)?;
+    /// worksheet.write_formula(5, 0, "=DATEVALUE(\"1-Jan-2013\")", None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_formula-1.png)
+    ///
+    /// The `format` parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a Format object.
+    ///
+    /// Libxlsxwriter doesn't calculate the value of a formula and instead stores a default value of `0`. The correct formula result is displayed in Excel, as shown in the example above, since it recalculates the formulas when it loads the file. For cases where this is an issue see the `write_formula_num()` function and the discussion in that section.
+    ///
+    /// Formulas must be written with the US style separator/range operator which is a comma (not semi-colon). Therefore a formula with multiple values should be written as follows:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_formula-2.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// // OK
+    /// worksheet.write_formula(0, 0, "=SUM(1, 2, 3)", None)?;
+    /// // NO. Error on load.
+    /// worksheet.write_formula(1, 0, "=SUM(1; 2; 3)", None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// See also [Working with Formulas](https://libxlsxwriter.github.io/working_with_formulas.html).
     pub fn write_formula(
         &mut self,
         row: WorksheetRow,
@@ -313,6 +440,31 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function writes an array formula to a cell range. In Excel an array formula is a formula that performs a calculation on a set of values.
+    /// In Excel an array formula is indicated by a pair of braces around the formula: `{=SUM(A1:B1*A2:B2)}`.
+    ///
+    /// Array formulas can return a single value or a range or values. For array formulas that return a range of values you must specify the range that the return values will be written to. This is why this function has first_ and last_ row/column parameters:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_array_formula-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_array_formula(4, 0, 6, 0, "{=TREND(C5:C7,B5:B7)}", None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// If the array formula returns a single value then the first_ and last_ parameters should be the same:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_array_formula-2.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_array_formula(1, 0, 1, 0, "{=SUM(B1:C1*B2:C2)}", None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
     pub fn write_array_formula(
         &mut self,
         first_row: WorksheetRow,
@@ -340,6 +492,25 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function can be used to write a date or time to the cell specified by row and column:
+    /// ```rust
+    /// use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// let datetime = DateTime::new(2013, 2, 28, 12, 0, 0.0);
+    /// let mut datetime_format = workbook.get_format();
+    /// datetime_format.set_num_format("mmm d yyyy hh:mm AM/PM");
+    /// worksheet.write_datetime(1, 0, &datetime, Some(&datetime_format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_datetime-1.png)
+    ///
+    /// The `format` parameter should be used to apply formatting to the cell using a [Format](struct.Format.html) object as shown above. Without a date format the datetime will appear as a number only.
+    ///
+    /// See [Working with Dates and Times](https://libxlsxwriter.github.io/working_with_dates.html) for more information about handling dates and times in libxlsxwriter.
     pub fn write_datetime(
         &mut self,
         row: WorksheetRow,
@@ -364,6 +535,76 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function is used to write a URL/hyperlink to a worksheet cell specified by row and column.
+    /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a [Format](struct.Format.html) object. The typical worksheet format for a hyperlink is a blue underline:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// let mut url_format = workbook.get_format();
+    /// url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    ///
+    /// The usual web style URI's are supported: `http://`, `https://`, `ftp://` and `mailto:` :
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # let mut url_format = workbook.get_format();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_url(0, 0, "ftp://www.python.org/", Some(&url_format))?;
+    /// worksheet.write_url(1, 0, "http://www.python.org/", Some(&url_format))?;
+    /// worksheet.write_url(2, 0, "https://www.python.org/", Some(&url_format))?;
+    /// worksheet.write_url(3, 0, "mailto:foo@example.com", Some(&url_format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    ///
+    /// An Excel hyperlink is comprised of two elements: the displayed string and the non-displayed link. By default the displayed string is the same as the link. However, it is possible to overwrite it with any other libxlsxwriter type using the appropriate `Worksheet.write_*()` function. The most common case is to overwrite the displayed link text with another string:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # let mut url_format = workbook.get_format();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
+    /// worksheet.write_string(0, 0, "Read the documentation.", Some(&url_format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    ///
+    /// Two local URIs are supported: `internal:` and `external:`. These are used for hyperlinks to internal worksheet references or external workbook and worksheet references:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_url-4.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # let mut worksheet2 = workbook.add_worksheet(None)?;
+    /// # let mut worksheet3 = workbook.add_worksheet(Some("Sales Data"))?;
+    /// # let mut url_format = workbook.get_format();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_url(0, 0, "internal:Sheet2!A1", Some(&url_format))?;
+    /// worksheet.write_url(1, 0, "internal:Sheet2!B2", Some(&url_format))?;
+    /// worksheet.write_url(2, 0, "internal:Sheet2!A1:B2", Some(&url_format))?;
+    /// worksheet.write_url(3, 0, "internal:'Sales Data'!A1", Some(&url_format))?;
+    /// worksheet.write_url(4, 0, "external:c:\\temp\\foo.xlsx", Some(&url_format))?;
+    /// worksheet.write_url(5, 0, "external:c:\\foo.xlsx#Sheet2!A1", Some(&url_format))?;
+    /// worksheet.write_url(6, 0, "external:..\\foo.xlsx", Some(&url_format))?;
+    /// worksheet.write_url(7, 0, "external:..\\foo.xlsx#Sheet2!A1", Some(&url_format))?;
+    /// worksheet.write_url(8, 0, "external:\\\\NET\\share\\foo.xlsx", Some(&url_format))?;
+    /// # workbook.close()
+    /// # }
+    /// ```
     pub fn write_url(
         &mut self,
         row: WorksheetRow,
