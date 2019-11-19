@@ -3,6 +3,7 @@
 //!
 //! Rust binding of [libxlsxwriter](https://github.com/jmcnamara/libxlsxwriter)
 //!
+//! ** API of this library is not stable. **
 //!
 //! Supported Features
 //! ------------------
@@ -29,15 +30,15 @@
 //! # fn main() { let _ = run(); }
 //! # fn run() -> Result<(), XlsxError> {
 //! let workbook = Workbook::new("simple1.xlsx");
-//! let mut format1 = workbook.get_format();
+//! let mut format1 = workbook.add_format();
 //! format1.set_font_color(FormatColor::Red);
 //!
-//! let mut format2 = workbook.get_format();
+//! let mut format2 = workbook.add_format();
 //! format2
 //!     .set_font_color(FormatColor::Blue)
 //!     .set_underline(FormatUnderline::Single);
 //!
-//! let mut format3 = workbook.get_format();
+//! let mut format3 = workbook.add_format();
 //! format3
 //!     .set_font_color(FormatColor::Green)
 //!     .set_align(FormatAlignment::CenterAcross)

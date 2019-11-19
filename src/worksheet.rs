@@ -37,11 +37,16 @@ impl Into<libxlsxwriter_sys::lxw_datetime> for &DateTime {
     }
 }
 
+/// Options for modifying images inserted via [Worksheet.insert_image_opt()](struct.Worksheet.html#method.insert_image_opt).
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct ImageOptions {
+    /// Offset from the left of the cell in pixels.
     pub x_offset: i32,
+    /// Offset from the top of the cell in pixels.
     pub y_offset: i32,
+    /// X scale of the image as a decimal.
     pub x_scale: f64,
+    /// Y scale of the image as a decimal.
     pub y_scale: f64,
 }
 
@@ -234,7 +239,14 @@ impl Into<libxlsxwriter_sys::lxw_protection> for &Protection {
     }
 }
 
+/// Integer data type to represent a row value. Equivalent to `u32`.
+///
+/// The maximum row in Excel is 1,048,576.
 pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
+
+/// Integer data type to represent a column value. Equivalent to `u16`.
+///
+/// The maximum column in Excel is 16,384.
 pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
 pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
 
@@ -282,7 +294,7 @@ impl<'a> Worksheet<'a> {
     /// # fn main() { let _ = run(); }
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx");
-    /// let mut format = workbook.get_format();
+    /// let mut format = workbook.add_format();
     /// format.set_num_format("$#,##0.00");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_number(0, 0, 1234.567, Some(&format))?;
@@ -336,7 +348,7 @@ impl<'a> Worksheet<'a> {
     /// # fn main() { let _ = run(); }
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx");
-    /// let mut format = workbook.get_format();
+    /// let mut format = workbook.add_format();
     /// format.set_bold();
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_string(0, 0, "This phrase is Bold!", Some(&format))?;
@@ -500,7 +512,7 @@ impl<'a> Worksheet<'a> {
     /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let datetime = DateTime::new(2013, 2, 28, 12, 0, 0.0);
-    /// let mut datetime_format = workbook.get_format();
+    /// let mut datetime_format = workbook.add_format();
     /// datetime_format.set_num_format("mmm d yyyy hh:mm AM/PM");
     /// worksheet.write_datetime(1, 0, &datetime, Some(&datetime_format))?;
     /// # workbook.close()
@@ -543,7 +555,7 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let mut url_format = workbook.get_format();
+    /// let mut url_format = workbook.add_format();
     /// url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
     /// # workbook.close()
@@ -557,7 +569,7 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.get_format();
+    /// # let mut url_format = workbook.add_format();
     /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "ftp://www.python.org/", Some(&url_format))?;
     /// worksheet.write_url(1, 0, "http://www.python.org/", Some(&url_format))?;
@@ -574,7 +586,7 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.get_format();
+    /// # let mut url_format = workbook.add_format();
     /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
     /// worksheet.write_string(0, 0, "Read the documentation.", Some(&url_format))?;
@@ -591,7 +603,7 @@ impl<'a> Worksheet<'a> {
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut worksheet2 = workbook.add_worksheet(None)?;
     /// # let mut worksheet3 = workbook.add_worksheet(Some("Sales Data"))?;
-    /// # let mut url_format = workbook.get_format();
+    /// # let mut url_format = workbook.add_format();
     /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "internal:Sheet2!A1", Some(&url_format))?;
     /// worksheet.write_url(1, 0, "internal:Sheet2!B2", Some(&url_format))?;
@@ -628,6 +640,18 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// Write an Excel boolean to the cell specified by row and column:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_boolean-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_boolean(0, 0, true, None)?;
+    /// worksheet.write_boolean(1, 0, false, None)?;
+    /// # workbook.close()
+    /// # }
+    /// ```    
     pub fn write_boolean(
         &mut self,
         row: WorksheetRow,
@@ -651,6 +675,24 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// Write a blank cell specified by row and column:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # let mut url_format = workbook.add_format();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_blank(1, 1, Some(&url_format));
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// This function is used to add formatting to a cell which doesn't contain a string or number value.
+    ///
+    /// Excel differentiates between an "Empty" cell and a "Blank" cell. An Empty cell is a cell which doesn't contain data or formatting whilst a Blank cell doesn't contain data but does contain formatting. Excel stores Blank cells but ignores Empty cells.
+    ///
+    /// As such, if you write an empty cell without formatting it is ignored.
     pub fn write_blank(
         &mut self,
         row: WorksheetRow,
@@ -672,6 +714,24 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// Write a blank cell specified by row and column:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # let mut url_format = workbook.add_format();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_blank(1, 1, Some(&url_format));
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// This function is used to add formatting to a cell which doesn't contain a string or number value.
+    ///
+    /// Excel differentiates between an "Empty" cell and a "Blank" cell. An Empty cell is a cell which doesn't contain data or formatting whilst a Blank cell doesn't contain data but does contain formatting. Excel stores Blank cells but ignores Empty cells.
+    ///
+    /// As such, if you write an empty cell without formatting it is ignored.    
     #[allow(clippy::too_many_arguments)]
     pub fn write_formula_num(
         &mut self,
@@ -698,11 +758,52 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function is used to write strings with multiple formats. For example to write the string 'This is bold and this is italic' you would use the following:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_richtext-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// let mut bold = workbook.add_format();
+    /// bold.set_bold();
+    /// let mut italic = workbook.add_format();
+    /// italic.set_italic();
+    /// worksheet.write_rich_string(
+    ///     0, 0,
+    ///     &[
+    ///         ("This is ", None),
+    ///         ("bold", Some(&bold)),
+    ///         (" and this is ", None),
+    ///         ("italic", Some(&italic))
+    ///     ],
+    ///     None
+    /// )?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_richtext-1.png)
+    ///
+    /// The basic rule is to break the string into fragments and put a lxw_format object before the fragment that you want to format. So if we look at the above example again:
+    ///
+    /// This is **bold** and this is *italic*
+    ///
+    /// The would be broken down into 4 fragments:
+    /// ```text
+    /// default: |This is |
+    /// bold:    |bold|
+    /// default: | and this is |
+    /// italic:  |italic|
+    /// ```
+    /// This in then converted to the tuple fragments shown in the example above. For the default format we use None.
+    ///
+    /// ### Note
+    ///  Excel doesn't allow the use of two consecutive formats in a rich string or an empty string fragment. For either of these conditions a warning is raised and the input to `worksheet.write_rich_string()` is ignored.
     pub fn write_rich_string(
         &mut self,
         row: WorksheetRow,
         col: WorksheetCol,
-        text: &[(&str, &Format)],
+        text: &[(&str, Option<&Format>)],
         format: Option<&Format>,
     ) -> Result<(), XlsxError> {
         let mut c_str: Vec<Vec<u8>> = text
@@ -720,7 +821,7 @@ impl<'a> Worksheet<'a> {
             .iter()
             .zip(c_str.iter_mut())
             .map(|(x, y)| libxlsxwriter_sys::lxw_rich_string_tuple {
-                format: x.1.format,
+                format: x.1.map(|z| z.format).unwrap_or(std::ptr::null_mut()),
                 string: y.as_mut_ptr() as *mut i8,
             })
             .collect();
@@ -838,7 +939,26 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    pub fn set_insert_image(
+    /// This function can be used to insert a image into a worksheet. The image can be in PNG, JPEG or BMP format:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_insert_image-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.insert_image(2, 1, "images/simple1.png")?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-insert_image-1.png)
+    ///
+    /// The Worksheet.insert_image_opt() function takes additional optional parameters to position and scale the image, see below.
+    ///
+    /// ### Note
+    /// The scaling of a image may be affected if is crosses a row that has its default height changed due to a font that is larger than the default font size or that has text wrapping turned on. To avoid this you should explicitly set the height of the row using Worksheet.set_row() if it crosses an inserted image.
+    ///
+    /// BMP images are only supported for backward compatibility. In general it is best to avoid BMP images since they aren't compressed. If used, BMP images must be 24 bit, true color, bitmaps.
+    pub fn insert_image(
         &mut self,
         row: WorksheetRow,
         col: WorksheetCol,
@@ -859,7 +979,31 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    pub fn set_insert_image_opt(
+    /// This function is like Worksheet.insert_image() function except that it takes an optional `ImageOptions` struct to scale and position the image:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_insert_image_opt-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.insert_image_opt(
+    ///     2, 1,
+    ///    "images/simple1.png",
+    ///     &ImageOptions{
+    ///         x_offset: 30,
+    ///         y_offset: 30,
+    ///         x_scale: 0.5,
+    ///         y_scale: 0.5,
+    ///     }
+    /// )?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-insert_image_opt-1.png)
+    ///
+    /// ### Note
+    /// See the notes about row scaling and BMP images in Worksheet.insert_image() above.
+    pub fn insert_image_opt(
         &mut self,
         row: WorksheetRow,
         col: WorksheetCol,
@@ -883,7 +1027,20 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    pub fn set_insert_image_buffer(
+    /// This function can be used to insert a image into a worksheet from a memory buffer:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_insert_image_buffer-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// let data = include_bytes!("../images/simple1.png");
+    /// worksheet.insert_image_buffer(0, 0, &data[..])?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// See Worksheet.insert_image() for details about the supported image formats, and other image features.
+    pub fn insert_image_buffer(
         &mut self,
         row: WorksheetRow,
         col: WorksheetCol,
@@ -905,7 +1062,7 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    pub fn set_insert_image_buffer_opt(
+    pub fn insert_image_buffer_opt(
         &mut self,
         row: WorksheetRow,
         col: WorksheetCol,

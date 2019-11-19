@@ -3,6 +3,18 @@ use std::cell::RefCell;
 use std::ffi::CString;
 use std::rc::Rc;
 
+/// The Workbook is the main object exposed by the libxlsxwriter library. It represents the entire spreadsheet as you see it in Excel and internally it represents the Excel file as it is written on disk.
+///
+/// ```rust
+/// use xlsxwriter::*;
+/// # fn main() { let _ = run(); }
+/// fn run() -> Result<(), XlsxError> {
+///     let workbook = Workbook::new("test-workbook.xlsx");
+///     let mut worksheet = workbook.add_worksheet(None)?;
+///     worksheet.write_string(0, 0, "Hello Excel", None)?;
+///     workbook.close()
+/// }
+/// ```
 pub struct Workbook {
     workbook: *mut libxlsxwriter_sys::lxw_workbook,
     _workbook_name: CString,
@@ -83,7 +95,7 @@ impl Workbook {
         }
     }
 
-    pub fn get_format(&self) -> Format {
+    pub fn add_format(&self) -> Format {
         unsafe {
             let format = libxlsxwriter_sys::workbook_add_format(self.workbook);
             if format.is_null() {

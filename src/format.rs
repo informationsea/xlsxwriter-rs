@@ -270,6 +270,9 @@ impl FormatBorder {
     }
 }
 
+/// This Format object has the functions and properties that are available for formatting cells in Excel.
+///
+/// The properties of a cell that can be formatted include: fonts, colors, patterns, borders, alignment and number formatting.
 pub struct Format<'a> {
     pub(crate) _workbook: &'a Workbook,
     pub(crate) format: *mut libxlsxwriter_sys::lxw_format,
