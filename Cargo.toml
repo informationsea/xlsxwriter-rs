@@ -1,11 +1,11 @@
 [package]
 name = "xlsxwriter"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
 readme = "README.md"
 
-description = "Rust binding of libxlsxwriter"
+description = "Write xlsx file with number, formula, string, formatting, autofilter, merged cells, data validation and more."
 repository = "https://github.com/informationsea/xlsxwriter-rs"
 homepage = "https://github.com/informationsea/xlsxwriter-rs"
 
