@@ -294,8 +294,8 @@ impl<'a> Worksheet<'a> {
     /// # fn main() { let _ = run(); }
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx");
-    /// let mut format = workbook.add_format();
-    /// format.set_num_format("$#,##0.00");
+    /// let format = workbook.add_format()
+    ///     .set_num_format("$#,##0.00");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_number(0, 0, 1234.567, Some(&format))?;
     /// # workbook.close()
@@ -348,8 +348,8 @@ impl<'a> Worksheet<'a> {
     /// # fn main() { let _ = run(); }
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx");
-    /// let mut format = workbook.add_format();
-    /// format.set_bold();
+    /// let format = workbook.add_format()
+    ///     .set_bold();
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_string(0, 0, "This phrase is Bold!", Some(&format))?;
     /// # workbook.close()
@@ -512,8 +512,8 @@ impl<'a> Worksheet<'a> {
     /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let datetime = DateTime::new(2013, 2, 28, 12, 0, 0.0);
-    /// let mut datetime_format = workbook.add_format();
-    /// datetime_format.set_num_format("mmm d yyyy hh:mm AM/PM");
+    /// let datetime_format = workbook.add_format()
+    ///     .set_num_format("mmm d yyyy hh:mm AM/PM");
     /// worksheet.write_datetime(1, 0, &datetime, Some(&datetime_format))?;
     /// # workbook.close()
     /// # }
@@ -555,8 +555,8 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let mut url_format = workbook.add_format();
-    /// url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// let url_format = workbook.add_format()
+    ///     .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
     /// # workbook.close()
     /// # }
@@ -569,8 +569,8 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format();
-    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = workbook.add_format()
+    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "ftp://www.python.org/", Some(&url_format))?;
     /// worksheet.write_url(1, 0, "http://www.python.org/", Some(&url_format))?;
     /// worksheet.write_url(2, 0, "https://www.python.org/", Some(&url_format))?;
@@ -586,8 +586,8 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format();
-    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = workbook.add_format()
+    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
     /// worksheet.write_string(0, 0, "Read the documentation.", Some(&url_format))?;
     /// # workbook.close()
@@ -603,8 +603,8 @@ impl<'a> Worksheet<'a> {
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut worksheet2 = workbook.add_worksheet(None)?;
     /// # let mut worksheet3 = workbook.add_worksheet(Some("Sales Data"))?;
-    /// # let mut url_format = workbook.add_format();
-    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = workbook.add_format()
+    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "internal:Sheet2!A1", Some(&url_format))?;
     /// worksheet.write_url(1, 0, "internal:Sheet2!B2", Some(&url_format))?;
     /// worksheet.write_url(2, 0, "internal:Sheet2!A1:B2", Some(&url_format))?;
@@ -682,8 +682,8 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format();
-    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = workbook.add_format()
+    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_blank(1, 1, Some(&url_format));
     /// # workbook.close()
     /// # }
@@ -721,8 +721,8 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format();
-    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = workbook.add_format()
+    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_blank(1, 1, Some(&url_format));
     /// # workbook.close()
     /// # }
@@ -765,10 +765,10 @@ impl<'a> Worksheet<'a> {
     /// # fn run() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_richtext-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let mut bold = workbook.add_format();
-    /// bold.set_bold();
-    /// let mut italic = workbook.add_format();
-    /// italic.set_italic();
+    /// let mut bold = workbook.add_format()
+    ///     .set_bold();
+    /// let mut italic = workbook.add_format()
+    ///     .set_italic();
     /// worksheet.write_rich_string(
     ///     0, 0,
     ///     &[

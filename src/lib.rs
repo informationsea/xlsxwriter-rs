@@ -30,16 +30,14 @@
 //! # fn main() { let _ = run(); }
 //! # fn run() -> Result<(), XlsxError> {
 //! let workbook = Workbook::new("simple1.xlsx");
-//! let mut format1 = workbook.add_format();
-//! format1.set_font_color(FormatColor::Red);
+//! let mut format1 = workbook.add_format()
+//!     .set_font_color(FormatColor::Red);
 //!
-//! let mut format2 = workbook.add_format();
-//! format2
+//! let mut format2 = workbook.add_format()
 //!     .set_font_color(FormatColor::Blue)
 //!     .set_underline(FormatUnderline::Single);
 //!
-//! let mut format3 = workbook.add_format();
-//! format3
+//! let mut format3 = workbook.add_format()
 //!     .set_font_color(FormatColor::Green)
 //!     .set_align(FormatAlignment::CenterAcross)
 //!     .set_align(FormatAlignment::VerticalCenter);
