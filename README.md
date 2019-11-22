@@ -29,16 +29,15 @@ Example
 
 ```rust
 let workbook = Workbook::new("target/simple1.xlsx");
-let mut format1 = workbook.get_format();
-format1.set_font_color(FormatColor::Red);
+let format1 = workbook.add_format().set_font_color(FormatColor::Red);
 
-let mut format2 = workbook.get_format();
-format2
+let format2 = workbook
+    .add_format()
     .set_font_color(FormatColor::Blue)
     .set_underline(FormatUnderline::Single);
 
-let mut format3 = workbook.get_format();
-format3
+let format3 = workbook
+    .add_format()
     .set_font_color(FormatColor::Green)
     .set_align(FormatAlignment::CenterAcross)
     .set_align(FormatAlignment::VerticalCenter);
