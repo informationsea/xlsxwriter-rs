@@ -1,4 +1,4 @@
-use super::{convert_bool, DataValidation, Format, FormatColor, Workbook, XlsxError};
+use super::{convert_bool, Chart, DataValidation, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
@@ -1079,6 +1079,23 @@ impl<'a> Worksheet<'a> {
                 buffer.len(),
                 &mut opt_struct,
             );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn insert_chart(
+        &mut self,
+        row: WorksheetRow,
+        column: WorksheetCol,
+        chart: &Chart,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result =
+                libxlsxwriter_sys::worksheet_insert_chart(self.worksheet, row, column, chart.chart);
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
             } else {

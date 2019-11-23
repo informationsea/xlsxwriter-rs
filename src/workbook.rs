@@ -1,4 +1,4 @@
-use super::{error, Format, Worksheet, XlsxError};
+use super::{error, Chart, ChartType, Format, Worksheet, XlsxError};
 use std::cell::RefCell;
 use std::ffi::CString;
 use std::rc::Rc;
@@ -18,7 +18,7 @@ use std::rc::Rc;
 pub struct Workbook {
     workbook: *mut libxlsxwriter_sys::lxw_workbook,
     _workbook_name: CString,
-    worksheet_names: Rc<RefCell<Vec<Vec<u8>>>>,
+    pub(crate) const_str: Rc<RefCell<Vec<Vec<u8>>>>,
 }
 
 impl Workbook {
@@ -32,7 +32,7 @@ impl Workbook {
             Workbook {
                 workbook: raw_workbook,
                 _workbook_name: workbook_name,
-                worksheet_names: Rc::new(RefCell::new(Vec::new())),
+                const_str: Rc::new(RefCell::new(Vec::new())),
             }
         }
     }
@@ -61,7 +61,7 @@ impl Workbook {
             );
 
             if let Some(name) = name_vec {
-                self.worksheet_names.borrow_mut().push(name);
+                self.const_str.borrow_mut().push(name);
             }
 
             if worksheet.is_null() {
@@ -105,6 +105,20 @@ impl Workbook {
             Format {
                 _workbook: self,
                 format,
+            }
+        }
+    }
+
+    pub fn add_chart(&self, chart_type: ChartType) -> Chart {
+        unsafe {
+            let chart = libxlsxwriter_sys::workbook_add_chart(self.workbook, chart_type.value());
+            if chart.is_null() {
+                unreachable!();
+            }
+
+            Chart {
+                _workbook: self,
+                chart,
             }
         }
     }

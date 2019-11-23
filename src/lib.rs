@@ -66,12 +66,14 @@
 
 extern crate libxlsxwriter_sys;
 
+mod chart;
 mod error;
 mod format;
 mod validation;
 mod workbook;
 mod worksheet;
 
+pub use chart::{Chart, ChartLine, ChartSeries, ChartType};
 pub use error::XlsxError;
 pub use format::{
     Format, FormatAlignment, FormatBorder, FormatColor, FormatPatterns, FormatScript,
@@ -86,6 +88,8 @@ pub use worksheet::{
     Worksheet, WorksheetCol, WorksheetRow,
 };
 
+use std::ffi::CString;
+
 fn convert_bool(value: bool) -> u8 {
     let result = if value {
         libxlsxwriter_sys::lxw_boolean_LXW_TRUE
@@ -93,6 +97,10 @@ fn convert_bool(value: bool) -> u8 {
         libxlsxwriter_sys::lxw_boolean_LXW_FALSE
     };
     result as u8
+}
+
+fn convert_str(value: &str) -> Vec<u8> {
+    CString::new(value).unwrap().as_bytes_with_nul().to_vec()
 }
 
 #[cfg(test)]
