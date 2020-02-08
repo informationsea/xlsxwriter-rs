@@ -1,6 +1,6 @@
 [package]
 name = "xlsxwriter"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
 readme = "README.md"
@@ -19,4 +19,4 @@ maintenance = { status = "experimental" }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libxlsxwriter-sys = {path = "libxlsxwriter-sys", version = "0.8.7"}
+libxlsxwriter-sys = {path = "libxlsxwriter-sys", version = "0.9.4"}

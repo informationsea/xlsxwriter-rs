@@ -14,6 +14,7 @@
 //! * Autofilters.
 //! * Data validation and drop down lists.
 //! * Worksheet PNG/JPEG images.
+//! * Cell comments.
 //!
 //! Coming soon
 //! -----------
