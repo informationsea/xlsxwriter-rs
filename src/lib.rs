@@ -84,8 +84,8 @@ pub use validation::{
 };
 pub use workbook::Workbook;
 pub use worksheet::{
-    DateTime, GridLines, HeaderFooterOptions, ImageOptions, PaperType, Protection, RowColOptions,
-    Worksheet, WorksheetCol, WorksheetRow,
+    CommentOptions, DateTime, GridLines, HeaderFooterOptions, ImageOptions, PaperType, Protection,
+    RowColOptions, Worksheet, WorksheetCol, WorksheetRow,
 };
 
 use std::ffi::CString;
