@@ -272,6 +272,39 @@ pub struct Worksheet<'a> {
 }
 
 impl<'a> Worksheet<'a> {
+    /// This function writes the comment of a cell
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_comment-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_comment(0, 0, "This is some comment text")?;
+    /// worksheet.write_comment(1, 0, "This cell also has a comment")?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    pub fn write_comment(
+        &mut self,
+        row: WorksheetRow,
+        col: WorksheetCol,
+        text: &str,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_write_comment(
+                self.worksheet,
+                row,
+                col,
+                CString::new(text).unwrap().as_c_str().as_ptr(),
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
     /// This function writes numeric types to the cell specified by row and column:
     /// ```rust
     /// # use xlsxwriter::*;
