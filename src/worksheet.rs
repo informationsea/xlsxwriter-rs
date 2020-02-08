@@ -249,6 +249,7 @@ pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
 ///
 /// The maximum column in Excel is 16,384.
 pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
+pub type CommentOptions = libxlsxwriter_sys::lxw_comment_options;
 pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
 
 /// The Worksheet object represents an Excel worksheet. It handles operations such as writing data to cells or formatting worksheet layout.
@@ -296,6 +297,29 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 CString::new(text).unwrap().as_c_str().as_ptr(),
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn write_comment_opt(
+        &mut self,
+        row: WorksheetRow,
+        col: WorksheetCol,
+        text: &str,
+        options: &mut CommentOptions,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_write_comment_opt(
+                self.worksheet,
+                row,
+                col,
+                CString::new(text).unwrap().as_c_str().as_ptr(),
+                options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
