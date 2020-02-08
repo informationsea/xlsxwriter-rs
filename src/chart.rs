@@ -135,7 +135,7 @@ impl ChartLine {
             width: self.width,
             dash_type: self.dash_type.value(),
             transparency: self.transparency,
-            has_color: convert_bool(false),
+            //has_color: convert_bool(false),
         }
     }
 }
@@ -173,7 +173,7 @@ impl ChartFill {
             color: self.color.value(),
             none: convert_bool(self.none),
             transparency: self.transparency,
-            has_color: convert_bool(false),
+            //has_color: convert_bool(false),
         }
     }
 }

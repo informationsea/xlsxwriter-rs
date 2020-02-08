@@ -17,7 +17,7 @@
 //!
 //! Coming soon
 //! -----------
-//! * Chars.
+//! * Charts.
 //!
 //! Examples
 //! --------
