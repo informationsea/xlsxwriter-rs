@@ -1,5 +1,6 @@
 use super::{convert_bool, Chart, DataValidation, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
+use std::convert::TryInto;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct DateTime {
@@ -1110,7 +1111,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 buffer.as_ptr(),
-                buffer.len(),
+                buffer.len().try_into().unwrap(),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1134,7 +1135,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 buffer.as_ptr(),
-                buffer.len(),
+                buffer.len().try_into().unwrap(),
                 &mut opt_struct,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
