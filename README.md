@@ -59,3 +59,13 @@ sheet1.set_tab_color(FormatColor::Cyan);
 workbook.close()?;
 ```
 
+Run Example with Cargo
+-------
+You can explore this example locally following the steps below:
+
+1. clone or fork this repository
+2. `git submodule update --init --recursive`
+    - The above command downloads the required C library so we can compile
+3. `cargo run --example hello_spreadsheet`
+
+You should then see the example in `target/simple1.xlsx`. Enjoy!
