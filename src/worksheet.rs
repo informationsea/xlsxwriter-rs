@@ -59,27 +59,9 @@ impl Into<libxlsxwriter_sys::lxw_image_options> for &ImageOptions {
             x_scale: self.x_scale,
             y_scale: self.y_scale,
             object_position: 0,
-            //row: 0,
-            //col: 0,
-            //filename: std::ptr::null_mut(),
             description: std::ptr::null_mut(),
             url: std::ptr::null_mut(),
             tip: std::ptr::null_mut(),
-            //anchor: 0,
-            //stream: std::ptr::null_mut(),
-            //image_type: 0,
-            //is_image_buffer: 0,
-            //image_buffer: std::ptr::null_mut(),
-            //image_buffer_size: 0,
-            //width: 0.,
-            //height: 0.,
-            //extension: std::ptr::null_mut(),
-            //x_dpi: 0.,
-            //y_dpi: 0.,
-            //chart: std::ptr::null_mut(),
-            //list_pointers: libxlsxwriter_sys::lxw_image_options__bindgen_ty_1 {
-            //    stqe_next: std::ptr::null_mut(),
-            //},
         }
     }
 }
@@ -234,9 +216,6 @@ impl Into<libxlsxwriter_sys::lxw_protection> for &Protection {
             objects: convert_bool(self.objects),
             no_content: convert_bool(self.no_content),
             no_objects: convert_bool(self.no_objects),
-            //no_sheet: convert_bool(false),
-            //is_configured: convert_bool(false),
-            //hash: [0; 5],
         }
     }
 }
