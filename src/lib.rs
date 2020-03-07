@@ -14,10 +14,11 @@
 //! * Autofilters.
 //! * Data validation and drop down lists.
 //! * Worksheet PNG/JPEG images.
+//! * Cell comments.
 //!
 //! Coming soon
 //! -----------
-//! * Chars.
+//! * Charts.
 //!
 //! Examples
 //! --------
@@ -84,8 +85,8 @@ pub use validation::{
 };
 pub use workbook::Workbook;
 pub use worksheet::{
-    DateTime, GridLines, HeaderFooterOptions, ImageOptions, PaperType, Protection, RowColOptions,
-    Worksheet, WorksheetCol, WorksheetRow,
+    CommentOptions, DateTime, GridLines, HeaderFooterOptions, ImageOptions, PaperType, Protection,
+    RowColOptions, Worksheet, WorksheetCol, WorksheetRow,
 };
 
 use std::ffi::CString;

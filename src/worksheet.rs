@@ -228,6 +228,7 @@ pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
 ///
 /// The maximum column in Excel is 16,384.
 pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
+pub type CommentOptions = libxlsxwriter_sys::lxw_comment_options;
 pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
 
 /// The Worksheet object represents an Excel worksheet. It handles operations such as writing data to cells or formatting worksheet layout.
@@ -251,6 +252,62 @@ pub struct Worksheet<'a> {
 }
 
 impl<'a> Worksheet<'a> {
+    /// This function writes the comment of a cell
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() { let _ = run(); }
+    /// # fn run() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_comment-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_comment(0, 0, "This is some comment text")?;
+    /// worksheet.write_comment(1, 0, "This cell also has a comment")?;
+    /// # workbook.close()
+    /// # }
+    /// ```
+    pub fn write_comment(
+        &mut self,
+        row: WorksheetRow,
+        col: WorksheetCol,
+        text: &str,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_write_comment(
+                self.worksheet,
+                row,
+                col,
+                CString::new(text).unwrap().as_c_str().as_ptr(),
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn write_comment_opt(
+        &mut self,
+        row: WorksheetRow,
+        col: WorksheetCol,
+        text: &str,
+        options: &mut CommentOptions,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_write_comment_opt(
+                self.worksheet,
+                row,
+                col,
+                CString::new(text).unwrap().as_c_str().as_ptr(),
+                options,
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
     /// This function writes numeric types to the cell specified by row and column:
     /// ```rust
     /// # use xlsxwriter::*;
@@ -631,7 +688,7 @@ impl<'a> Worksheet<'a> {
     /// worksheet.write_boolean(1, 0, false, None)?;
     /// # workbook.close()
     /// # }
-    /// ```    
+    /// ```
     pub fn write_boolean(
         &mut self,
         row: WorksheetRow,
@@ -711,7 +768,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// Excel differentiates between an "Empty" cell and a "Blank" cell. An Empty cell is a cell which doesn't contain data or formatting whilst a Blank cell doesn't contain data but does contain formatting. Excel stores Blank cells but ignores Empty cells.
     ///
-    /// As such, if you write an empty cell without formatting it is ignored.    
+    /// As such, if you write an empty cell without formatting it is ignored.
     #[allow(clippy::too_many_arguments)]
     pub fn write_formula_num(
         &mut self,
