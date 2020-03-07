@@ -102,6 +102,8 @@ matrix:
 # For simple configurations, instead of using the build matrix, you can simply set the
 # default-toolchain and default-host manually here.
 install:
+  - git submodule init
+  - git submodule update
   - appveyor DownloadFile https://win.rustup.rs/ -FileName rustup-init.exe
   - rustup-init -yv --default-toolchain %channel% --default-host %target%
   - set PATH=%PATH%;%USERPROFILE%\.cargo\bin
@@ -119,7 +121,3 @@ build: false
 # environment variable.
 test_script:
   - cargo test --verbose %cargoflags%
-
-before_build:
-  - git submodule init
-  - git submodule update
