@@ -20,12 +20,12 @@ pub enum FormatColor {
     Silver,
     White,
     Yellow,
-    Custom(i32),
+    Custom(u32),
 }
 
 #[allow(clippy::unreadable_literal)]
 impl FormatColor {
-    pub fn value(self) -> i32 {
+    pub fn value(self) -> u32 {
         match self {
             FormatColor::Black => 0x1000000,
             FormatColor::Blue => 0x0000FF,

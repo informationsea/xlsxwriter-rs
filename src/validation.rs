@@ -240,7 +240,6 @@ impl DataValidation {
                 show_error: convert_bool(self.show_error),
                 error_type: self.error_type.value(),
                 dropdown: convert_bool(self.dropdown),
-                is_between: convert_bool(false),
                 value_number: self.value_number,
                 value_formula: value_formula
                     .as_mut()
@@ -279,10 +278,6 @@ impl DataValidation {
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
                     .unwrap_or(std::ptr::null_mut()) as *mut i8,
-                sqref: [0; 28],
-                list_pointers: libxlsxwriter_sys::lxw_data_validation__bindgen_ty_1 {
-                    stqe_next: std::ptr::null_mut(),
-                },
             },
 
             value_formula,

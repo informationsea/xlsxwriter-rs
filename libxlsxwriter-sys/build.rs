@@ -5,13 +5,15 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-const C_FILES: [&str; 36] = [
+const C_FILES: [&str; 39] = [
     "third_party/libxlsxwriter/third_party/tmpfileplus/tmpfileplus.c",
     "third_party/libxlsxwriter/third_party/minizip/ioapi.c",
     "third_party/libxlsxwriter/third_party/minizip/zip.c",
+    "third_party/libxlsxwriter/third_party/md5/md5.c",
     "third_party/libxlsxwriter/src/app.c",
     "third_party/libxlsxwriter/src/chart.c",
     "third_party/libxlsxwriter/src/chartsheet.c",
+    "third_party/libxlsxwriter/src/comment.c",
     "third_party/libxlsxwriter/src/content_types.c",
     "third_party/libxlsxwriter/src/core.c",
     "third_party/libxlsxwriter/src/custom.c",
@@ -24,6 +26,7 @@ const C_FILES: [&str; 36] = [
     "third_party/libxlsxwriter/src/styles.c",
     "third_party/libxlsxwriter/src/theme.c",
     "third_party/libxlsxwriter/src/utility.c",
+    "third_party/libxlsxwriter/src/vml.c",
     "third_party/libxlsxwriter/src/workbook.c",
     "third_party/libxlsxwriter/src/worksheet.c",
     "third_party/libxlsxwriter/src/xmlwriter.c",
@@ -84,6 +87,7 @@ fn main() -> io::Result<()> {
         .whitelist_function("^(chart|chartsheet|workbook|worksheet|format|lxw)_.*")
         .whitelist_type("^lxw_.*")
         .whitelist_var("^lxw_.*")
+        .blacklist_function("_get_image_properties")
         .generate()
         .expect("Unable to generate bindings");
 
