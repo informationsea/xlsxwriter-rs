@@ -932,7 +932,7 @@ impl<'a> Worksheet<'a> {
         &mut self,
         first_col: WorksheetCol,
         last_col: WorksheetCol,
-        height: f64,
+        width: f64,
         format: Option<&Format>,
     ) -> Result<(), XlsxError> {
         unsafe {
@@ -940,7 +940,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 first_col,
                 last_col,
-                height,
+                width,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -955,7 +955,7 @@ impl<'a> Worksheet<'a> {
         &mut self,
         first_col: WorksheetCol,
         last_col: WorksheetCol,
-        height: f64,
+        width: f64,
         format: Option<&Format>,
         options: &mut RowColOptions,
     ) -> Result<(), XlsxError> {
@@ -964,7 +964,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 first_col,
                 last_col,
-                height,
+                width,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
                 options,
             );
