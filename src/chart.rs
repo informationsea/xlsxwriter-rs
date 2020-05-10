@@ -199,8 +199,7 @@ impl<'a> ChartSeries<'a> {
     /// The `ChartSeries.set_categories()` function is an alternative method that is easier to generate programmatically. It requires that you set the categories and values parameters in Chart.add_series() to `None` and then set them using row and column values in ChartSeries.set_categories() and ChartSeries.set_values():
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_categories-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -270,8 +269,7 @@ impl<'a> ChartSeries<'a> {
     ///
     /// ```rust
     /// use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_name-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -297,8 +295,7 @@ impl<'a> ChartSeries<'a> {
     /// The name parameter can also be a formula such as =Sheet1!$A$1 to point to a cell in the workbook that contains the name:
     /// ```rust
     /// use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_name-2.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -334,8 +331,7 @@ impl<'a> ChartSeries<'a> {
     /// The `ChartSeries.set_name_range()` function can be used to set a series name range and is an alternative to using `ChartSeries.set_name()` and a string formula:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_name_range-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -373,8 +369,7 @@ impl<'a> ChartSeries<'a> {
     /// Set the line/border properties of a chart series:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_line-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -412,8 +407,7 @@ impl<'a> ChartSeries<'a> {
     /// Set the fill properties of a chart series:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_fill-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -455,8 +449,7 @@ impl<'a> ChartSeries<'a> {
     /// Invert the fill color for negative values. Usually only applicable to column and bar charts.
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart_series-set_invert_if_negative-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -504,8 +497,7 @@ impl<'a> ChartSeries<'a> {
 /// A Chart object isn't created directly. Instead a chart is created by calling the Workbook.add_chart() function from a Workbook object. For example:
 /// ```rust
 /// use xlsxwriter::*;
-/// # fn main() { let _ = run(); }
-/// # fn run() -> Result<(), XlsxError> {
+/// # fn main() -> Result<(), XlsxError> {
 /// let workbook = Workbook::new("test-chart.xlsx");
 /// let mut worksheet = workbook.add_worksheet(None)?;
 /// write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -546,8 +538,7 @@ impl<'a> Chart<'a> {
     /// For an libxlsxwriter chart object the chart_add_series() function is used to set the categories and values of the series:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart-add_series-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -569,8 +560,7 @@ impl<'a> Chart<'a> {
     /// *categories: This sets the chart category labels. The category is more or less the same as the X axis. In most Excel chart types the categories property is optional and the chart will just assume a sequential series from 1..n:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart-add_series-2.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -592,8 +582,7 @@ impl<'a> Chart<'a> {
     /// The categories and values should be a string formula like "=Sheet1!$A$2:$A$7" in the same way it is represented in Excel. This is convenient when recreating a chart from an example in Excel but it is trickier to generate programmatically. For these cases you can set the categories and values to None and use the ChartSeries.set_categories() and ChartSeries.set_values() functions:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart-add_series-3.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -618,8 +607,7 @@ impl<'a> Chart<'a> {
     ///
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart-add_series-4.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
@@ -642,8 +630,7 @@ impl<'a> Chart<'a> {
     /// It is also possible to specify non-contiguous ranges:
     /// ```rust
     /// # use xlsxwriter::*;
-    /// # fn main() { let _ = run(); }
-    /// # fn run() -> Result<(), XlsxError> {
+    /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-chart-add_series-5.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents

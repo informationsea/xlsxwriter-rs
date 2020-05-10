@@ -28,8 +28,7 @@
 //! ```rust
 //! use xlsxwriter::*;
 //!
-//! # fn main() { let _ = run(); }
-//! # fn run() -> Result<(), XlsxError> {
+//! # fn main() -> Result<(), XlsxError> {
 //! let workbook = Workbook::new("simple1.xlsx");
 //! let mut format1 = workbook.add_format()
 //!     .set_font_color(FormatColor::Red);

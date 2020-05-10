@@ -7,8 +7,7 @@ use std::rc::Rc;
 ///
 /// ```rust
 /// use xlsxwriter::*;
-/// # fn main() { let _ = run(); }
-/// fn run() -> Result<(), XlsxError> {
+/// fn main() -> Result<(), XlsxError> {
 ///     let workbook = Workbook::new("test-workbook.xlsx");
 ///     let mut worksheet = workbook.add_worksheet(None)?;
 ///     worksheet.write_string(0, 0, "Hello Excel", None)?;
