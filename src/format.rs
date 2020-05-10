@@ -96,6 +96,7 @@ impl FormatScript {
 pub enum FormatAlignment {
     None,
     Left,
+    Center,
     Right,
     Fill,
     Justify,
@@ -113,6 +114,7 @@ impl FormatAlignment {
         let value = match self {
             FormatAlignment::None => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_NONE,
             FormatAlignment::Left => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_LEFT,
+            FormatAlignment::Center => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_CENTER,
             FormatAlignment::Right => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_RIGHT,
             FormatAlignment::Fill => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_FILL,
             FormatAlignment::Justify => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_JUSTIFY,
