@@ -28,6 +28,8 @@ jobs:
           ${{ runner.os }}-build-${{ env.cache-name }}-
           ${{ runner.os }}-build-
           ${{ runner.os }}-
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
     - name: Cache target
       uses: actions/cache@v2
       env:
