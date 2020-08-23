@@ -49,9 +49,9 @@ jobs:
     - name: Build
       run: cargo build
       env:
-        PATH: ${{ 'C:\Program Files\LLVM\bin;' + env.PATH }}
+        PATH: ${{ format('C:\Program Files\LLVM\bin;{0}', env.PATH) }}
     - name: Run tests
       run: cargo test --verbose
       env:
-        PATH: ${{ 'C:\Program Files\LLVM\bin;' + env.PATH }}
+        PATH: ${{ format('C:\Program Files\LLVM\bin;{0}', env.PATH) }}
 
