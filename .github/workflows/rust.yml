@@ -1,0 +1,46 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  win-mac-build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [mac-latest, windows-latest, linux-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-cargo
+      with:
+        path: ~/.cargo/registry
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.crate') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Cache target
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-target
+      with:
+        path: target
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.crate') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Build
+      run: cargo build
+    - name: Run tests
+      run: cargo test --verbose
+
