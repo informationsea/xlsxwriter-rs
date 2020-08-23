@@ -48,6 +48,10 @@ jobs:
             .\LLVM-10.0.0-win64.exe -S
     - name: Build
       run: cargo build
+      env:
+        PATH: ${{ 'C:\Program Files\LLVM\bin;' + env.PATH }}
     - name: Run tests
       run: cargo test --verbose
+      env:
+        PATH: ${{ 'C:\Program Files\LLVM\bin;' + env.PATH }}
 
