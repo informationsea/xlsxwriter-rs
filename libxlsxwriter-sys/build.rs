@@ -64,6 +64,8 @@ fn main() -> io::Result<()> {
     let mut build = cc::Build::new();
     build
         .include("third_party/libxlsxwriter/include")
+        .flag_if_supported("-Wno-implicit-function-declaration")
+        .flag_if_supported("-Wno-unused-parameter")
         .include("third_party/zlib");
     for path in &C_FILES[..] {
         assert_file_exists(path)?;
