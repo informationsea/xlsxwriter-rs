@@ -1,8 +1,8 @@
-name: Rust
+name: Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, test-actions ]
   pull_request:
     branches: [ master ]
 
@@ -10,13 +10,50 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  win-mac-build:
-    runs-on: ${{ matrix.os }}
+  build:
+    runs-on: ${{ matrix.config.os }}
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        config:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            test: true
+            cross: false
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            test: true
+            cross: false
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            test: true
+            cross: false
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            test: true
+            cross: false
     steps:
+    - name: Git config
+      if: ${{ matrix.config.os == 'windows-latest' }}
+      run: git config --global core.autocrlf input
     - uses: actions/checkout@v2
+    - name: Install LLVM Windows
+      if: ${{ matrix.config.os == 'windows-latest' }}
+      run: choco install llvm
+    - name: Install LLVM Ubuntu
+      if: ${{ matrix.config.os == 'ubuntu-latest' }}
+      run: sudo apt-get install libclang-dev llvm-dev
+    - name: Install musl tools
+      if: ${{ matrix.config.target == 'x86_64-unknown-linux-musl' }}
+      run: sudo apt-get install musl-tools musl-dev
+    - name: Checkout submodule
+      run: git submodule update --init --recursive
+    - name: Install rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: ${{ matrix.config.target }}
+        override: true
+        components: rustfmt, clippy
     - name: Cache dependencies
       uses: actions/cache@v2
       env:
@@ -26,32 +63,18 @@ jobs:
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.crate') }}
         restore-keys: |
           ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - name: Checkout submodules
-      run: git submodule update --init --recursive
     - name: Cache target
       uses: actions/cache@v2
       env:
         cache-name: cache-target
       with:
         path: target
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.crate') }}
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.config.target }}-${{ hashFiles('**/*.o') }}
         restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - name: Install LLVM
-      if: ${{ matrix.os == 'windows-latest' }}
-      run: |
-            curl -OL "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/LLVM-10.0.0-win64.exe"
-            .\LLVM-10.0.0-win64.exe -S
-    - name: Build
-      run: cargo build
-      env:
-        PATH: ${{ format('C:\Program Files\LLVM\bin;{0}', env.PATH) }}
-    - name: Run tests
-      run: cargo test --verbose
-      env:
-        PATH: ${{ format('C:\Program Files\LLVM\bin;{0}', env.PATH) }}
-
+          ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.config.target }}
+    - name: Test
+      if: ${{ matrix.config.test }}
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --release --target ${{ matrix.config.target }}
