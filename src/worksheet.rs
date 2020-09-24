@@ -116,6 +116,9 @@ impl Into<libxlsxwriter_sys::lxw_header_footer_options> for &HeaderFooterOptions
     fn into(self) -> libxlsxwriter_sys::lxw_header_footer_options {
         libxlsxwriter_sys::lxw_header_footer_options {
             margin: self.margin,
+            image_left: std::ptr::null_mut(),
+            image_center: std::ptr::null_mut(),
+            image_right: std::ptr::null_mut(),
         }
     }
 }

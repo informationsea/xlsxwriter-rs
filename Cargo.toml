@@ -19,4 +19,4 @@ maintenance = { status = "experimental" }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libxlsxwriter-sys = {path = "libxlsxwriter-sys", version = "0.9.4"}
+libxlsxwriter-sys = {path = "libxlsxwriter-sys", version = "^1.0.0"}
