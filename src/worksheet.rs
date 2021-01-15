@@ -1069,7 +1069,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 buffer.as_ptr(),
-                buffer.len() as u64,
+                buffer.len() as libxlsxwriter_sys::size_t,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1093,7 +1093,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 buffer.as_ptr(),
-                buffer.len() as u64,
+                buffer.len() as libxlsxwriter_sys::size_t,
                 &mut opt_struct,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
