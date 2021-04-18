@@ -19,6 +19,10 @@ jobs:
             target: x86_64-pc-windows-msvc
             test: true
             cross: false
+          - os: windows-i686-latest
+            target: i686-pc-windows-msvc
+            test: true
+            cross: false
           - os: macos-latest
             target: x86_64-apple-darwin
             test: true
