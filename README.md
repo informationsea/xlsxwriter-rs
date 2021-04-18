@@ -65,9 +65,10 @@ Run Example with Cargo
 -------
 You can explore this example locally following the steps below:
 
-1. clone or fork this repository
-2. `git submodule update --init --recursive`
+1. Install LLVM and set LIBCLANG_PATH if you are using windows. (see [bindgen doc](https://rust-lang.github.io/rust-bindgen/requirements.html#clang) for details)
+2. clone or fork this repository
+3. `git submodule update --init --recursive`
     - The above command downloads the required C library so we can compile
-3. `cargo run --example hello_spreadsheet`
+4. `cargo run --example hello_spreadsheet`
 
 You should then see the example in `target/simple1.xlsx`. Enjoy!
