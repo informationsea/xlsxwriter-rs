@@ -3,7 +3,7 @@ name = "xlsxwriter"
 version = "0.3.3"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
-readme = "README.md"
+readme = "../README.md"
 
 description = "Write xlsx file with number, formula, string, formatting, autofilter, merged cells, data validation and more."
 repository = "https://github.com/informationsea/xlsxwriter-rs"
