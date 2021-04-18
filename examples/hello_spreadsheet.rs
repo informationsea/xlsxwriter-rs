@@ -29,5 +29,5 @@ fn main() -> Result<(), xlsxwriter::XlsxError> {
 
     sheet1.set_selection(1, 0, 1, 2);
     sheet1.set_tab_color(FormatColor::Cyan);
-    Ok(workbook.close()?)
+    workbook.close()
 }

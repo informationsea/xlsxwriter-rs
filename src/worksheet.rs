@@ -24,15 +24,15 @@ impl DateTime {
     }
 }
 
-impl Into<libxlsxwriter_sys::lxw_datetime> for &DateTime {
-    fn into(self) -> libxlsxwriter_sys::lxw_datetime {
+impl From<&DateTime> for libxlsxwriter_sys::lxw_datetime {
+    fn from(datetime: &DateTime) -> Self {
         libxlsxwriter_sys::lxw_datetime {
-            year: self.year.into(),
-            month: self.month.into(),
-            day: self.day.into(),
-            hour: self.hour.into(),
-            min: self.min.into(),
-            sec: self.second,
+            year: datetime.year.into(),
+            month: datetime.month.into(),
+            day: datetime.day.into(),
+            hour: datetime.hour.into(),
+            min: datetime.min.into(),
+            sec: datetime.second,
         }
     }
 }
@@ -50,13 +50,13 @@ pub struct ImageOptions {
     pub y_scale: f64,
 }
 
-impl Into<libxlsxwriter_sys::lxw_image_options> for &ImageOptions {
-    fn into(self) -> libxlsxwriter_sys::lxw_image_options {
+impl From<&ImageOptions> for libxlsxwriter_sys::lxw_image_options {
+    fn from(options: &ImageOptions) -> Self {
         libxlsxwriter_sys::lxw_image_options {
-            x_offset: self.x_offset,
-            y_offset: self.y_offset,
-            x_scale: self.x_scale,
-            y_scale: self.y_scale,
+            x_offset: options.x_offset,
+            y_offset: options.y_offset,
+            x_scale: options.x_scale,
+            y_scale: options.y_scale,
             description: std::ptr::null_mut(),
             url: std::ptr::null_mut(),
             tip: std::ptr::null_mut(),
@@ -113,10 +113,10 @@ pub struct HeaderFooterOptions {
     pub margin: f64,
 }
 
-impl Into<libxlsxwriter_sys::lxw_header_footer_options> for &HeaderFooterOptions {
-    fn into(self) -> libxlsxwriter_sys::lxw_header_footer_options {
+impl From<&HeaderFooterOptions> for libxlsxwriter_sys::lxw_header_footer_options {
+    fn from(options: &HeaderFooterOptions) -> libxlsxwriter_sys::lxw_header_footer_options {
         libxlsxwriter_sys::lxw_header_footer_options {
-            margin: self.margin,
+            margin: options.margin,
             image_left: std::ptr::null_mut(),
             image_center: std::ptr::null_mut(),
             image_right: std::ptr::null_mut(),
@@ -199,26 +199,26 @@ impl Default for Protection {
     }
 }
 
-impl Into<libxlsxwriter_sys::lxw_protection> for &Protection {
-    fn into(self) -> libxlsxwriter_sys::lxw_protection {
+impl From<&Protection> for libxlsxwriter_sys::lxw_protection {
+    fn from(protection: &Protection) -> libxlsxwriter_sys::lxw_protection {
         libxlsxwriter_sys::lxw_protection {
-            no_select_locked_cells: convert_bool(self.no_select_locked_cells),
-            no_select_unlocked_cells: convert_bool(self.no_select_unlocked_cells),
-            format_cells: convert_bool(self.format_cells),
-            format_columns: convert_bool(self.format_columns),
-            format_rows: convert_bool(self.format_rows),
-            insert_columns: convert_bool(self.insert_columns),
-            insert_rows: convert_bool(self.insert_rows),
-            insert_hyperlinks: convert_bool(self.insert_hyperlinks),
-            delete_columns: convert_bool(self.delete_columns),
-            delete_rows: convert_bool(self.delete_rows),
-            sort: convert_bool(self.sort),
-            autofilter: convert_bool(self.autofilter),
-            pivot_tables: convert_bool(self.pivot_tables),
-            scenarios: convert_bool(self.scenarios),
-            objects: convert_bool(self.objects),
-            no_content: convert_bool(self.no_content),
-            no_objects: convert_bool(self.no_objects),
+            no_select_locked_cells: convert_bool(protection.no_select_locked_cells),
+            no_select_unlocked_cells: convert_bool(protection.no_select_unlocked_cells),
+            format_cells: convert_bool(protection.format_cells),
+            format_columns: convert_bool(protection.format_columns),
+            format_rows: convert_bool(protection.format_rows),
+            insert_columns: convert_bool(protection.insert_columns),
+            insert_rows: convert_bool(protection.insert_rows),
+            insert_hyperlinks: convert_bool(protection.insert_hyperlinks),
+            delete_columns: convert_bool(protection.delete_columns),
+            delete_rows: convert_bool(protection.delete_rows),
+            sort: convert_bool(protection.sort),
+            autofilter: convert_bool(protection.autofilter),
+            pivot_tables: convert_bool(protection.pivot_tables),
+            scenarios: convert_bool(protection.scenarios),
+            objects: convert_bool(protection.objects),
+            no_content: convert_bool(protection.no_content),
+            no_objects: convert_bool(protection.no_objects),
         }
     }
 }
