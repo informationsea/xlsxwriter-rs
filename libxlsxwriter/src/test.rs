@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn test_simple1() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("target/simple1.xlsx");
+    let workbook = Workbook::new("../target/simple1.xlsx");
     let format1 = workbook.add_format().set_font_color(FormatColor::Red);
 
     let format2 = workbook
@@ -37,7 +37,7 @@ fn test_simple1() -> Result<(), XlsxError> {
 
 #[test]
 fn test_sample1() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("target/test.xlsx");
+    let workbook = Workbook::new("../target/test.xlsx");
 
     let format1 = workbook
         .add_format()

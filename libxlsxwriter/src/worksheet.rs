@@ -966,7 +966,7 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_insert_image-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// worksheet.insert_image(2, 1, "images/simple1.png")?;
+    /// worksheet.insert_image(2, 1, "../images/simple1.png")?;
     /// # workbook.close()
     /// # }
     /// ```
@@ -1007,7 +1007,7 @@ impl<'a> Worksheet<'a> {
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.insert_image_opt(
     ///     2, 1,
-    ///    "images/simple1.png",
+    ///    "../images/simple1.png",
     ///     &ImageOptions{
     ///         x_offset: 30,
     ///         y_offset: 30,
@@ -1052,7 +1052,7 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_insert_image_buffer-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let data = include_bytes!("../images/simple1.png");
+    /// let data = include_bytes!("../../images/simple1.png");
     /// worksheet.insert_image_buffer(0, 0, &data[..])?;
     /// # workbook.close()
     /// # }

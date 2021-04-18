@@ -1,22 +1,2 @@
-[package]
-name = "xlsxwriter"
-version = "0.3.2"
-authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
-edition = "2018"
-readme = "README.md"
-
-description = "Write xlsx file with number, formula, string, formatting, autofilter, merged cells, data validation and more."
-repository = "https://github.com/informationsea/xlsxwriter-rs"
-homepage = "https://github.com/informationsea/xlsxwriter-rs"
-
-keywords = ["excel", "xlsx"]
-categories = ["api-bindings", "encoding", "text-processing"]
-license = "Apache-2.0"
-
-[badges]
-travis-ci = { repository = "informationsea/xlsxwriter-rs", branch = "master" }
-maintenance = { status = "experimental" }
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-libxlsxwriter-sys = {path = "libxlsxwriter-sys", version = "^1.0.0"}
+[workspace]
+members = ["libxlsxwriter", "libxlsxwriter-sys"]
