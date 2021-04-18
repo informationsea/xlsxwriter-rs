@@ -61,6 +61,7 @@ impl Into<libxlsxwriter_sys::lxw_image_options> for &ImageOptions {
             url: std::ptr::null_mut(),
             tip: std::ptr::null_mut(),
             object_position: 0,
+            decorative: 0,
         }
     }
 }

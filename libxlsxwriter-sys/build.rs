@@ -86,10 +86,10 @@ fn main() -> io::Result<()> {
         .generate_comments(false)
         .clang_arg("-Iinclude")
         .header("wrapper.h")
-        .whitelist_function("^(chart|chartsheet|workbook|worksheet|format|lxw)_.*")
-        .whitelist_type("^lxw_.*")
-        .whitelist_var("^lxw_.*")
-        .blacklist_function("_get_image_properties")
+        .allowlist_function("^(chart|chartsheet|workbook|worksheet|format|lxw)_.*")
+        .allowlist_type("^lxw_.*")
+        .allowlist_var("^lxw_.*")
+        .blocklist_function("_get_image_properties")
         .generate()
         .expect("Unable to generate bindings");
 
