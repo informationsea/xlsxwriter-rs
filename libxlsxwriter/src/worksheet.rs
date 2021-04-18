@@ -787,6 +787,50 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function writes a formula or Excel function to the cell specified by row and column with a user defined string result:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_write_formula_str-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # let mut url_format = workbook.add_format()
+    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// worksheet.write_formula_str(1, 1, "=\"A\" & \"B\"", None, "AB");
+    /// # workbook.close()
+    /// # }
+    /// ```
+    /// The worksheet_write_formula_str() function is similar to the worksheet_write_formula_num() function except it
+    /// writes a string result instead or a numeric result. See worksheet_write_formula_num() for more details on
+    /// why/when these functions are required.
+    ///
+    /// One place where the worksheet_write_formula_str() function may be required is to specify an empty result which
+    /// will force a recalculation of the formula when loaded in LibreOffice.
+    #[allow(clippy::too_many_arguments)]
+    pub fn write_formula_str(
+        &mut self,
+        row: WorksheetRow,
+        col: WorksheetCol,
+        formula: &str,
+        format: Option<&Format>,
+        result: &str,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_write_formula_str(
+                self.worksheet,
+                row,
+                col,
+                CString::new(formula).unwrap().as_c_str().as_ptr(),
+                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                CString::new(result).unwrap().as_c_str().as_ptr(),
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
     /// This function is used to write strings with multiple formats. For example to write the string 'This is bold and this is italic' you would use the following:
     /// ```rust
     /// # use xlsxwriter::*;
