@@ -43,6 +43,10 @@ jobs:
     - name: Install LLVM Windows
       if: ${{ matrix.config.os == 'windows-latest' }}
       run: choco install llvm
+    - name: Setup LLVM path
+      if: ${{ matrix.config.os == 'windows-latest' }}
+      run: |
+        echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" >> $GITHUB_ENV
     - name: Install LLVM Ubuntu
       if: ${{ matrix.config.os == 'ubuntu-latest' }}
       run: sudo apt-get install libclang-dev llvm-dev
