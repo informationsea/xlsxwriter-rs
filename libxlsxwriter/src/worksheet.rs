@@ -737,23 +737,30 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    /// Write a blank cell specified by row and column:
+    /// This function writes a formula or Excel function to the cell specified by row and column with a user defined numeric result:
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_formula_num-1.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut url_format = workbook.add_format()
     /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
-    /// worksheet.write_blank(1, 1, Some(&url_format));
+    /// worksheet.write_formula_num(1, 1, "=1 + 2", None, 3.0);
     /// # workbook.close()
     /// # }
     /// ```
-    /// This function is used to add formatting to a cell which doesn't contain a string or number value.
+    /// Libxlsxwriter doesn't calculate the value of a formula and instead stores the value 0 as the formula result.
+    /// It then sets a global flag in the XLSX file to say that all formulas and functions should be recalculated when the file is opened.
     ///
-    /// Excel differentiates between an "Empty" cell and a "Blank" cell. An Empty cell is a cell which doesn't contain data or formatting whilst a Blank cell doesn't contain data but does contain formatting. Excel stores Blank cells but ignores Empty cells.
+    /// This is the method recommended in the Excel documentation and in general it works fine with spreadsheet applications.
     ///
-    /// As such, if you write an empty cell without formatting it is ignored.
+    /// However, applications that don't have a facility to calculate formulas, such as Excel Viewer, or some mobile
+    /// applications will only display the 0 results.
+    ///
+    /// If required, the worksheet_write_formula_num() function can be used to specify a formula and its result.
+    ///
+    /// This function is rarely required and is only provided for compatibility with some third party applications.
+    /// For most applications the worksheet_write_formula() function is the recommended way of writing formulas.
     #[allow(clippy::too_many_arguments)]
     pub fn write_formula_num(
         &mut self,
