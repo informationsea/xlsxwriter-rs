@@ -362,3 +362,57 @@ impl ChartPatternType {
         value as u8
     }
 }
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ChartMarkerType {
+    MarkerAutomatic,
+    MarkerNone,
+    MarkerSquare,
+    MarkerDiamond,
+    MarkerTriangle,
+    MarkerX,
+    MarkerStar,
+    MarkerShortDash,
+    MarkerLongDash,
+    MarkerCircle,
+    MarkerPlus,
+}
+
+impl ChartMarkerType {
+    pub(crate) fn value(self) -> u8 {
+        let value = match self {
+            ChartMarkerType::MarkerAutomatic => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_AUTOMATIC
+            }
+            ChartMarkerType::MarkerNone => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_NONE
+            }
+            ChartMarkerType::MarkerSquare => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_SQUARE
+            }
+            ChartMarkerType::MarkerDiamond => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_DIAMOND
+            }
+            ChartMarkerType::MarkerTriangle => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_TRIANGLE
+            }
+            ChartMarkerType::MarkerX => libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_X,
+            ChartMarkerType::MarkerStar => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_STAR
+            }
+            ChartMarkerType::MarkerShortDash => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_SHORT_DASH
+            }
+            ChartMarkerType::MarkerLongDash => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_LONG_DASH
+            }
+            ChartMarkerType::MarkerCircle => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_CIRCLE
+            }
+            ChartMarkerType::MarkerPlus => {
+                libxlsxwriter_sys::lxw_chart_marker_type_LXW_CHART_MARKER_PLUS
+            }
+        };
+        value as u8
+    }
+}

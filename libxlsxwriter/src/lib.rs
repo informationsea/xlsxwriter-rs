@@ -74,8 +74,8 @@ mod workbook;
 mod worksheet;
 
 pub use chart::{
-    Chart, ChartDashType, ChartFill, ChartLine, ChartPattern, ChartPatternType, ChartSeries,
-    ChartType,
+    Chart, ChartDashType, ChartFill, ChartLine, ChartMarkerType, ChartPattern, ChartPatternType,
+    ChartSeries, ChartType,
 };
 pub use error::XlsxError;
 pub use format::{
