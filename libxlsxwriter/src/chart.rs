@@ -108,6 +108,292 @@ impl ChartDashType {
     }
 }
 
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum ChartPatternType {
+    /// None pattern.
+    None,
+    /// 5 Percent pattern.
+    Percent5,
+    /// 10 Percent pattern.
+    Percent10,
+    /// 20 Percent pattern.
+    Percent20,
+    /// 25 Percent pattern.
+    Percent25,
+    /// 30 Percent pattern.
+    Percent30,
+    /// 40 Percent pattern.
+    Percent40,
+    /// 50 Percent pattern.
+    Percent50,
+    /// 60 Percent pattern.
+    Percent60,
+    /// 70 Percent pattern.
+    Percent70,
+    /// 75 Percent pattern.
+    Percent75,
+    /// 80 Percent pattern.
+    Percent80,
+    /// 90 Percent pattern.
+    Percent90,
+    /// Light downward diagonal pattern.
+    LightDownwardDiagonal,
+    /// Light upward diagonal pattern.
+    LightUpwardDiagonal,
+    /// Dark downward diagonal pattern.
+    DarkDownwardDiagonal,
+    /// Dark upward diagonal pattern.
+    DarkUpwardDiagonal,
+    /// Wide downward diagonal pattern.
+    WideDownwardDiagonal,
+    /// Wide upward diagonal pattern.
+    WideUpwardDiagonal,
+    /// Light vertical pattern.
+    LightVertical,
+    /// Light horizontal pattern.
+    LightHorizontal,
+    /// Narrow vertical pattern.
+    NarrowVertical,
+    /// Narrow horizontal pattern.
+    NarrowHorizontal,
+    /// Dark vertical pattern.
+    DarkVertical,
+    /// Dark horizontal pattern.
+    DarkHorizontal,
+    /// Dashed downward diagonal pattern.
+    DashedDownwardDiagonal,
+    /// Dashed upward diagonal pattern.
+    DashedUpwardDiagonal,
+    /// Dashed horizontal pattern.
+    DashedHorizontal,
+    /// Dashed vertical pattern.
+    DashedVertical,
+    /// Small confetti pattern.
+    SmallConfetti,
+    /// Large confetti pattern.
+    LargeConfetti,
+    /// Zigzag pattern.    
+    Zigzag,
+    /// Wave pattern.
+    Wave,
+    /// Diagonal brick pattern.
+    DiagonalBrick,
+    ///Horizontal brick pattern.
+    HorizontalBrick,
+    /// Weave pattern.
+    Weave,
+    /// Plaid pattern.
+    Plaid,
+    /// Divot pattern.
+    Divot,
+    /// Dotted grid pattern.
+    DottedGrid,
+    /// Dotted diamond pattern.
+    DottedDiamond,
+    /// Shingle pattern.
+    Shingle,
+    /// Trellis pattern.
+    Trellis,
+    /// Sphere pattern.
+    Sphere,
+    /// Small grid pattern.
+    SmallGrid,
+    /// Large grid pattern.
+    LargeGrid,
+    /// Small check pattern.
+    SmallCheck,
+    /// Large check pattern.
+    LargeCheck,
+    /// Outlined diamond pattern.
+    OutlinedDiamond,
+    /// Solid diamond pattern.
+    SolidDiamond,
+}
+
+impl ChartPatternType {
+    fn value(self) -> u8 {
+        let value = match self {
+            ChartPatternType::None => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_NONE
+            }
+            ChartPatternType::Percent5 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_5
+            }
+            ChartPatternType::Percent10 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_10
+            }
+            ChartPatternType::Percent20 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_20
+            }
+            ChartPatternType::Percent25 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_25
+            }
+            ChartPatternType::Percent30 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_30
+            }
+            ChartPatternType::Percent40 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_40
+            }
+            ChartPatternType::Percent50 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_50
+            }
+            ChartPatternType::Percent60 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_60
+            }
+            ChartPatternType::Percent70 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_70
+            }
+            ChartPatternType::Percent75 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_75
+            }
+            ChartPatternType::Percent80 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_80
+            }
+            ChartPatternType::Percent90 => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PERCENT_90
+            }
+            ChartPatternType::LightDownwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LIGHT_DOWNWARD_DIAGONAL
+            }
+            ChartPatternType::LightUpwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LIGHT_UPWARD_DIAGONAL
+            }
+            ChartPatternType::DarkDownwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DARK_DOWNWARD_DIAGONAL
+            }
+            ChartPatternType::DarkUpwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DARK_UPWARD_DIAGONAL
+            }
+            ChartPatternType::WideDownwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_WIDE_DOWNWARD_DIAGONAL
+            }
+            ChartPatternType::WideUpwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_WIDE_UPWARD_DIAGONAL
+            }
+            ChartPatternType::LightVertical => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LIGHT_VERTICAL
+            }
+            ChartPatternType::LightHorizontal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LIGHT_HORIZONTAL
+            }
+            ChartPatternType::NarrowVertical => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_NARROW_VERTICAL
+            }
+            ChartPatternType::NarrowHorizontal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_NARROW_HORIZONTAL
+            }
+            ChartPatternType::DarkVertical => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DARK_VERTICAL
+            }
+            ChartPatternType::DarkHorizontal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DARK_HORIZONTAL
+            }
+            ChartPatternType::DashedDownwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DASHED_DOWNWARD_DIAGONAL
+            }
+            ChartPatternType::DashedUpwardDiagonal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DASHED_UPWARD_DIAGONAL
+            }
+            ChartPatternType::DashedHorizontal => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DASHED_HORIZONTAL
+            }
+            ChartPatternType::DashedVertical => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DASHED_VERTICAL
+            }
+            ChartPatternType::SmallConfetti => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_SMALL_CONFETTI
+            }
+            ChartPatternType::LargeConfetti => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LARGE_CONFETTI
+            }
+            ChartPatternType::Zigzag => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_ZIGZAG
+            }
+            ChartPatternType::Wave => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_WAVE
+            }
+            ChartPatternType::DiagonalBrick => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DIAGONAL_BRICK
+            }
+            ChartPatternType::HorizontalBrick => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_HORIZONTAL_BRICK
+            }
+            ChartPatternType::Weave => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_WEAVE
+            }
+            ChartPatternType::Plaid => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_PLAID
+            }
+            ChartPatternType::Divot => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DIVOT
+            }
+            ChartPatternType::DottedGrid => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DOTTED_GRID
+            }
+            ChartPatternType::DottedDiamond => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_DOTTED_DIAMOND
+            }
+            ChartPatternType::Shingle => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_SHINGLE
+            }
+            ChartPatternType::Trellis => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_TRELLIS
+            }
+            ChartPatternType::Sphere => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_SPHERE
+            }
+            ChartPatternType::SmallGrid => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_SMALL_GRID
+            }
+            ChartPatternType::LargeGrid => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LARGE_GRID
+            }
+            ChartPatternType::SmallCheck => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_SMALL_CHECK
+            }
+            ChartPatternType::LargeCheck => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_LARGE_CHECK
+            }
+            ChartPatternType::OutlinedDiamond => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_OUTLINED_DIAMOND
+            }
+            ChartPatternType::SolidDiamond => {
+                libxlsxwriter_sys::lxw_chart_pattern_type_LXW_CHART_PATTERN_SOLID_DIAMOND
+            }
+        };
+        value as u8
+    }
+}
+
+/// Struct to represent a chart pattern.
+#[derive(Copy, Clone, PartialEq, PartialOrd)]
+pub struct ChartPattern {
+    /// The pattern foreground color.
+    pub fg_color: FormatColor,
+    /// The pattern background color.
+    pub bg_color: FormatColor,
+    /// The pattern type.
+    pub chart_pattern: ChartPatternType,
+}
+
+impl ChartPattern {
+    pub fn new(fg_color: FormatColor, bg_color: FormatColor, pattern: ChartPatternType) -> Self {
+        ChartPattern {
+            fg_color,
+            bg_color,
+            chart_pattern: pattern,
+        }
+    }
+
+    fn value(&self) -> libxlsxwriter_sys::lxw_chart_pattern {
+        libxlsxwriter_sys::lxw_chart_pattern {
+            fg_color: self.fg_color.value(),
+            bg_color: self.bg_color.value(),
+            type_: self.chart_pattern.value(),
+        }
+    }
+}
+
 /// Struct to represent a chart line.
 #[derive(Copy, Clone, PartialEq, PartialOrd)]
 pub struct ChartLine {
@@ -457,6 +743,9 @@ impl<'a> ChartSeries<'a> {
     /// # let mut series1 = chart.add_series(None, Some("=Sheet1!$A$2:$A$6"));
     /// # let mut series2 = chart.add_series(None, Some("=Sheet1!$B$2:$B$6"));
     /// # let mut series3 = chart.add_series(None, Some("=Sheet1!$C$2:$C$6"));
+    /// # series1.set_name("=Sheet1!$A$1");
+    /// # series2.set_name("=Sheet1!$B$1");
+    /// # series3.set_name("=Sheet1!$C$1");
     /// # let mut chart_fill_1 = ChartFill::new();
     /// # chart_fill_1.color = FormatColor::Red;
     /// # let mut chart_fill_2 = ChartFill::new();
@@ -476,7 +765,7 @@ impl<'a> ChartSeries<'a> {
     /// # worksheet.write_string(0, 0, "Set 1", None)?;
     /// # worksheet.write_string(0, 1, "Set 2", None)?;
     /// # worksheet.write_string(0, 2, "Set 3", None)?;
-    /// # for i in 0..6 {
+    /// # for i in 1..6 {
     /// #     let j: f64 = i.into();
     /// #     worksheet.write_number(i, 0, (j*10.) - 20., None)?;
     /// #     worksheet.write_number(i, 1, (j*10. + 2.) - 20., None)?;
@@ -488,6 +777,42 @@ impl<'a> ChartSeries<'a> {
     pub fn set_invert_if_negative(&mut self) {
         unsafe {
             libxlsxwriter_sys::chart_series_set_invert_if_negative(self.chart_series);
+        }
+    }
+
+    /// Set the pattern properties of a chart series:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-chart_series-set_pattern-1.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # write_worksheet(&mut worksheet)?; // write worksheet contents
+    /// # let mut chart = workbook.add_chart(ChartType::Column);
+    /// # let mut series1 = chart.add_series(None, Some("=Sheet1!$A$2:$A$6"));
+    /// # let mut series2 = chart.add_series(None, Some("=Sheet1!$B$2:$B$6"));
+    /// # series1.set_name("=Sheet1!$A$1");
+    /// # series2.set_name("=Sheet1!$B$1");
+    /// let pattern1 = ChartPattern::new(FormatColor::Custom(0x804000), FormatColor::Custom(0xC68C53), ChartPatternType::Shingle);
+    /// series1.set_pattern(&pattern1);
+    /// let pattern2 = ChartPattern::new(FormatColor::Custom(0xB30000), FormatColor::Custom(0xFF6666), ChartPatternType::HorizontalBrick);
+    /// series2.set_pattern(&pattern2);
+    /// # worksheet.insert_chart(1, 3, &chart)?;
+    /// # workbook.close()
+    /// # }
+    /// # fn write_worksheet(worksheet: &mut Worksheet) -> Result<(), XlsxError> {
+    /// # worksheet.write_string(0, 0, "Shingle", None)?;
+    /// # worksheet.write_string(0, 1, "Brick", None)?;
+    /// # for i in 1..6 {
+    /// #     let j: f64 = i.into();
+    /// #     worksheet.write_number(i, 0, (j*10.) - 20., None)?;
+    /// #     worksheet.write_number(i, 1, (j*10. + 2.) - 20., None)?;
+    /// # }
+    /// # Ok(())
+    /// # }
+    /// ```    
+    pub fn set_pattern(&mut self, pattern: &ChartPattern) {
+        unsafe {
+            libxlsxwriter_sys::chart_series_set_pattern(self.chart_series, &mut pattern.value())
         }
     }
 }

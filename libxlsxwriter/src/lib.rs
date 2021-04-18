@@ -73,7 +73,10 @@ mod validation;
 mod workbook;
 mod worksheet;
 
-pub use chart::{Chart, ChartDashType, ChartFill, ChartLine, ChartSeries, ChartType};
+pub use chart::{
+    Chart, ChartDashType, ChartFill, ChartLine, ChartPattern, ChartPatternType, ChartSeries,
+    ChartType,
+};
 pub use error::XlsxError;
 pub use format::{
     Format, FormatAlignment, FormatBorder, FormatColor, FormatPatterns, FormatScript,
