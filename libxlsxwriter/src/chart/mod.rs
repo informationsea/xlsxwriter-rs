@@ -6,6 +6,7 @@ pub use self::constants::*;
 pub use self::series::*;
 pub use self::structs::*;
 use super::{convert_str, Workbook};
+use std::os::raw::c_char;
 
 /// The Chart object represents an Excel chart. It provides functions for adding data series to the chart and for configuring the chart.
 ///
@@ -177,11 +178,11 @@ impl<'a> Chart<'a> {
                 categories_vec
                     .as_ref()
                     .map(|x| x.as_ptr())
-                    .unwrap_or(std::ptr::null()) as *const i8,
+                    .unwrap_or(std::ptr::null()) as *const c_char,
                 values_vec
                     .as_ref()
                     .map(|x| x.as_ptr())
-                    .unwrap_or(std::ptr::null()) as *const i8,
+                    .unwrap_or(std::ptr::null()) as *const c_char,
             )
         };
         if let Some(x) = categories_vec {

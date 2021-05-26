@@ -1,6 +1,7 @@
 use super::constants::*;
 use super::structs::*;
 use crate::{convert_bool, convert_str, Workbook, WorksheetCol, WorksheetRow};
+use std::os::raw::c_char;
 
 /// Struct to represent an Excel chart data series.
 /// This struct is created using the chart.add_series() function. It is used in functions that modify a chart series but the members of the struct aren't modified directly.
@@ -46,7 +47,7 @@ impl<'a> ChartSeries<'a> {
         unsafe {
             libxlsxwriter_sys::chart_series_set_categories(
                 self.chart_series,
-                sheet_name_vec.as_ptr() as *const i8,
+                sheet_name_vec.as_ptr() as *const c_char,
                 first_row,
                 first_column,
                 last_row,
@@ -71,7 +72,7 @@ impl<'a> ChartSeries<'a> {
         unsafe {
             libxlsxwriter_sys::chart_series_set_values(
                 self.chart_series,
-                sheet_name_vec.as_ptr() as *const i8,
+                sheet_name_vec.as_ptr() as *const c_char,
                 first_row,
                 first_column,
                 last_row,
@@ -138,7 +139,7 @@ impl<'a> ChartSeries<'a> {
         unsafe {
             libxlsxwriter_sys::chart_series_set_name(
                 self.chart_series,
-                name_vec.as_ptr() as *const i8,
+                name_vec.as_ptr() as *const c_char,
             );
         }
         self._workbook.const_str.borrow_mut().push(name_vec);
@@ -174,7 +175,7 @@ impl<'a> ChartSeries<'a> {
         unsafe {
             libxlsxwriter_sys::chart_series_set_name_range(
                 self.chart_series,
-                sheet_name_vec.as_ptr() as *const i8,
+                sheet_name_vec.as_ptr() as *const c_char,
                 row,
                 column,
             );
