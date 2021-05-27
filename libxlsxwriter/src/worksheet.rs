@@ -223,15 +223,17 @@ impl From<&Protection> for libxlsxwriter_sys::lxw_protection {
     }
 }
 
-/// Integer data type to represent a row value. Equivalent to `u32`.
-///
-/// The maximum row in Excel is 1,048,576.
-pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
 
 /// Integer data type to represent a column value. Equivalent to `u16`.
 ///
 /// The maximum column in Excel is 16,384.
+pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
+
+/// Integer data type to represent a row value. Equivalent to `u32`.
+///
+/// The maximum row in Excel is 1,048,576.
 pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
+
 pub type CommentOptions = libxlsxwriter_sys::lxw_comment_options;
 pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
 
