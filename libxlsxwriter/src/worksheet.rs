@@ -1,5 +1,6 @@
 use super::{convert_bool, Chart, DataValidation, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
+use std::os::raw::c_char;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct DateTime {
@@ -896,7 +897,7 @@ impl<'a> Worksheet<'a> {
             .zip(c_str.iter_mut())
             .map(|(x, y)| libxlsxwriter_sys::lxw_rich_string_tuple {
                 format: x.1.map(|z| z.format).unwrap_or(std::ptr::null_mut()),
-                string: y.as_mut_ptr() as *mut i8,
+                string: y.as_mut_ptr() as *mut c_char,
             })
             .collect();
         let mut rich_text_ptr: Vec<*mut libxlsxwriter_sys::lxw_rich_string_tuple> = rich_text

@@ -1,6 +1,7 @@
 use super::{error, Chart, ChartType, Format, Worksheet, XlsxError};
 use std::cell::RefCell;
 use std::ffi::CString;
+use std::os::raw::c_char;
 use std::rc::Rc;
 
 /// The Workbook is the main object exposed by the libxlsxwriter library. It represents the entire spreadsheet as you see it in Excel and internally it represents the Excel file as it is written on disk.
@@ -44,7 +45,7 @@ impl Workbook {
             if let Some(sheet_name) = name_vec.as_ref() {
                 let result = libxlsxwriter_sys::workbook_validate_sheet_name(
                     self.workbook,
-                    sheet_name.as_ptr() as *const i8,
+                    sheet_name.as_ptr() as *const c_char,
                 );
                 if result != libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                     return Err(XlsxError::new(result));
@@ -55,7 +56,7 @@ impl Workbook {
                 self.workbook,
                 name_vec
                     .as_ref()
-                    .map(|x| x.as_ptr() as *const i8)
+                    .map(|x| x.as_ptr() as *const c_char)
                     .unwrap_or(std::ptr::null()),
             );
 

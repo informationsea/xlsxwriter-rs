@@ -1,5 +1,6 @@
 use super::{convert_bool, DateTime};
 use std::ffi::CString;
+use std::os::raw::c_char;
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum DataValidationType {
@@ -218,9 +219,11 @@ impl DataValidation {
                 })
                 .collect()
         });
-        let mut value_list_ptr: Option<Vec<*mut i8>> = value_list
-            .as_mut()
-            .map(|x| x.iter_mut().map(|y| y.as_mut_ptr() as *mut i8).collect());
+        let mut value_list_ptr: Option<Vec<*mut c_char>> = value_list.as_mut().map(|x| {
+            x.iter_mut()
+                .map(|y| y.as_mut_ptr() as *mut c_char)
+                .collect()
+        });
         if let Some(l) = value_list_ptr.as_mut() {
             l.push(std::ptr::null_mut());
         }
@@ -244,7 +247,7 @@ impl DataValidation {
                 value_formula: value_formula
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
                 value_list: value_list_ptr
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
@@ -254,30 +257,32 @@ impl DataValidation {
                 minimum_formula: minimum_formula
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut())
+                    as *mut c_char,
                 minimum_datetime: (&self.minimum_datetime).into(),
                 maximum_number: self.maximum_number,
                 maximum_formula: maximum_formula
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut())
+                    as *mut c_char,
                 maximum_datetime: (&self.maximum_datetime).into(),
                 input_title: input_title
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
                 input_message: input_message
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
                 error_title: error_title
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
                 error_message: error_message
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut i8,
+                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
             },
 
             value_formula,
@@ -297,7 +302,7 @@ impl DataValidation {
 pub(crate) struct CDataValidation {
     value_formula: Option<Vec<u8>>,
     value_list: Option<Vec<Vec<u8>>>,
-    value_list_ptr: Option<Vec<*mut i8>>,
+    value_list_ptr: Option<Vec<*mut c_char>>,
     minimum_formula: Option<Vec<u8>>,
     maximum_formula: Option<Vec<u8>>,
     input_title: Option<Vec<u8>>,
