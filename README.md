@@ -24,6 +24,11 @@ Coming soon
 
 * Charts.
 
+Build requirements
+------------------
+
+* LLVM and clang
+
 Example
 -------
 
