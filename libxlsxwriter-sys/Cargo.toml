@@ -1,6 +1,6 @@
 [package]
 name = "libxlsxwriter-sys"
-version = "1.0.2"
+version = "1.0.6"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
 build = "build.rs"

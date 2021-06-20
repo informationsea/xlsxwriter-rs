@@ -5,7 +5,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-const C_FILES: [&str; 39] = [
+const C_FILES: [&str; 40] = [
     "third_party/libxlsxwriter/third_party/tmpfileplus/tmpfileplus.c",
     "third_party/libxlsxwriter/third_party/minizip/ioapi.c",
     "third_party/libxlsxwriter/third_party/minizip/zip.c",
@@ -20,6 +20,7 @@ const C_FILES: [&str; 39] = [
     "third_party/libxlsxwriter/src/drawing.c",
     "third_party/libxlsxwriter/src/format.c",
     "third_party/libxlsxwriter/src/hash_table.c",
+    "third_party/libxlsxwriter/src/metadata.c",
     "third_party/libxlsxwriter/src/packager.c",
     "third_party/libxlsxwriter/src/relationships.c",
     "third_party/libxlsxwriter/src/shared_strings.c",
