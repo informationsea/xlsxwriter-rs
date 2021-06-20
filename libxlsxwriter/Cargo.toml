@@ -1,6 +1,6 @@
 [package]
 name = "xlsxwriter"
-version = "0.3.3"
+version = "0.3.4"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
 readme = "../README.md"
