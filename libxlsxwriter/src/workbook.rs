@@ -123,6 +123,38 @@ impl Workbook {
         }
     }
 
+    /// This function is used to defined a name that can be used to represent a value,
+    /// a single cell or a range of cells in a workbook:
+    /// These defined names can then be used in formulas:
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() -> Result<(), XlsxError> {
+    /// let workbook = Workbook::new("test-workbook-define_name.xlsx");
+    /// let mut worksheet = workbook.add_worksheet(None)?;
+    /// workbook.define_name("Exchange_rate", "=0.95");
+    /// worksheet.write_formula(0, 0, "=Exchange_rate", None);
+    /// # workbook.close()
+    /// # }
+    /// ```
+    pub fn define_name(&self, name: &str, formula: &str) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::workbook_define_name(
+                self.workbook,
+                CString::new(name).expect("Null Error").as_c_str().as_ptr(),
+                CString::new(formula)
+                    .expect("Null Error")
+                    .as_c_str()
+                    .as_ptr(),
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
     pub fn close(mut self) -> Result<(), XlsxError> {
         unsafe {
             let result = libxlsxwriter_sys::workbook_close(self.workbook);
