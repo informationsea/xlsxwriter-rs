@@ -123,6 +123,32 @@ impl Workbook {
         }
     }
 
+    pub fn define_name(
+        &self,
+        name: &str,
+        formula: &str,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::workbook_define_name(
+                self.workbook,
+                CString::new(name)
+                .expect("Null Error")
+                .as_c_str()
+                .as_ptr(),
+                CString::new(formula)
+                .expect("Null Error")
+                .as_c_str()
+                .as_ptr()
+            );
+
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
     pub fn close(mut self) -> Result<(), XlsxError> {
         unsafe {
             let result = libxlsxwriter_sys::workbook_close(self.workbook);
