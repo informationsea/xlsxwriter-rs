@@ -198,7 +198,7 @@ impl<'a> Chart<'a> {
     }
 
     /// The chart_title_set_name() function sets the name (title) for the chart. The name is displayed above the chart.
-    /// The name parameter can also be a formula such as =Sheet1!$A$1 to point to a cell in the workbook that contains the name.
+    /// The name parameter can also be a formula such as `=Sheet1!$A$1` to point to a cell in the workbook that contains the name.
     /// The Excel default is to have no chart title.
     pub fn add_title(&mut self, title: &str) {
         let title_vec = convert_str(title);
