@@ -36,6 +36,44 @@ impl Workbook {
             }
         }
     }
+    pub fn new_with_options(
+        filename: &str,
+        constant_memory: bool,
+        tmpdir: Option<&str>,
+        use_zip64: bool,
+    ) -> Workbook {
+        let tmpdir_vec = tmpdir.map(|x| CString::new(x).unwrap().as_bytes_with_nul().to_vec());
+
+        unsafe {
+            let tmpdir_ptr;
+            if let Some(tmpdir) = tmpdir_vec.as_ref() {
+                tmpdir_ptr = tmpdir.as_ptr();
+            } else {
+                tmpdir_ptr = std::ptr::null();
+            }
+
+            let workbook_options = libxlsxwriter_sys::lxw_workbook_options {
+                constant_memory: constant_memory as u8,
+                tmpdir: tmpdir_ptr as *mut c_char,
+                use_zip64: use_zip64 as u8,
+            };
+
+            let workbook_name = CString::new(filename).expect("Null Error");
+
+            let raw_workbook = libxlsxwriter_sys::workbook_new_opt(
+                workbook_name.as_c_str().as_ptr(),
+                &mut workbook_options.into(),
+            );
+            if raw_workbook.is_null() {
+                unreachable!()
+            }
+            Workbook {
+                workbook: raw_workbook,
+                _workbook_name: workbook_name,
+                const_str: Rc::new(RefCell::new(Vec::new())),
+            }
+        }
+    }
     pub fn add_worksheet<'a>(
         &'a self,
         sheet_name: Option<&str>,
