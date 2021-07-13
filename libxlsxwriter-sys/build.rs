@@ -5,7 +5,7 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-const C_FILES: [&str; 39] = [
+const C_FILES: [&str; 24] = [
     "third_party/libxlsxwriter/third_party/tmpfileplus/tmpfileplus.c",
     "third_party/libxlsxwriter/third_party/minizip/ioapi.c",
     "third_party/libxlsxwriter/third_party/minizip/zip.c",
@@ -30,6 +30,9 @@ const C_FILES: [&str; 39] = [
     "third_party/libxlsxwriter/src/workbook.c",
     "third_party/libxlsxwriter/src/worksheet.c",
     "third_party/libxlsxwriter/src/xmlwriter.c",
+];
+
+const ZLIB_FILES: [&str; 15] = [
     "third_party/zlib/adler32.c",
     "third_party/zlib/compress.c",
     "third_party/zlib/crc32.c",
@@ -65,16 +68,25 @@ fn main() -> io::Result<()> {
     build
         .include("third_party/libxlsxwriter/include")
         .flag_if_supported("-Wno-implicit-function-declaration")
-        .flag_if_supported("-Wno-unused-parameter")
-        .include("third_party/zlib");
+        .flag_if_supported("-Wno-unused-parameter");
     for path in &C_FILES[..] {
         assert_file_exists(path)?;
         build.file(path);
     }
 
-    if env::var("CARGO_FEATURE_no_md5").is_ok() {
+    if env::var("CARGO_FEATURE_SYSTEM_ZLIB").is_ok() {
+        println!("cargo:rustc-link-lib=z");
+    } else {
+        build.include("third_party/zlib");
+        for path in &ZLIB_FILES[..] {
+            assert_file_exists(path)?;
+            build.file(path);
+        }
+    }
+
+    if env::var("CARGO_FEATURE_NO_MD5").is_ok() {
         build.define("USE_NO_MD5", None);
-    } else if env::var("CARGO_FEATURE_use_openssl_md5").is_ok() {
+    } else if env::var("CARGO_FEATURE_USE_OPENSSL_MD5").is_ok() {
         build.define("USE_OPENSSL_MD5", None);
         println!("cargo:rustc-link-lib=crypto");
     } else {

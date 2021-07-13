@@ -224,7 +224,6 @@ impl From<&Protection> for libxlsxwriter_sys::lxw_protection {
     }
 }
 
-
 /// Integer data type to represent a column value. Equivalent to `u16`.
 ///
 /// The maximum column in Excel is 16,384.

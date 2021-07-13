@@ -20,6 +20,7 @@ exclude = ["third_party/libxlsxwriter/docs", "third_party/libxlsxwriter/test", "
 [features]
 no-md5 = []
 use-openssl-md5 = []
+system-zlib = []
 
 [build-dependencies]
 cc = "1.0"

@@ -16,6 +16,7 @@ license = "Apache-2.0"
 [features]
 no-md5 = ["libxlsxwriter-sys/no-md5"]
 use-openssl-md5 = ["libxlsxwriter-sys/use-openssl-md5"]
+system-zlib = ["libxlsxwriter-sys/system-zlib"]
 
 [dependencies]
 libxlsxwriter-sys = {path = "../libxlsxwriter-sys", version = "^1.0.2"}

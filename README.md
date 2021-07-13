@@ -27,6 +27,7 @@ Feature Flags
 
 * `no-md5`: Disable image de-duplication and remove md5 function. (See [upstream document](https://github.com/jmcnamara/libxlsxwriter/blob/dcf8d418dba726d2ee123fb111a3174e67b15f6b/docs/src/getting_started.dox#L639) to learn more).
 * `use-openssl-md5`: Use OpenSSL implementation of md5 function. (See [upstream document](https://github.com/jmcnamara/libxlsxwriter/blob/dcf8d418dba726d2ee123fb111a3174e67b15f6b/docs/src/getting_started.dox#L629) to learn more).
+* `system-zlib`: Use system zlib instead of included zlib.
 
 Build requirements
 ------------------
