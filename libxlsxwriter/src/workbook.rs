@@ -40,6 +40,16 @@ impl Workbook {
     }
 
     /// This function is the same as the [`Workbook::new()`] constructor but allows additional options to be set.
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() -> Result<(), XlsxError> {
+    /// let workbook = Workbook::new_with_options("test-workbook_with_options.xlsx", true, Some("target"), true);
+    /// let mut worksheet = workbook.add_worksheet(None)?;
+    /// worksheet.write_string(0, 0, "Hello Excel", None)?;
+    /// workbook.close()
+    /// # }
+    /// ```    
+    ///
     /// The options that can be set are:
     /// * `constant_memory`: This option reduces the amount of data stored in memory so that large files can be written efficiently.
     ///   This option is off by default. See the note below for limitations when this mode is on.
