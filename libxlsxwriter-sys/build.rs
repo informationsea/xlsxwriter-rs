@@ -5,11 +5,10 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-const C_FILES: [&str; 40] = [
+const C_FILES: [&str; 39] = [
     "third_party/libxlsxwriter/third_party/tmpfileplus/tmpfileplus.c",
     "third_party/libxlsxwriter/third_party/minizip/ioapi.c",
     "third_party/libxlsxwriter/third_party/minizip/zip.c",
-    "third_party/libxlsxwriter/third_party/md5/md5.c",
     "third_party/libxlsxwriter/src/app.c",
     "third_party/libxlsxwriter/src/chart.c",
     "third_party/libxlsxwriter/src/chartsheet.c",
@@ -72,12 +71,23 @@ fn main() -> io::Result<()> {
         assert_file_exists(path)?;
         build.file(path);
     }
+
+    if env::var("CARGO_FEATURE_no_md5").is_ok() {
+        build.define("USE_NO_MD5", None);
+    } else if env::var("CARGO_FEATURE_use_openssl_md5").is_ok() {
+        build.define("USE_OPENSSL_MD5", None);
+        println!("cargo:rustc-link-lib=crypto");
+    } else {
+        build.file("third_party/libxlsxwriter/third_party/md5/md5.c");
+    }
+
     if cfg!(windows) {
         build
             .file("third_party/libxlsxwriter/third_party/minizip/iowin32.c")
             .flag_if_supported("/utf-8")
             .include("include");
     }
+
     build.compile("libxlsxwriter.a");
 
     // The bindgen::Builder is the main entry point

@@ -17,6 +17,10 @@ exclude = ["third_party/libxlsxwriter/docs", "third_party/libxlsxwriter/test", "
 
 [dependencies]
 
+[features]
+no-md5 = []
+use-openssl-md5 = []
+
 [build-dependencies]
 cc = "1.0"
 bindgen = ">= 0.58, < 0.59"

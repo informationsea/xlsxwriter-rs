@@ -86,3 +86,15 @@ jobs:
       with:
         command: test
         args: --release --target ${{ matrix.config.target }}
+    - name: Test No MD5
+      if: ${{ matrix.config.test }}
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --release --target ${{ matrix.config.target }} --features no-md5
+    - name: Test Use OpenSSL md5
+      if: ${{ matrix.config.test && matrix.config.target == 'x86_64-unknown-linux-gnu' }}
+      uses: actions-rs/cargo@v1
+      with:
+        command: test
+        args: --release --target ${{ matrix.config.target }} --features use-openssl-md5
