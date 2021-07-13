@@ -1,8 +1,6 @@
 xlsxwriter-rs
 =============
 [![Build](https://github.com/informationsea/xlsxwriter-rs/workflows/Build/badge.svg)](https://github.com/informationsea/xlsxwriter-rs/actions)
-[![Build Status](https://travis-ci.org/informationsea/xlsxwriter-rs.svg?branch=master)](https://travis-ci.org/informationsea/xlsxwriter-rs)
-[![Build status](https://ci.appveyor.com/api/projects/status/lf6j3rvk0p5xd0gn?svg=true)](https://ci.appveyor.com/project/informationsea/xlsxwriter-rs)
 ![GitHub](https://img.shields.io/github/license/informationsea/xlsxwriter-rs)
 ![GitHub top language](https://img.shields.io/github/languages/top/informationsea/xlsxwriter-rs)
 [![Crates.io](https://img.shields.io/crates/v/xlsxwriter)](https://crates.io/crates/xlsxwriter)
