@@ -22,10 +22,73 @@ pub struct Workbook {
 }
 
 impl Workbook {
+    /// This function is used to create a new Excel workbook with a given filename.
+    /// When specifying a filename it is recommended that you use an .xlsx extension or Excel will generate a warning when opening the file.
     pub fn new(filename: &str) -> Workbook {
         unsafe {
             let workbook_name = CString::new(filename).expect("Null Error");
             let raw_workbook = libxlsxwriter_sys::workbook_new(workbook_name.as_c_str().as_ptr());
+            if raw_workbook.is_null() {
+                unreachable!()
+            }
+            Workbook {
+                workbook: raw_workbook,
+                _workbook_name: workbook_name,
+                const_str: Rc::new(RefCell::new(Vec::new())),
+            }
+        }
+    }
+
+    /// This function is the same as the [`Workbook::new()`] constructor but allows additional options to be set.
+    /// The options that can be set are:
+    /// * `constant_memory`: This option reduces the amount of data stored in memory so that large files can be written efficiently.
+    ///   This option is off by default. See the note below for limitations when this mode is on.
+    /// * `tmpdir`: libxlsxwriter stores workbook data in temporary files prior to assembling the final XLSX file. The temporary
+    ///   files are created in the system's temp directory. If the default temporary directory isn't accessible to your application,
+    ///   or doesn't contain enough space, you can specify an alternative location using the tmpdir option.
+    /// * `use_zip64`: Make the zip library use ZIP64 extensions when writing very large xlsx files to allow the zip container, or
+    ///   individual XML files within it, to be greater than 4 GB. See ZIP64 on Wikipedia for more information. This option is
+    ///   off by default.
+    ///
+    /// ### Note
+    /// In constant_memory mode each row of in-memory data is written to disk and then freed when a new row is started via one
+    /// of the `Worksheet::write_*()` functions. Therefore, once this option is active data should be written in sequential row
+    /// by row order. For this reason [`Worksheet::merge_range()`] and some other row based functionality doesn't work in this mode.
+    /// See [Constant Memory Mode](https://libxlsxwriter.github.io/working_with_memory.html#ww_mem_constant) for more details.
+    ///
+    /// Also, in `constant_memory` mode the library uses temp file storage for worksheet data. This can lead to an issue on OSes
+    /// that map the `/tmp` directory into memory since it is possible to consume the "system" memory even though the "process"
+    /// memory remains constant. In these cases you should use an alternative temp file location by using the `tmpdir` option shown
+    /// above. See [Constant memory mode and the /tmp directory](https://libxlsxwriter.github.io/working_with_memory.html#ww_mem_temp)
+    /// for more details.
+    pub fn new_with_options(
+        filename: &str,
+        constant_memory: bool,
+        tmpdir: Option<&str>,
+        use_zip64: bool,
+    ) -> Workbook {
+        let tmpdir_vec = tmpdir.map(|x| CString::new(x).unwrap().as_bytes_with_nul().to_vec());
+
+        unsafe {
+            let tmpdir_ptr;
+            if let Some(tmpdir) = tmpdir_vec.as_ref() {
+                tmpdir_ptr = tmpdir.as_ptr();
+            } else {
+                tmpdir_ptr = std::ptr::null();
+            }
+
+            let mut workbook_options = libxlsxwriter_sys::lxw_workbook_options {
+                constant_memory: constant_memory as u8,
+                tmpdir: tmpdir_ptr as *mut c_char,
+                use_zip64: use_zip64 as u8,
+            };
+
+            let workbook_name = CString::new(filename).expect("Null Error");
+
+            let raw_workbook = libxlsxwriter_sys::workbook_new_opt(
+                workbook_name.as_c_str().as_ptr(),
+                &mut workbook_options,
+            );
             if raw_workbook.is_null() {
                 unreachable!()
             }
