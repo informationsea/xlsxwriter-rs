@@ -29,6 +29,13 @@ Build requirements
 
 * LLVM and clang
 
+### How to build on windows
+
+1. Install Visual Studio
+2. Install [LLVM](https://llvm.org/)
+3. Set environment variable `LIBCLANG_PATH` as `C:\Program Files\LLVM\bin`
+4. Run build
+
 Example
 -------
 
