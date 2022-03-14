@@ -237,6 +237,11 @@ pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
 pub type CommentOptions = libxlsxwriter_sys::lxw_comment_options;
 pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
 
+pub const LXW_DEF_ROW_HEIGHT: f64 = 8.43;
+pub const LXW_DEF_ROW_HEIGHT_PIXELS: u32 = 20;
+pub const LXW_DEF_COL_WIDTH: f64 = 15.0;
+pub const LXW_DEF_COL_WIDTH_PIXELS: u32 = 64;
+
 /// The Worksheet object represents an Excel worksheet. It handles operations such as writing data to cells or formatting worksheet layout.
 ///
 /// A Worksheet object isn't created directly. Instead a worksheet is created by calling the `workbook.add_worksheet()` function from a [Workbook](struct.Workbook.html) object:
@@ -965,6 +970,53 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// The set_row_pixels() function is the same as the [Worksheet::set_row()] function except that the height can be set in pixels.
+    ///
+    /// If you wish to set the format of a row without changing the height you can pass the default row height in pixels: [LXW_DEF_ROW_HEIGHT_PIXELS].
+    pub fn set_row_pixels(
+        &mut self,
+        row: WorksheetRow,
+        pixels: u32,
+        format: Option<&Format>,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_row_pixels(
+                self.worksheet,
+                row,
+                pixels,
+                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_row_pixels_opt(
+        &mut self,
+        row: WorksheetRow,
+        pixels: u32,
+        format: Option<&Format>,
+        options: &mut RowColOptions,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_row_pixels_opt(
+                self.worksheet,
+                row,
+                pixels,
+                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                options,
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
     pub fn set_column(
         &mut self,
         first_col: WorksheetCol,
@@ -1002,6 +1054,54 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_col,
                 width,
+                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                options,
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_column_pixels(
+        &mut self,
+        first_col: WorksheetCol,
+        last_col: WorksheetCol,
+        pixels: u32,
+        format: Option<&Format>,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_column_pixels(
+                self.worksheet,
+                first_col,
+                last_col,
+                pixels,
+                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+            );
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn set_column_pixels_opt(
+        &mut self,
+        first_col: WorksheetCol,
+        last_col: WorksheetCol,
+        pixels: u32,
+        format: Option<&Format>,
+        options: &mut RowColOptions,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let result = libxlsxwriter_sys::worksheet_set_column_pixels_opt(
+                self.worksheet,
+                first_col,
+                last_col,
+                pixels,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
                 options,
             );
@@ -1202,6 +1302,10 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function allows an autofilter to be added to a worksheet.
+    ///
+    /// An autofilter is a way of adding drop down lists to the headers of a 2D range of worksheet data.
+    /// This allows users to filter the data based on simple criteria so that some data is shown and some is hidden.
     pub fn autofilter(
         &mut self,
         first_row: WorksheetRow,

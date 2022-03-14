@@ -80,12 +80,11 @@ impl Workbook {
         let tmpdir_vec = tmpdir.map(|x| CString::new(x).unwrap().as_bytes_with_nul().to_vec());
 
         unsafe {
-            let tmpdir_ptr;
-            if let Some(tmpdir) = tmpdir_vec.as_ref() {
-                tmpdir_ptr = tmpdir.as_ptr();
+            let tmpdir_ptr = if let Some(tmpdir) = tmpdir_vec.as_ref() {
+                tmpdir.as_ptr()
             } else {
-                tmpdir_ptr = std::ptr::null();
-            }
+                std::ptr::null()
+            };
 
             let mut workbook_options = libxlsxwriter_sys::lxw_workbook_options {
                 constant_memory: constant_memory as u8,
