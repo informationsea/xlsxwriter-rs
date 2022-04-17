@@ -83,3 +83,34 @@ fn test_sample1() -> Result<(), XlsxError> {
     workbook.close()?;
     Ok(())
 }
+
+#[test]
+fn test_add_table1() -> Result<(), XlsxError> {
+    let workbook = Workbook::new("test-worksheet_add_table-2.xlsx");
+    let mut worksheet = workbook.add_worksheet(None)?;
+    worksheet.write_string(0, 0, "header 1", None)?;
+    worksheet.write_string(0, 1, "header 2", None)?;
+    worksheet.write_string(1, 0, "content 1", None)?;
+    worksheet.write_number(1, 1, 1.0, None)?;
+    worksheet.write_string(2, 0, "content 2", None)?;
+    worksheet.write_number(2, 1, 2.0, None)?;
+    worksheet.write_string(3, 0, "content 3", None)?;
+    worksheet.write_number(3, 1, 3.0, None)?;
+
+    let options = TableOptions {
+        name: Some("TABLE1".to_string()),
+        no_header_row: true,
+        no_autofilter: true,
+        no_banded_rows: true,
+        banded_columns: true,
+        first_column: true,
+        last_column: true,
+        style_type: TableStyleType::Light,
+        style_type_number: 1,
+        total_row: false,
+        columns: None,
+    };
+    worksheet.add_table(0, 0, 3, 1, Some(options))?;
+    workbook.close()?;
+    Ok(())
+}

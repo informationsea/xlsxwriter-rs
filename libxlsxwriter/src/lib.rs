@@ -88,8 +88,9 @@ pub use validation::{
 pub use workbook::Workbook;
 pub use worksheet::{
     CommentOptions, DateTime, GridLines, HeaderFooterOptions, ImageOptions, PaperType, Protection,
-    RowColOptions, Worksheet, WorksheetCol, WorksheetRow, LXW_DEF_COL_WIDTH,
-    LXW_DEF_COL_WIDTH_PIXELS, LXW_DEF_ROW_HEIGHT, LXW_DEF_ROW_HEIGHT_PIXELS,
+    RowColOptions, TableOptions, TableStyleType, TableTotalFunction, Worksheet, WorksheetCol,
+    WorksheetRow, LXW_DEF_COL_WIDTH, LXW_DEF_COL_WIDTH_PIXELS, LXW_DEF_ROW_HEIGHT,
+    LXW_DEF_ROW_HEIGHT_PIXELS,
 };
 
 use std::ffi::CString;
