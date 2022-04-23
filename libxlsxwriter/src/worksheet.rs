@@ -2,10 +2,6 @@ use super::{convert_bool, Chart, DataValidation, Format, FormatColor, Workbook, 
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-fn str_to_raw_pointer(value: &str) -> *mut std::os::raw::c_char {
-    CString::new(value).expect("CString::new failed").into_raw()
-}
-
 fn option_string_to_raw_pointer(value: Option<&str>) -> *mut std::os::raw::c_char {
     value
         .map(|x| CString::new(x).expect("CString::new failed").into_raw())
@@ -13,6 +9,8 @@ fn option_string_to_raw_pointer(value: Option<&str>) -> *mut std::os::raw::c_cha
 }
 
 /// Structure to set the options of a table column.
+///
+/// Please read [libxslxwriter document](https://libxlsxwriter.github.io/working_with_tables.html) to learn more.
 #[derive(Default)]
 pub struct TableColumn<'a> {
     /// Set the header name/caption for the column. If NULL the header defaults to Column 1, Column 2, etc.
@@ -89,6 +87,8 @@ impl From<TableStyleType> for u8 {
 }
 
 /// Definitions for the standard Excel functions that are available via the dropdown in the total row of an Excel table.
+///
+/// Please read [libxslxwriter document](https://libxlsxwriter.github.io/working_with_tables.html) to learn more.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum TableTotalFunction {
     None,
@@ -212,26 +212,43 @@ pub struct TableOptions<'a> {
     pub total_row: bool,
 
     /// The columns parameter can be used to set properties for columns within the table.
-    ///
-    /// TODO: Not implemented
     pub columns: Option<Vec<TableColumn<'a>>>,
 }
 
-impl<'a> From<TableOptions<'a>> for libxlsxwriter_sys::lxw_table_options {
-    fn from(o: TableOptions<'a>) -> libxlsxwriter_sys::lxw_table_options {
-        libxlsxwriter_sys::lxw_table_options {
-            name: option_string_to_raw_pointer(o.name.as_deref()),
-            no_header_row: convert_bool(o.no_header_row),
-            no_autofilter: convert_bool(o.no_autofilter),
-            no_banded_rows: convert_bool(o.no_banded_rows),
-            banded_columns: convert_bool(o.banded_columns),
-            first_column: convert_bool(o.first_column),
-            last_column: convert_bool(o.last_column),
-            style_type: o.style_type.into(),
-            style_type_number: o.style_type_number,
-            total_row: convert_bool(o.total_row),
-            columns: std::ptr::null_mut(), // TODO: fix here
-        }
+impl<'a> TableOptions<'a> {
+    fn into_lxw_table_options(
+        self,
+    ) -> (
+        Option<Vec<libxlsxwriter_sys::lxw_table_column>>,
+        libxlsxwriter_sys::lxw_table_options,
+    ) {
+        let mut columns: Option<Vec<libxlsxwriter_sys::lxw_table_column>> = self
+            .columns
+            .map(|z| z.into_iter().map(|x| x.into()).collect());
+        let mut c_columns: Option<Vec<_>> = columns.as_mut().map(|x| {
+            x.iter_mut()
+                .map(|y| y as *mut libxlsxwriter_sys::lxw_table_column)
+                .collect()
+        });
+        (
+            columns,
+            libxlsxwriter_sys::lxw_table_options {
+                name: option_string_to_raw_pointer(self.name.as_deref()),
+                no_header_row: convert_bool(self.no_header_row),
+                no_autofilter: convert_bool(self.no_autofilter),
+                no_banded_rows: convert_bool(self.no_banded_rows),
+                banded_columns: convert_bool(self.banded_columns),
+                first_column: convert_bool(self.first_column),
+                last_column: convert_bool(self.last_column),
+                style_type: self.style_type.into(),
+                style_type_number: self.style_type_number,
+                total_row: convert_bool(self.total_row),
+                columns: c_columns
+                    .as_mut()
+                    .map(|x| x.as_mut_ptr())
+                    .unwrap_or(std::ptr::null_mut()),
+            },
+        )
     }
 }
 
@@ -1562,6 +1579,7 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// This function is used to construct an Excel data validation or to limit the user input to a dropdown list of values
     pub fn data_validation_cell(
         &mut self,
         row: WorksheetRow,
@@ -1569,11 +1587,12 @@ impl<'a> Worksheet<'a> {
         validation: &DataValidation,
     ) -> Result<(), XlsxError> {
         unsafe {
+            let mut validation = validation.to_c_struct();
             let result = libxlsxwriter_sys::worksheet_data_validation_cell(
                 self.worksheet,
                 row,
                 col,
-                &mut validation.to_c_struct().data_validation,
+                &mut validation.data_validation,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1630,6 +1649,8 @@ impl<'a> Worksheet<'a> {
     /// # workbook.close()
     /// # }
     /// ```
+    ///
+    /// Please read [libxslxwriter document](https://libxlsxwriter.github.io/working_with_tables.html) to learn more.
     pub fn add_table(
         &mut self,
         first_row: WorksheetRow,
@@ -1638,16 +1659,41 @@ impl<'a> Worksheet<'a> {
         last_col: WorksheetCol,
         options: Option<TableOptions<'a>>,
     ) -> Result<(), XlsxError> {
+        eprintln!(
+            "col: {} {} {:?}",
+            first_col,
+            last_col,
+            options
+                .as_ref()
+                .map(|x| x.columns.as_ref().map(|y| y.len()))
+        );
+        if options
+            .as_ref()
+            .map(|x| {
+                x.columns
+                    .as_ref()
+                    .map(|y| y.len() != (last_col - first_col + 1).into())
+                    .unwrap_or(false)
+            })
+            .unwrap_or(false)
+        {
+            return Err(XlsxError {
+                error: crate::error::NUMBER_OF_COLUMNS_IS_NOT_MATCHED,
+            });
+        }
+
         unsafe {
-            let options: Option<Box<libxlsxwriter_sys::lxw_table_options>> =
-                options.map(|x| Box::new(x.into()));
+            let mut options = options.map(|x| x.into_lxw_table_options());
             let result = libxlsxwriter_sys::worksheet_add_table(
                 self.worksheet,
                 first_row,
                 first_col,
                 last_row,
                 last_col,
-                options.map(Box::into_raw).unwrap_or(std::ptr::null_mut()),
+                options
+                    .as_mut()
+                    .map(|x| &mut x.1 as *mut libxlsxwriter_sys::lxw_table_options)
+                    .unwrap_or(std::ptr::null_mut()),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())

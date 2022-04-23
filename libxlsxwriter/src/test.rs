@@ -114,3 +114,87 @@ fn test_add_table1() -> Result<(), XlsxError> {
     workbook.close()?;
     Ok(())
 }
+
+#[test]
+fn test_add_table2() -> Result<(), XlsxError> {
+    let workbook = Workbook::new("test-worksheet_add_table-3.xlsx");
+    let mut worksheet = workbook.add_worksheet(None)?;
+    worksheet.write_string(0, 0, "header 1", None)?;
+    worksheet.write_string(0, 1, "header 2", None)?;
+    worksheet.write_string(0, 2, "header 3", None)?;
+    worksheet.write_string(1, 0, "content 1", None)?;
+    worksheet.write_number(1, 1, 1.0, None)?;
+    worksheet.write_string(2, 0, "content 2", None)?;
+    worksheet.write_number(2, 1, 2.0, None)?;
+    worksheet.write_string(3, 0, "content 3", None)?;
+    worksheet.write_number(3, 1, 3.0, None)?;
+
+    let options = TableOptions {
+        name: Some("TABLE1".to_string()),
+        no_header_row: false,
+        no_autofilter: false,
+        no_banded_rows: false,
+        banded_columns: false,
+        first_column: false,
+        last_column: false,
+        style_type: TableStyleType::Dark,
+        style_type_number: 5,
+        total_row: true,
+        columns: Some(vec![
+            TableColumn {
+                header: Some("HEADER1".to_string()),
+                formula: None,
+                total_string: Some("Total".to_string()),
+                total_function: TableTotalFunction::None,
+                header_format: None,
+                format: None,
+                total_value: 0.0,
+            },
+            TableColumn {
+                header: Some("HEADER2".to_string()),
+                formula: None,
+                total_string: None,
+                total_function: TableTotalFunction::Sum,
+                header_format: None,
+                format: None,
+                total_value: 0.0,
+            },
+            TableColumn {
+                header: Some("HEADER3".to_string()),
+                formula: Some("=[@[HEADER2]]*2".to_string()),
+                total_string: None,
+                total_function: TableTotalFunction::Count,
+                header_format: None,
+                format: None,
+                total_value: 0.0,
+            },
+        ]),
+    };
+    worksheet.add_table(0, 0, 4, 2, Some(options))?;
+    workbook.close()?;
+    Ok(())
+}
+
+#[test]
+fn test_validation() -> Result<(), XlsxError> {
+    let workbook = Workbook::new("test-worksheet_validation-cell-1.xlsx");
+    let mut validation = DataValidation::new(
+        DataValidationType::Integer,
+        DataValidationCriteria::Between,
+        DataValidationErrorType::Stop,
+    );
+    validation.show_input = true;
+    validation.show_error = true;
+    validation.ignore_blank = true;
+    validation.minimum_number = 0.;
+    validation.maximum_number = 2.;
+    validation.input_title = Some("Input Title".to_string());
+    validation.input_message = Some("Input Message".to_string());
+    validation.error_title = Some("Error Title".to_string());
+    validation.error_message = Some("Error Message".to_string());
+    let mut worksheet = workbook.add_worksheet(None)?;
+    worksheet.write_string(0, 0, "test1", None)?;
+    worksheet.data_validation_cell(1, 0, &validation)?;
+    workbook.close()?;
+    Ok(())
+}
