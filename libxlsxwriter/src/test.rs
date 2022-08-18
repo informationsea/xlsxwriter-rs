@@ -1,3 +1,5 @@
+use std::os::raw::c_char;
+
 use super::*;
 
 #[test]
@@ -157,7 +159,7 @@ fn test_add_table2() -> Result<(), XlsxError> {
                 total_function: TableTotalFunction::Sum,
                 header_format: None,
                 format: None,
-                total_value: 0.0,
+                total_value: 6.0,
             },
             TableColumn {
                 header: Some("HEADER3".to_string()),
@@ -166,7 +168,7 @@ fn test_add_table2() -> Result<(), XlsxError> {
                 total_function: TableTotalFunction::Count,
                 header_format: None,
                 format: None,
-                total_value: 0.0,
+                total_value: 3.0,
             },
         ]),
     };

@@ -1,7 +1,6 @@
 use super::constants::*;
 use super::structs::*;
-use crate::{convert_bool, convert_str, Workbook, WorksheetCol, WorksheetRow};
-use std::os::raw::c_char;
+use crate::{convert_bool, Workbook, WorksheetCol, WorksheetRow};
 
 /// Struct to represent an Excel chart data series.
 /// This struct is created using the chart.add_series() function. It is used in functions that modify a chart series but the members of the struct aren't modified directly.
@@ -43,18 +42,16 @@ impl<'a> ChartSeries<'a> {
         last_row: WorksheetRow,
         last_column: WorksheetCol,
     ) {
-        let sheet_name_vec = convert_str(sheet_name);
         unsafe {
             libxlsxwriter_sys::chart_series_set_categories(
                 self.chart_series,
-                sheet_name_vec.as_ptr() as *const c_char,
+                self._workbook.register_str(sheet_name),
                 first_row,
                 first_column,
                 last_row,
                 last_column,
             );
         }
-        self._workbook.const_str.borrow_mut().push(sheet_name_vec);
     }
 
     /// The categories and values of a chart data series are generally set using the `Chart.add_series()` function and Excel range formulas like "=Sheet1!$A$2:$A$7".
@@ -68,18 +65,16 @@ impl<'a> ChartSeries<'a> {
         last_row: WorksheetRow,
         last_column: WorksheetCol,
     ) {
-        let sheet_name_vec = convert_str(sheet_name);
         unsafe {
             libxlsxwriter_sys::chart_series_set_values(
                 self.chart_series,
-                sheet_name_vec.as_ptr() as *const c_char,
+                self._workbook.register_str(sheet_name),
                 first_row,
                 first_column,
                 last_row,
                 last_column,
             );
         }
-        self._workbook.const_str.borrow_mut().push(sheet_name_vec);
     }
 
     /// This function is used to set the name for a chart data series. The series name in Excel is displayed in the chart legend and in the formula bar. The name property is optional and if it isn't supplied it will default to `Series 1..n`.
@@ -135,14 +130,12 @@ impl<'a> ChartSeries<'a> {
     /// # }
     /// ```
     pub fn set_name(&mut self, name: &str) {
-        let name_vec = convert_str(name);
         unsafe {
             libxlsxwriter_sys::chart_series_set_name(
                 self.chart_series,
-                name_vec.as_ptr() as *const c_char,
+                self._workbook.register_str(name),
             );
         }
-        self._workbook.const_str.borrow_mut().push(name_vec);
     }
 
     /// The `ChartSeries.set_name_range()` function can be used to set a series name range and is an alternative to using `ChartSeries.set_name()` and a string formula:
@@ -171,16 +164,14 @@ impl<'a> ChartSeries<'a> {
     /// # }
     /// ```
     pub fn set_name_range(&mut self, sheet_name: &str, row: WorksheetRow, column: WorksheetCol) {
-        let sheet_name_vec = convert_str(sheet_name);
         unsafe {
             libxlsxwriter_sys::chart_series_set_name_range(
                 self.chart_series,
-                sheet_name_vec.as_ptr() as *const c_char,
+                self._workbook.register_str(sheet_name),
                 row,
                 column,
             );
         }
-        self._workbook.const_str.borrow_mut().push(sheet_name_vec);
     }
 
     /// Set the line/border properties of a chart series:

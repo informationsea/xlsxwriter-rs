@@ -5,8 +5,7 @@ mod structs;
 pub use self::constants::*;
 pub use self::series::*;
 pub use self::structs::*;
-use super::{convert_str, Workbook};
-use std::os::raw::c_char;
+use super::Workbook;
 
 /// The Chart object represents an Excel chart. It provides functions for adding data series to the chart and for configuring the chart.
 ///
@@ -169,28 +168,13 @@ impl<'a> Chart<'a> {
         categories: Option<&str>,
         values: Option<&str>,
     ) -> ChartSeries<'a> {
-        let categories_vec = categories.map(convert_str);
-        let values_vec = values.map(convert_str);
-        let mut const_str = self._workbook.const_str.borrow_mut();
         let series = unsafe {
             libxlsxwriter_sys::chart_add_series(
                 self.chart,
-                categories_vec
-                    .as_ref()
-                    .map(|x| x.as_ptr())
-                    .unwrap_or(std::ptr::null()) as *const c_char,
-                values_vec
-                    .as_ref()
-                    .map(|x| x.as_ptr())
-                    .unwrap_or(std::ptr::null()) as *const c_char,
+                self._workbook.register_option_str(categories),
+                self._workbook.register_option_str(values),
             )
         };
-        if let Some(x) = categories_vec {
-            const_str.push(x);
-        }
-        if let Some(x) = values_vec {
-            const_str.push(x);
-        }
         ChartSeries {
             _workbook: self._workbook,
             chart_series: series,
@@ -201,11 +185,8 @@ impl<'a> Chart<'a> {
     /// The name parameter can also be a formula such as `=Sheet1!$A$1` to point to a cell in the workbook that contains the name.
     /// The Excel default is to have no chart title.
     pub fn add_title(&mut self, title: &str) {
-        let title_vec = convert_str(title);
-        let mut const_str = self._workbook.const_str.borrow_mut();
         unsafe {
-            libxlsxwriter_sys::chart_title_set_name(self.chart, title_vec.as_ptr() as *const c_char)
+            libxlsxwriter_sys::chart_title_set_name(self.chart, self._workbook.register_str(title))
         }
-        const_str.push(title_vec);
     }
 }

@@ -2,6 +2,7 @@ use super::{error, Chart, ChartType, Format, Worksheet, XlsxError};
 use std::cell::RefCell;
 use std::ffi::CString;
 use std::os::raw::c_char;
+use std::pin::Pin;
 use std::rc::Rc;
 
 /// The Workbook is the main object exposed by the libxlsxwriter library. It represents the entire spreadsheet as you see it in Excel and internally it represents the Excel file as it is written on disk.
@@ -17,24 +18,40 @@ use std::rc::Rc;
 /// ```
 pub struct Workbook {
     workbook: *mut libxlsxwriter_sys::lxw_workbook,
-    _workbook_name: CString,
-    pub(crate) const_str: Rc<RefCell<Vec<Vec<u8>>>>,
+    pub(crate) const_str: Rc<RefCell<Vec<Pin<Box<CString>>>>>,
 }
 
 impl Workbook {
+    pub(crate) fn register_str(&self, s: &str) -> *const c_char {
+        let c = Box::pin(CString::new(s).expect("Cannot create CString from string"));
+        let p = c.as_ptr();
+        self.const_str.borrow_mut().push(c);
+        p
+    }
+
+    pub(crate) fn register_option_str(&self, s: Option<&str>) -> *const c_char {
+        if let Some(s) = s {
+            let c = Box::pin(CString::new(s).expect("Cannot create CString from string"));
+            let p = c.as_ptr();
+            self.const_str.borrow_mut().push(c);
+            p
+        } else {
+            std::ptr::null()
+        }
+    }
+
     /// This function is used to create a new Excel workbook with a given filename.
     /// When specifying a filename it is recommended that you use an .xlsx extension or Excel will generate a warning when opening the file.
     pub fn new(filename: &str) -> Workbook {
         unsafe {
-            let workbook_name = CString::new(filename).expect("Null Error");
-            let raw_workbook = libxlsxwriter_sys::workbook_new(workbook_name.as_c_str().as_ptr());
+            let workbook_name = Box::pin(CString::new(filename).expect("Null Error"));
+            let raw_workbook = libxlsxwriter_sys::workbook_new(workbook_name.as_ptr());
             if raw_workbook.is_null() {
                 unreachable!()
             }
             Workbook {
                 workbook: raw_workbook,
-                _workbook_name: workbook_name,
-                const_str: Rc::new(RefCell::new(Vec::new())),
+                const_str: Rc::new(RefCell::new(vec![workbook_name])),
             }
         }
     }
@@ -92,32 +109,31 @@ impl Workbook {
                 use_zip64: use_zip64 as u8,
             };
 
-            let workbook_name = CString::new(filename).expect("Null Error");
+            let workbook_name = Box::pin(CString::new(filename).expect("Null Error"));
 
-            let raw_workbook = libxlsxwriter_sys::workbook_new_opt(
-                workbook_name.as_c_str().as_ptr(),
-                &mut workbook_options,
-            );
+            let raw_workbook =
+                libxlsxwriter_sys::workbook_new_opt(workbook_name.as_ptr(), &mut workbook_options);
             if raw_workbook.is_null() {
                 unreachable!()
             }
             Workbook {
                 workbook: raw_workbook,
-                _workbook_name: workbook_name,
-                const_str: Rc::new(RefCell::new(Vec::new())),
+                const_str: Rc::new(RefCell::new(vec![workbook_name])),
             }
         }
     }
+
     pub fn add_worksheet<'a>(
         &'a self,
         sheet_name: Option<&str>,
     ) -> Result<Worksheet<'a>, XlsxError> {
-        let name_vec = sheet_name.map(|x| CString::new(x).unwrap().as_bytes_with_nul().to_vec());
+        let name_cstr =
+            sheet_name.map(|x| Box::pin(CString::new(x).expect("Cannot create CString")));
         unsafe {
-            if let Some(sheet_name) = name_vec.as_ref() {
+            if let Some(sheet_name) = name_cstr.as_ref() {
                 let result = libxlsxwriter_sys::workbook_validate_sheet_name(
                     self.workbook,
-                    sheet_name.as_ptr() as *const c_char,
+                    sheet_name.as_ptr(),
                 );
                 if result != libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                     return Err(XlsxError::new(result));
@@ -126,14 +142,14 @@ impl Workbook {
 
             let worksheet = libxlsxwriter_sys::workbook_add_worksheet(
                 self.workbook,
-                name_vec
+                name_cstr
                     .as_ref()
-                    .map(|x| x.as_ptr() as *const c_char)
+                    .map(|x| x.as_ptr())
                     .unwrap_or(std::ptr::null()),
             );
 
-            if let Some(name) = name_vec {
-                self.const_str.borrow_mut().push(name);
+            if let Some(name) = name_cstr {
+                self.const_str.borrow_mut().push(name)
             }
 
             if worksheet.is_null() {

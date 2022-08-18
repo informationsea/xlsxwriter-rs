@@ -73,14 +73,14 @@ mod validation;
 mod workbook;
 mod worksheet;
 
+use std::{ffi::CString, os::raw::c_char, pin::Pin};
+
 pub use chart::*;
 pub use error::XlsxError;
 pub use format::*;
 pub use validation::*;
 pub use workbook::*;
 pub use worksheet::*;
-
-use std::ffi::CString;
 
 fn convert_bool(value: bool) -> u8 {
     let result = if value {
@@ -91,8 +91,32 @@ fn convert_bool(value: bool) -> u8 {
     result as u8
 }
 
-fn convert_str(value: &str) -> Vec<u8> {
-    CString::new(value).unwrap().as_bytes_with_nul().to_vec()
+#[derive(Debug, Clone, PartialEq, Default)]
+pub(crate) struct CStringHelper {
+    strings: Vec<Pin<Box<CString>>>,
+}
+
+impl CStringHelper {
+    pub fn new() -> CStringHelper {
+        CStringHelper {
+            strings: Vec::new(),
+        }
+    }
+
+    pub fn add(&mut self, s: &str) -> *const c_char {
+        let s = Box::pin(CString::new(s).unwrap());
+        let p = s.as_ptr();
+        self.strings.push(s);
+        p
+    }
+
+    pub fn add_opt(&mut self, s: Option<&str>) -> *const c_char {
+        if let Some(s) = s {
+            self.add(s)
+        } else {
+            std::ptr::null()
+        }
+    }
 }
 
 #[cfg(test)]
