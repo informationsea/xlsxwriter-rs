@@ -1,9 +1,12 @@
 mod table;
+mod validation;
 
 use super::{convert_bool, Chart, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 use std::os::raw::c_char;
+
 pub use table::*;
+pub use validation::*;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct DateTime {
