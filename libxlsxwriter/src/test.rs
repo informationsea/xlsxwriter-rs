@@ -174,27 +174,3 @@ fn test_add_table2() -> Result<(), XlsxError> {
     workbook.close()?;
     Ok(())
 }
-
-#[test]
-fn test_validation() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("test-worksheet_validation-cell-1.xlsx");
-    let mut validation = DataValidation::new(
-        DataValidationType::Integer,
-        DataValidationCriteria::Between,
-        DataValidationErrorType::Stop,
-    );
-    validation.show_input = true;
-    validation.show_error = true;
-    validation.ignore_blank = true;
-    validation.minimum_number = 0.;
-    validation.maximum_number = 2.;
-    validation.input_title = Some("Input Title".to_string());
-    validation.input_message = Some("Input Message".to_string());
-    validation.error_title = Some("Error Title".to_string());
-    validation.error_message = Some("Error Message".to_string());
-    let mut worksheet = workbook.add_worksheet(None)?;
-    worksheet.write_string(0, 0, "test1", None)?;
-    worksheet.data_validation_cell(1, 0, &validation)?;
-    workbook.close()?;
-    Ok(())
-}
