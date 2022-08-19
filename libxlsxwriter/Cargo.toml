@@ -1,6 +1,6 @@
 [package]
 name = "xlsxwriter"
-version = "0.3.5"
+version = "0.4.0"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
 readme = "../README.md"
@@ -19,4 +19,4 @@ use-openssl-md5 = ["libxlsxwriter-sys/use-openssl-md5"]
 system-zlib = ["libxlsxwriter-sys/system-zlib"]
 
 [dependencies]
-libxlsxwriter-sys = {path = "../libxlsxwriter-sys", version = "^1.0.2"}
+libxlsxwriter-sys = {path = "../libxlsxwriter-sys", version = "^1.1.4"}
