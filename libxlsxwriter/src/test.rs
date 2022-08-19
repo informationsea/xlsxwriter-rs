@@ -1,5 +1,3 @@
-use std::os::raw::c_char;
-
 use super::*;
 
 #[test]

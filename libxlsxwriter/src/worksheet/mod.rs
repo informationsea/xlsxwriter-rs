@@ -1,11 +1,11 @@
 mod table;
 
-use super::{convert_bool, Chart, DataValidation, Format, FormatColor, Workbook, XlsxError};
+use super::{convert_bool, Chart, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 use std::os::raw::c_char;
 pub use table::*;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct DateTime {
     pub year: i16,
     pub month: i8,
@@ -1323,54 +1323,6 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_row,
                 last_col,
-            );
-            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
-                Ok(())
-            } else {
-                Err(XlsxError::new(result))
-            }
-        }
-    }
-
-    /// This function is used to construct an Excel data validation or to limit the user input to a dropdown list of values
-    pub fn data_validation_cell(
-        &mut self,
-        row: WorksheetRow,
-        col: WorksheetCol,
-        validation: &DataValidation,
-    ) -> Result<(), XlsxError> {
-        unsafe {
-            let mut validation = validation.to_c_struct();
-            let result = libxlsxwriter_sys::worksheet_data_validation_cell(
-                self.worksheet,
-                row,
-                col,
-                &mut validation.data_validation,
-            );
-            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
-                Ok(())
-            } else {
-                Err(XlsxError::new(result))
-            }
-        }
-    }
-
-    pub fn data_validation_range(
-        &mut self,
-        first_row: WorksheetRow,
-        first_col: WorksheetCol,
-        last_row: WorksheetRow,
-        last_col: WorksheetCol,
-        validation: &DataValidation,
-    ) -> Result<(), XlsxError> {
-        unsafe {
-            let result = libxlsxwriter_sys::worksheet_data_validation_range(
-                self.worksheet,
-                first_row,
-                first_col,
-                last_row,
-                last_col,
-                &mut validation.to_c_struct().data_validation,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())

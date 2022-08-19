@@ -91,6 +91,15 @@ fn convert_bool(value: bool) -> u8 {
     result as u8
 }
 
+fn convert_validation_bool(value: bool) -> u8 {
+    let result = if value {
+        libxlsxwriter_sys::lxw_validation_boolean_LXW_VALIDATION_ON
+    } else {
+        libxlsxwriter_sys::lxw_validation_boolean_LXW_VALIDATION_OFF
+    };
+    result as u8
+}
+
 #[derive(Debug, Clone, PartialEq, Default)]
 pub(crate) struct CStringHelper {
     strings: Vec<Pin<Box<CString>>>,

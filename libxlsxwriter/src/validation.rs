@@ -1,4 +1,8 @@
-use super::{convert_bool, DateTime};
+use crate::{
+    convert_validation_bool, CStringHelper, Worksheet, WorksheetCol, WorksheetRow, XlsxError,
+};
+
+use super::DateTime;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
@@ -182,15 +186,6 @@ pub struct DataValidation {
     pub error_message: Option<String>,
 }
 
-fn option_str_to_cstr_bytes(s: &Option<String>) -> Option<Vec<u8>> {
-    s.as_ref().map(|x| {
-        CString::new(x as &str)
-            .unwrap()
-            .into_bytes_with_nul()
-            .to_vec()
-    })
-}
-
 impl DataValidation {
     pub fn new(
         validate: DataValidationType,
@@ -201,49 +196,27 @@ impl DataValidation {
             validate,
             criteria,
             ignore_blank: true,
-            show_input: false,
+            show_input: true,
             show_error: true,
             error_type,
-            dropdown: false,
+            dropdown: true,
             value_number: 0.,
             value_formula: None,
             value_list: None,
-            value_datetime: DateTime {
-                year: 0,
-                month: 0,
-                day: 0,
-                hour: 0,
-                min: 0,
-                second: 0.,
-            },
+            value_datetime: DateTime::default(),
             minimum_number: 0.,
             minimum_formula: None,
-            minimum_datetime: DateTime {
-                year: 0,
-                month: 0,
-                day: 0,
-                hour: 0,
-                min: 0,
-                second: 0.,
-            },
+            minimum_datetime: DateTime::default(),
             maximum_number: 0.,
             maximum_formula: None,
-            maximum_datetime: DateTime {
-                year: 0,
-                month: 0,
-                day: 0,
-                hour: 0,
-                min: 0,
-                second: 0.,
-            },
+            maximum_datetime: DateTime::default(),
             input_title: None,
             input_message: None,
             error_title: None,
             error_message: None,
         }
     }
-    pub(crate) fn to_c_struct(&self) -> CDataValidation {
-        let mut _value_formula = option_str_to_cstr_bytes(&self.value_formula);
+    pub(crate) fn to_c_struct(&self, c_string_helper: &mut CStringHelper) -> CDataValidation {
         let mut _value_list: Option<Vec<Vec<u8>>> = self.value_list.as_ref().map(|x| {
             x.iter()
                 .map(|y| {
@@ -254,96 +227,108 @@ impl DataValidation {
                 })
                 .collect()
         });
-        let mut _value_list_ptr: Option<Vec<*mut c_char>> = _value_list.as_mut().map(|x| {
-            x.iter_mut()
-                .map(|y| y.as_mut_ptr() as *mut c_char)
+        let mut _value_list_ptr: Option<Vec<*mut c_char>> = self.value_list.as_ref().map(|x| {
+            x.iter()
+                .map(|y| c_string_helper.add(y) as *mut c_char)
                 .collect()
         });
         if let Some(l) = _value_list_ptr.as_mut() {
             l.push(std::ptr::null_mut());
         }
-        let mut _minimum_formula = option_str_to_cstr_bytes(&self.minimum_formula);
-        let mut _maximum_formula = option_str_to_cstr_bytes(&self.maximum_formula);
-        let mut _input_title = option_str_to_cstr_bytes(&self.input_title);
-        let mut _input_message = option_str_to_cstr_bytes(&self.input_message);
-        let mut _error_title = option_str_to_cstr_bytes(&self.error_title);
-        let mut _error_message = option_str_to_cstr_bytes(&self.error_message);
 
         CDataValidation {
             data_validation: libxlsxwriter_sys::lxw_data_validation {
                 validate: self.validate.value(),
                 criteria: self.criteria.value(),
-                ignore_blank: convert_bool(self.ignore_blank),
-                show_input: convert_bool(self.show_input),
-                show_error: convert_bool(self.show_error),
+                ignore_blank: convert_validation_bool(self.ignore_blank),
+                show_input: convert_validation_bool(self.show_input),
+                show_error: convert_validation_bool(self.show_error),
                 error_type: self.error_type.value(),
-                dropdown: convert_bool(self.dropdown),
+                dropdown: convert_validation_bool(self.dropdown),
                 value_number: self.value_number,
-                value_formula: _value_formula
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
+                value_formula: c_string_helper.add_opt(self.value_formula.as_deref())
+                    as *mut c_char,
                 value_list: _value_list_ptr
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
                     .unwrap_or(std::ptr::null_mut()),
                 value_datetime: (&self.value_datetime).into(),
                 minimum_number: self.minimum_number,
-                minimum_formula: _minimum_formula
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut())
+                minimum_formula: c_string_helper.add_opt(self.minimum_formula.as_deref())
                     as *mut c_char,
                 minimum_datetime: (&self.minimum_datetime).into(),
                 maximum_number: self.maximum_number,
-                maximum_formula: _maximum_formula
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut())
+                maximum_formula: c_string_helper.add_opt(self.maximum_formula.as_deref())
                     as *mut c_char,
                 maximum_datetime: (&self.maximum_datetime).into(),
-                input_title: _input_title
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
-                input_message: _input_message
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
-                error_title: _error_title
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
-                error_message: _error_message
-                    .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()) as *mut c_char,
+                input_title: c_string_helper.add_opt(self.input_title.as_deref()) as *mut c_char,
+                input_message: c_string_helper.add_opt(self.input_message.as_deref())
+                    as *mut c_char,
+                error_title: c_string_helper.add_opt(self.error_title.as_deref()) as *mut c_char,
+                error_message: c_string_helper.add_opt(self.error_message.as_deref())
+                    as *mut c_char,
             },
-
-            _value_formula,
-            _value_list,
             _value_list_ptr,
-            _minimum_formula,
-            _maximum_formula,
-            _input_title,
-            _input_message,
-            _error_title,
-            _error_message,
         }
     }
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct CDataValidation {
-    _value_formula: Option<Vec<u8>>,
-    _value_list: Option<Vec<Vec<u8>>>,
     _value_list_ptr: Option<Vec<*mut c_char>>,
-    _minimum_formula: Option<Vec<u8>>,
-    _maximum_formula: Option<Vec<u8>>,
-    _input_title: Option<Vec<u8>>,
-    _input_message: Option<Vec<u8>>,
-    _error_title: Option<Vec<u8>>,
-    _error_message: Option<Vec<u8>>,
-
     pub(crate) data_validation: libxlsxwriter_sys::lxw_data_validation,
+}
+
+impl<'a> Worksheet<'a> {
+    /// This function is used to construct an Excel data validation or to limit the user input to a dropdown list of values
+    pub fn data_validation_cell(
+        &mut self,
+        row: WorksheetRow,
+        col: WorksheetCol,
+        validation: &DataValidation,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let mut c_string_helper = CStringHelper::new();
+            let mut validation = validation.to_c_struct(&mut c_string_helper);
+            let result = libxlsxwriter_sys::worksheet_data_validation_cell(
+                self.worksheet,
+                row,
+                col,
+                &mut validation.data_validation,
+            );
+            std::mem::drop(c_string_helper);
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
+
+    pub fn data_validation_range(
+        &mut self,
+        first_row: WorksheetRow,
+        first_col: WorksheetCol,
+        last_row: WorksheetRow,
+        last_col: WorksheetCol,
+        validation: &DataValidation,
+    ) -> Result<(), XlsxError> {
+        unsafe {
+            let mut c_string_helper = CStringHelper::new();
+            let result = libxlsxwriter_sys::worksheet_data_validation_range(
+                self.worksheet,
+                first_row,
+                first_col,
+                last_row,
+                last_col,
+                &mut validation.to_c_struct(&mut c_string_helper).data_validation,
+            );
+            std::mem::drop(c_string_helper);
+            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
+                Ok(())
+            } else {
+                Err(XlsxError::new(result))
+            }
+        }
+    }
 }
