@@ -8,6 +8,7 @@ use std::os::raw::c_char;
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum DataValidationType {
+    None,
     Integer,
     IntegerFormula,
     Decimal,
@@ -27,6 +28,9 @@ pub enum DataValidationType {
 impl DataValidationType {
     fn value(self) -> u8 {
         let value = match self {
+            DataValidationType::None => {
+                libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_NONE
+            }
             DataValidationType::Integer => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_INTEGER
             }
@@ -76,6 +80,7 @@ impl DataValidationType {
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum DataValidationCriteria {
+    None,
     Between,
     NotBetween,
     EqualTo,
@@ -89,6 +94,7 @@ pub enum DataValidationCriteria {
 impl DataValidationCriteria {
     fn value(self) -> u8 {
         let value = match self {
+            DataValidationCriteria::None => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NONE,
             DataValidationCriteria::Between => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_BETWEEN,
             DataValidationCriteria::NotBetween => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NOT_BETWEEN,
             DataValidationCriteria::EqualTo => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_EQUAL_TO,
@@ -281,6 +287,29 @@ pub(crate) struct CDataValidation {
 
 impl<'a> Worksheet<'a> {
     /// This function is used to construct an Excel data validation or to limit the user input to a dropdown list of values
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_validation-cell-3.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// let mut validation = DataValidation::new(
+    ///     DataValidationType::Integer,
+    ///     DataValidationCriteria::GreaterThanOrEqualTo,
+    ///     DataValidationErrorType::Warning,
+    /// );
+    /// validation.value_number = 10.;
+    ///
+    /// # let format = workbook
+    /// #    .add_format()
+    /// #    .set_border(crate::FormatBorder::Dashed);
+    /// #
+    /// worksheet.write_string(0, 0, "10 or greater", None)?;
+    /// # worksheet.write_blank(1, 0, Some(&format))?;
+    /// worksheet.data_validation_cell(1, 0, &validation)?;
+    /// # workbook.close()
+    /// # }
+    /// ```    
+    ///
     pub fn data_validation_cell(
         &mut self,
         row: WorksheetRow,
@@ -305,6 +334,27 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// The this function is the same as the `data_validation_cell()`, see above, except the data validation is applied to a range of cells.
+    /// ```rust
+    /// # use xlsxwriter::*;
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_validation-cell-4.xlsx");
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// let mut validation = DataValidation::new(
+    ///     DataValidationType::List,
+    ///     DataValidationCriteria::None,
+    ///     DataValidationErrorType::Stop,
+    /// );
+    /// validation.value_list = Some(vec!["VALUE1".to_string(), "VALUE2".to_string(), "VALUE3".to_string()]);
+    ///
+    /// # let format = workbook
+    /// #    .add_format()
+    /// #    .set_border(crate::FormatBorder::Dashed);
+    /// #
+    /// worksheet.data_validation_range(0, 0, 100, 100, &validation)?;
+    /// # workbook.close()
+    /// # }
+    /// ```
     pub fn data_validation_range(
         &mut self,
         first_row: WorksheetRow,
@@ -346,18 +396,55 @@ mod test {
             DataValidationCriteria::Between,
             DataValidationErrorType::Stop,
         );
+
+        let format = workbook
+            .add_format()
+            .set_border(crate::FormatBorder::Dashed);
+
         validation.show_input = true;
         validation.show_error = true;
         validation.ignore_blank = true;
         validation.minimum_number = 0.;
         validation.maximum_number = 2.;
         validation.input_title = Some("Input Title".to_string());
-        validation.input_message = Some("Input Message".to_string());
+        validation.input_message = Some("Value must be 0 to 2".to_string());
         validation.error_title = Some("Error Title".to_string());
         validation.error_message = Some("Error Message".to_string());
         let mut worksheet = workbook.add_worksheet(None)?;
-        worksheet.write_string(0, 0, "test1", None)?;
+        worksheet.write_string(0, 0, "validation test", None)?;
+        worksheet.write_blank(1, 0, Some(&format))?;
         worksheet.data_validation_cell(1, 0, &validation)?;
+        workbook.close()?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_validation2() -> Result<(), XlsxError> {
+        let workbook = Workbook::new("test-worksheet_validation-cell-2.xlsx");
+        let mut validation = DataValidation::new(
+            DataValidationType::List,
+            DataValidationCriteria::None,
+            DataValidationErrorType::Warning,
+        );
+        validation.input_title = Some("Input Title".to_string());
+        validation.input_message = Some("Input Message".to_string());
+        validation.error_title = Some("Error Title".to_string());
+        validation.error_message = Some("Error Message".to_string());
+        validation.value_list = Some(vec!["VALUE1".to_string(), "VALUE2".to_string()]);
+
+        let format = workbook
+            .add_format()
+            .set_border(crate::FormatBorder::Dashed);
+
+        let mut worksheet = workbook.add_worksheet(None)?;
+        worksheet.write_string(0, 0, "input list", None)?;
+        for i in 1..=10 {
+            for j in 0..=1 {
+                worksheet.write_blank(i, j, Some(&format))?;
+            }
+        }
+
+        worksheet.data_validation_range(1, 0, 10, 1, &validation)?;
         workbook.close()?;
         Ok(())
     }
