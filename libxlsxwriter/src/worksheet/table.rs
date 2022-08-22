@@ -270,7 +270,7 @@ impl<'a> Worksheet<'a> {
 
         let mut options = if let Some(options) = options {
             Some(libxlsxwriter_sys::lxw_table_options {
-                name: cstring_helper.add_opt(options.name.as_deref()) as *mut i8,
+                name: cstring_helper.add_opt(options.name.as_deref()) as *mut c_char,
                 no_header_row: convert_bool(options.no_header_row),
                 no_autofilter: convert_bool(options.no_autofilter),
                 no_banded_rows: convert_bool(options.no_banded_rows),
