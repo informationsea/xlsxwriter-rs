@@ -27,10 +27,22 @@ jobs:
             target: x86_64-apple-darwin
             test: true
             cross: false
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            test: false
+            cross: false
           - os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             test: true
             cross: false
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            test: true
+            cross: true
+          - os: ubuntu-latest
+            target: armv7-unknown-linux-gnueabi
+            test: true
+            cross: true
           - os: ubuntu-latest
             target: x86_64-unknown-linux-musl
             test: true
