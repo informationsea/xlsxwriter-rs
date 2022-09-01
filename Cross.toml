@@ -1,0 +1,8 @@
+[target.arm-unknown-linux-gnueabihf]
+dockerfile = ".cross/arm-linux-gnueabihf/Dockerfile"
+
+[target.armv7-unknown-linux-gnueabihf]
+dockerfile = ".cross/arm-linux-gnueabihf/Dockerfile"
+
+[target.aarch64-unknown-linux-gnu]
+dockerfile = ".cross/aarch64-linux-gnu/Dockerfile"

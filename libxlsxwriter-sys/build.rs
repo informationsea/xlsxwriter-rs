@@ -106,9 +106,16 @@ fn main() -> io::Result<()> {
     // The bindgen::Builder is the main entry point
     // to bindgen, and lets you build up options for
     // the resulting bindings.
-    let bindings = bindgen::Builder::default()
+    let builder = bindgen::Builder::default()
         .generate_comments(false)
-        .clang_arg("-Iinclude")
+        .clang_arg("-Iinclude");
+    let builder = if let Ok(sysroot) = env::var("SYSROOT") {
+        builder.clang_arg(format!("--sysroot={}", sysroot))
+    } else {
+        builder
+    };
+
+    let bindings = builder
         .header("wrapper.h")
         .allowlist_function("^(chart|chartsheet|workbook|worksheet|format|lxw)_.*")
         .allowlist_type("^lxw_.*")

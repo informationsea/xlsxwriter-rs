@@ -203,7 +203,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_add_table-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_add_table-0.xlsx");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_string(0, 0, "header 1", None)?;
     /// worksheet.write_string(0, 1, "header 2", None)?;
