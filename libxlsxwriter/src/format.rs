@@ -340,11 +340,11 @@ impl<'a> Format<'a> {
         self
     }
 
-    pub fn set_num_format(self, num_font: &str) -> Self {
+    pub fn set_num_format(self, num_format: &str) -> Self {
         unsafe {
             libxlsxwriter_sys::format_set_num_format(
                 self.format,
-                CString::new(num_font).unwrap().as_c_str().as_ptr(),
+                CString::new(num_format).unwrap().as_c_str().as_ptr(),
             );
         }
         self
