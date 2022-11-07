@@ -5,10 +5,11 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 
-const C_FILES: [&str; 25] = [
+const C_FILES: [&str; 26] = [
     "third_party/libxlsxwriter/third_party/tmpfileplus/tmpfileplus.c",
     "third_party/libxlsxwriter/third_party/minizip/ioapi.c",
     "third_party/libxlsxwriter/third_party/minizip/zip.c",
+    "third_party/libxlsxwriter/third_party/dtoa/emyg_dtoa.c",
     "third_party/libxlsxwriter/src/app.c",
     "third_party/libxlsxwriter/src/chart.c",
     "third_party/libxlsxwriter/src/chartsheet.c",
@@ -100,6 +101,9 @@ fn main() -> io::Result<()> {
             .flag_if_supported("/utf-8")
             .include("include");
     }
+
+    // Make `libxlsxwriter` use DTOA for number formating to avoid locale-specific C functions.
+    build.define("USE_DTOA_LIBRARY", None);
 
     build.compile("libxlsxwriter.a");
 
