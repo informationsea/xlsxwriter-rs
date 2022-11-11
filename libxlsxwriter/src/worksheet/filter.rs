@@ -235,11 +235,7 @@ mod test {
             value_string: None,
         };
         worksheet1.filter_column(0, &worksheet1_criteria)?;
-        let mut hidden_row = RowColOptions {
-            hidden: 1,
-            level: 0,
-            collapsed: 0,
-        };
+        let mut hidden_row = RowColOptions::new(true, 0, false);
         for i in 1..=10 {
             worksheet1.set_row_opt(i, 13.2, None, &mut hidden_row)?;
         }

@@ -10,6 +10,16 @@ pub use filter::*;
 pub use table::*;
 pub use validation::*;
 
+/// Integer data type to represent a column value. Equivalent to `u16`.
+///
+/// The maximum column in Excel is 16,384.
+pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
+
+/// Integer data type to represent a row value. Equivalent to `u32`.
+///
+/// The maximum row in Excel is 1,048,576.
+pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
+
 #[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct DateTime {
     pub year: i16,
@@ -232,18 +242,114 @@ impl From<&Protection> for libxlsxwriter_sys::lxw_protection {
     }
 }
 
-/// Integer data type to represent a column value. Equivalent to `u16`.
-///
-/// The maximum column in Excel is 16,384.
-pub type WorksheetCol = libxlsxwriter_sys::lxw_col_t;
+/// Options struct for the `set_column()` and `set_row()` functions.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct RowColOptions {
+    hidden: bool,
+    level: u8,
+    collapsed: bool,
+}
 
-/// Integer data type to represent a row value. Equivalent to `u32`.
-///
-/// The maximum row in Excel is 1,048,576.
-pub type WorksheetRow = libxlsxwriter_sys::lxw_row_t;
+impl RowColOptions {
+    pub fn new(hidden: bool, level: u8, collapsed: bool) -> Self {
+        RowColOptions {
+            hidden,
+            level,
+            collapsed,
+        }
+    }
 
-pub type CommentOptions = libxlsxwriter_sys::lxw_comment_options;
-pub type RowColOptions = libxlsxwriter_sys::lxw_row_col_options;
+    pub(crate) fn into_internal(&self) -> libxlsxwriter_sys::lxw_row_col_options {
+        libxlsxwriter_sys::lxw_row_col_options {
+            hidden: convert_bool(self.hidden),
+            level: self.level,
+            collapsed: convert_bool(self.collapsed),
+        }
+    }
+}
+
+impl Default for RowColOptions {
+    fn default() -> Self {
+        RowColOptions {
+            hidden: false,
+            level: 0,
+            collapsed: false,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CommentDisplayType {
+    Default,
+    Hidden,
+    Visible,
+}
+
+impl Default for CommentDisplayType {
+    fn default() -> Self {
+        CommentDisplayType::Default
+    }
+}
+
+impl CommentDisplayType {
+    pub(crate) fn into_internal(self) -> libxlsxwriter_sys::lxw_comment_display_types {
+        match self {
+            CommentDisplayType::Default => {
+                libxlsxwriter_sys::lxw_comment_display_types_LXW_COMMENT_DISPLAY_DEFAULT
+            }
+            CommentDisplayType::Hidden => {
+                libxlsxwriter_sys::lxw_comment_display_types_LXW_COMMENT_DISPLAY_HIDDEN
+            }
+            CommentDisplayType::Visible => {
+                libxlsxwriter_sys::lxw_comment_display_types_LXW_COMMENT_DISPLAY_VISIBLE
+            }
+        }
+    }
+}
+
+/// Options for modifying comments inserted via `write_comment_opt()`
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
+pub struct CommentOptions {
+    visible: CommentDisplayType,
+    author: Option<String>,
+    width: Option<u16>,
+    height: Option<u16>,
+    x_scale: Option<f64>,
+    y_scale: Option<f64>,
+    color: FormatColor,
+    font_name: Option<String>,
+    font_size: Option<f64>,
+    font_family: Option<u8>,
+    start_row: WorksheetRow,
+    start_col: WorksheetCol,
+    x_offset: i32,
+    y_offset: i32,
+}
+
+impl CommentOptions {
+    pub(crate) fn into_internal(
+        &self,
+        workbook: &Workbook,
+    ) -> libxlsxwriter_sys::lxw_comment_options {
+        libxlsxwriter_sys::lxw_comment_options {
+            visible: self.visible.into_internal() as u8,
+            author: workbook.register_option_str(self.author.as_deref()) as *mut std::ffi::c_char,
+            width: self.width.unwrap_or_default(),
+            height: self.height.unwrap_or_default(),
+            x_scale: self.x_scale.unwrap_or_default(),
+            y_scale: self.y_scale.unwrap_or_default(),
+            color: self.color.value(),
+            font_name: workbook.register_option_str(self.font_name.as_deref())
+                as *mut std::ffi::c_char,
+            font_size: self.font_size.unwrap_or_default(),
+            font_family: self.font_family.unwrap_or_default(),
+            start_row: self.start_row,
+            start_col: self.start_col,
+            x_offset: self.x_offset,
+            y_offset: self.y_offset,
+        }
+    }
+}
 
 pub const LXW_DEF_ROW_HEIGHT: f64 = 8.43;
 pub const LXW_DEF_ROW_HEIGHT_PIXELS: u32 = 20;
@@ -307,15 +413,16 @@ impl<'a> Worksheet<'a> {
         row: WorksheetRow,
         col: WorksheetCol,
         text: &str,
-        options: &mut CommentOptions,
+        options: &CommentOptions,
     ) -> Result<(), XlsxError> {
+        let mut options = options.into_internal(self._workbook);
         unsafe {
             let result = libxlsxwriter_sys::worksheet_write_comment_opt(
                 self.worksheet,
                 row,
                 col,
-                CString::new(text).unwrap().as_c_str().as_ptr(),
-                options,
+                self._workbook.register_str(text),
+                &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -960,15 +1067,16 @@ impl<'a> Worksheet<'a> {
         row: WorksheetRow,
         height: f64,
         format: Option<&Format>,
-        options: &mut RowColOptions,
+        options: &RowColOptions,
     ) -> Result<(), XlsxError> {
         unsafe {
+            let mut options = options.into_internal();
             let result = libxlsxwriter_sys::worksheet_set_row_opt(
                 self.worksheet,
                 row,
                 height,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
-                options,
+                &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1007,15 +1115,16 @@ impl<'a> Worksheet<'a> {
         row: WorksheetRow,
         pixels: u32,
         format: Option<&Format>,
-        options: &mut RowColOptions,
+        options: &RowColOptions,
     ) -> Result<(), XlsxError> {
+        let mut options = options.into_internal();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_row_pixels_opt(
                 self.worksheet,
                 row,
                 pixels,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
-                options,
+                &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1054,8 +1163,9 @@ impl<'a> Worksheet<'a> {
         last_col: WorksheetCol,
         width: f64,
         format: Option<&Format>,
-        options: &mut RowColOptions,
+        options: &RowColOptions,
     ) -> Result<(), XlsxError> {
+        let mut options = options.into_internal();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_column_opt(
                 self.worksheet,
@@ -1063,7 +1173,7 @@ impl<'a> Worksheet<'a> {
                 last_col,
                 width,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
-                options,
+                &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1104,6 +1214,7 @@ impl<'a> Worksheet<'a> {
         format: Option<&Format>,
         options: &mut RowColOptions,
     ) -> Result<(), XlsxError> {
+        let mut options = options.into_internal();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_column_pixels_opt(
                 self.worksheet,
@@ -1111,7 +1222,7 @@ impl<'a> Worksheet<'a> {
                 last_col,
                 pixels,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
-                options,
+                &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())

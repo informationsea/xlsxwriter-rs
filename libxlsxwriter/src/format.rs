@@ -2,7 +2,7 @@ use super::Workbook;
 use std::ffi::CString;
 
 #[allow(clippy::unreadable_literal)]
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum FormatColor {
     Black,
     Blue,
@@ -48,7 +48,7 @@ impl FormatColor {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum FormatUnderline {
     Single,
     Double,
@@ -76,7 +76,7 @@ impl FormatUnderline {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum FormatScript {
     SuperScript,
     SubScript,
@@ -92,7 +92,7 @@ impl FormatScript {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum FormatAlignment {
     None,
     Left,
@@ -144,7 +144,7 @@ impl FormatAlignment {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum FormatPatterns {
     None,
     Solid,
@@ -222,7 +222,7 @@ impl FormatPatterns {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 pub enum FormatBorder {
     None,
     Thin,
