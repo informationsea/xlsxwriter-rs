@@ -80,7 +80,7 @@ impl FilterCriteria {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Default)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct FilterRule {
     pub criteria: FilterCriteria,
     pub value_string: Option<String>,
