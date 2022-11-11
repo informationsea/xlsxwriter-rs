@@ -1,3 +1,4 @@
+mod filter;
 mod table;
 mod validation;
 
@@ -5,6 +6,7 @@ use super::{convert_bool, Chart, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
+pub use filter::*;
 pub use table::*;
 pub use validation::*;
 
@@ -1299,33 +1301,6 @@ impl<'a> Worksheet<'a> {
                 last_col,
                 CString::new(string).unwrap().as_c_str().as_ptr(),
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
-            );
-            if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
-                Ok(())
-            } else {
-                Err(XlsxError::new(result))
-            }
-        }
-    }
-
-    /// This function allows an autofilter to be added to a worksheet.
-    ///
-    /// An autofilter is a way of adding drop down lists to the headers of a 2D range of worksheet data.
-    /// This allows users to filter the data based on simple criteria so that some data is shown and some is hidden.
-    pub fn autofilter(
-        &mut self,
-        first_row: WorksheetRow,
-        first_col: WorksheetCol,
-        last_row: WorksheetRow,
-        last_col: WorksheetCol,
-    ) -> Result<(), XlsxError> {
-        unsafe {
-            let result = libxlsxwriter_sys::worksheet_autofilter(
-                self.worksheet,
-                first_row,
-                first_col,
-                last_row,
-                last_col,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
