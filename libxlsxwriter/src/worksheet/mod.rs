@@ -1250,9 +1250,12 @@ impl<'a> Worksheet<'a> {
     /// The Worksheet.insert_image_opt() function takes additional optional parameters to position and scale the image, see below.
     ///
     /// ### Note
-    /// The scaling of a image may be affected if is crosses a row that has its default height changed due to a font that is larger than the default font size or that has text wrapping turned on. To avoid this you should explicitly set the height of the row using Worksheet.set_row() if it crosses an inserted image.
+    /// The scaling of a image may be affected if is crosses a row that has its default height changed due to a font that is larger than
+    /// the default font size or that has text wrapping turned on. To avoid this you should explicitly set the height of the row using
+    /// [`Worksheet::set_row`] if it crosses an inserted image.
     ///
-    /// BMP images are only supported for backward compatibility. In general it is best to avoid BMP images since they aren't compressed. If used, BMP images must be 24 bit, true color, bitmaps.
+    /// BMP images are only supported for backward compatibility. In general it is best to avoid BMP images since they aren't compressed.
+    /// If used, BMP images must be 24 bit, true color, bitmaps.
     pub fn insert_image(
         &mut self,
         row: WorksheetRow,
@@ -1296,7 +1299,7 @@ impl<'a> Worksheet<'a> {
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-insert_image_opt-1.png)
     ///
     /// ### Note
-    /// See the notes about row scaling and BMP images in Worksheet.insert_image() above.
+    /// See the notes about row scaling and BMP images in [`Worksheet::insert_image`] above.
     pub fn insert_image_opt(
         &mut self,
         row: WorksheetRow,
@@ -1332,7 +1335,7 @@ impl<'a> Worksheet<'a> {
     /// # workbook.close()
     /// # }
     /// ```
-    /// See Worksheet.insert_image() for details about the supported image formats, and other image features.
+    /// See [`Worksheet::insert_image`] for details about the supported image formats, and other image features.
     pub fn insert_image_buffer(
         &mut self,
         row: WorksheetRow,
@@ -1397,6 +1400,7 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// The [`Worksheet::merge_range`] function allows cells to be merged together so that they act as a single area.
     pub fn merge_range(
         &mut self,
         first_row: WorksheetRow,
@@ -1424,42 +1428,79 @@ impl<'a> Worksheet<'a> {
         }
     }
 
+    /// The [`Worksheet::activate`] function is used to specify which worksheet is initially visible in a multi-sheet workbook.
     pub fn activate(&mut self) {
         unsafe {
             libxlsxwriter_sys::worksheet_activate(self.worksheet);
         }
     }
 
+    /// The [`Worksheet::select`] function is used to indicate that a worksheet is selected in a multi-sheet workbook.
+    ///
+    /// A selected worksheet has its tab highlighted. Selecting worksheets is a way of grouping them together so that, for example, several worksheets could be printed in one go.
+    /// A worksheet that has been activated via the [`Worksheet::activate`] function will also appear as selected.
     pub fn select(&mut self) {
         unsafe {
             libxlsxwriter_sys::worksheet_select(self.worksheet);
         }
     }
 
+    /// The [`Worksheet::hide`] function is used to hide a worksheet.
+    ///
+    /// You may wish to hide a worksheet in order to avoid confusing a user with intermediate data or calculations.
+    ///
+    /// A hidden worksheet can not be activated or selected so this function is mutually exclusive with the [`Worksheet::activate`]
+    /// and [`Worksheet::select`] functions. In addition, since the first worksheet will default to being the active worksheet,
+    /// you cannot hide the first worksheet without activating another sheet.
     pub fn hide(&mut self) {
         unsafe {
             libxlsxwriter_sys::worksheet_hide(self.worksheet);
         }
     }
 
+    /// The [`Worksheet::activate`] function determines which worksheet is initially selected. However,
+    /// if there are a large number of worksheets the selected worksheet may not appear on the screen.
+    /// To avoid this you can select the leftmost visible worksheet tab using [`Worksheet::set_first_sheet`]
+    ///
+    /// This function is not required very often. The default value is the first worksheet.
     pub fn set_first_sheet(&mut self) {
         unsafe {
             libxlsxwriter_sys::worksheet_set_first_sheet(self.worksheet);
         }
     }
 
+    /// The [`Worksheet::freeze_panes`] function can be used to divide a worksheet into horizontal or
+    /// vertical regions known as panes and to "freeze" these panes so that the splitter bars are not visible.
+    ///
+    /// The parameters row and col are used to specify the location of the split. It should be noted that the
+    /// split is specified at the top or left of a cell and that the function uses zero based indexing. Therefore
+    /// to freeze the first row of a worksheet it is necessary to specify the split at row 2 (which is 1 as the zero-based index).
+    ///
+    /// You can set one of the row and col parameters as zero if you do not want either a vertical or horizontal split.
     pub fn freeze_panes(&mut self, row: WorksheetRow, col: WorksheetCol) {
         unsafe {
             libxlsxwriter_sys::worksheet_freeze_panes(self.worksheet, row, col);
         }
     }
 
+    /// The [`Worksheet::split_panes`] function can be used to divide a worksheet into horizontal or vertical regions known as panes.
+    /// This function is different from the [`Worksheet::freeze_panes`] function in that the splits between the panes will be visible
+    /// to the user and each pane will have its own scroll bars.
+    ///
+    /// The parameters vertical and horizontal are used to specify the vertical and horizontal position of the split. The units for
+    /// vertical and horizontal are the same as those used by Excel to specify row height and column width. However, the vertical
+    /// and horizontal units are different from each other. Therefore you must specify the vertical and horizontal parameters in
+    /// terms of the row heights and column widths that you have set or the default values which are 15 for a row and 8.43 for a column.
     pub fn split_panes(&mut self, vertical: f64, horizontal: f64) {
         unsafe {
             libxlsxwriter_sys::worksheet_split_panes(self.worksheet, vertical, horizontal);
         }
     }
 
+    /// The [`Worksheet::set_selection`] function can be used to specify which cell or range of cells is selected in a worksheet:
+    /// The most common requirement is to select a single cell, in which case the first_ and last_ parameters should be the same.
+    ///
+    /// The active cell within a selected range is determined by the order in which `first_` and `last_` are specified.
     pub fn set_selection(
         &mut self,
         first_row: WorksheetRow,
