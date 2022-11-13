@@ -116,6 +116,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// An autofilter is a way of adding drop down lists to the headers of a 2D range of worksheet data.
     /// This allows users to filter the data based on simple criteria so that some data is shown and some is hidden.
+    ///
     pub fn autofilter(
         &mut self,
         first_row: WorksheetRow,
@@ -141,6 +142,27 @@ impl<'a> Worksheet<'a> {
 
     /// This function can be used to filter columns in a autofilter range based on single rule conditions.
     ///
+    /// ```rust
+    /// use xlsxwriter::*;
+    ///
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_filter_column.xlsx")?;
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # worksheet.write_string(0, 0, "Column A", None)?;
+    /// # worksheet.write_string(0, 1, "Column B", None)?;
+    /// # for i in 1..=10 {
+    /// #     let v: f64 = i.into();
+    /// #     worksheet.write_number(i, 0, v, None)?;
+    /// #     worksheet.write_number(i, 1, v + 0.5, None)?;
+    /// # }
+    /// worksheet.autofilter(0, 0, 10, 1)?;
+    /// worksheet.filter_column(0, &FilterRule::new(FilterCriteria::NotEqualTo, 9.0))?;
+    /// worksheet.set_row_opt(9, LXW_DEF_ROW_HEIGHT, None, &RowColOptions::new(true, 0, false))?;
+    /// # Ok(())
+    /// # }
+    ///
+    /// ```
+    ///
     /// The `col` parameter is a zero indexed column number and must refer to a column in an existing autofilter created with [`Worksheet::autofilter`].
     /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.
     pub fn filter_column(
@@ -164,6 +186,27 @@ impl<'a> Worksheet<'a> {
     }
 
     /// This function can be used to filter columns in a autofilter range based on two rule conditions.
+    ///
+    /// ```rust
+    /// use xlsxwriter::*;
+    ///
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_filter_column2.xlsx")?;
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # worksheet.write_string(0, 0, "Column A", None)?;
+    /// # worksheet.write_string(0, 1, "Column B", None)?;
+    /// # for i in 1..=10 {
+    /// #     let v: f64 = i.into();
+    /// #     worksheet.write_number(i, 0, v, None)?;
+    /// #     worksheet.write_number(i, 1, v + 0.5, None)?;
+    /// # }
+    /// worksheet.autofilter(0, 0, 10, 1)?;
+    /// worksheet.filter_column2(0, &FilterRule::new(FilterCriteria::LessThan, 8.5), &FilterRule::new(FilterCriteria::GreaterThan, 9.5), FilterOperator::FilterOr)?;
+    /// worksheet.set_row_opt(9, LXW_DEF_ROW_HEIGHT, None, &RowColOptions::new(true, 0, false))?;
+    /// # Ok(())
+    /// # }
+    ///
+    /// ```
     ///
     /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.
     pub fn filter_column2(
@@ -191,6 +234,32 @@ impl<'a> Worksheet<'a> {
         Ok(())
     }
 
+    /// This function can be used specify multiple string matching criteria. This is a newer type of filter introduced in Excel 2007.
+    /// Prior to that it was only possible to have either 1 or 2 filter conditions, such as the ones used by [`Worksheet::filter_column()`]
+    /// and [`Worksheet::filter_column2()`].
+    ///
+    /// ```rust
+    /// use xlsxwriter::*;
+    ///
+    /// # fn main() -> Result<(), XlsxError> {
+    /// # let workbook = Workbook::new("test-worksheet_filter_list.xlsx")?;
+    /// # let mut worksheet = workbook.add_worksheet(None)?;
+    /// # worksheet.write_string(0, 0, "Column A", None)?;
+    /// # worksheet.write_string(0, 1, "Column B", None)?;
+    /// # for i in 1..=10 {
+    /// #     let v: f64 = i.into();
+    /// #     worksheet.write_number(i, 0, v, None)?;
+    /// #     worksheet.write_number(i, 1, v + 0.5, None)?;
+    /// # }
+    /// worksheet.autofilter(0, 0, 10, 1)?;
+    /// worksheet.filter_list(0, &["1", "2", "3", "4", "5", "6", "7", "8", "10"])?;
+    /// worksheet.set_row_opt(9, LXW_DEF_ROW_HEIGHT, None, &RowColOptions::new(true, 0, false))?;
+    /// # Ok(())
+    /// # }
+    ///
+    /// ```
+    ///
+    /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.    
     pub fn filter_list(
         &mut self,
         col: crate::WorksheetCol,
