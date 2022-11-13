@@ -29,7 +29,7 @@
 //! use xlsxwriter::*;
 //!
 //! # fn main() -> Result<(), XlsxError> {
-//! let workbook = Workbook::new("simple1.xlsx");
+//! let workbook = Workbook::new("simple1.xlsx")?;
 //! let mut format1 = workbook.add_format()
 //!     .set_font_color(FormatColor::Red);
 //!

@@ -15,7 +15,7 @@ use super::Workbook;
 /// ```rust
 /// use xlsxwriter::*;
 /// # fn main() -> Result<(), XlsxError> {
-/// let workbook = Workbook::new("test-chart.xlsx");
+/// let workbook = Workbook::new("test-chart.xlsx")?;
 /// let mut worksheet = workbook.add_worksheet(None)?;
 /// write_worksheet(&mut worksheet)?; // write worksheet contents
 /// let mut chart = workbook.add_chart(ChartType::Column);
@@ -56,7 +56,7 @@ impl<'a> Chart<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-chart-add_series-1.xlsx");
+    /// # let workbook = Workbook::new("test-chart-add_series-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
     /// # let mut chart = workbook.add_chart(ChartType::Column);
@@ -78,7 +78,7 @@ impl<'a> Chart<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-chart-add_series-2.xlsx");
+    /// # let workbook = Workbook::new("test-chart-add_series-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
     /// # let mut chart = workbook.add_chart(ChartType::Column);
@@ -100,7 +100,7 @@ impl<'a> Chart<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-chart-add_series-3.xlsx");
+    /// # let workbook = Workbook::new("test-chart-add_series-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
     /// # let mut chart = workbook.add_chart(ChartType::Column);
@@ -125,7 +125,7 @@ impl<'a> Chart<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-chart-add_series-4.xlsx");
+    /// # let workbook = Workbook::new("test-chart-add_series-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
     /// # let mut chart = workbook.add_chart(ChartType::Column);
@@ -148,7 +148,7 @@ impl<'a> Chart<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-chart-add_series-5.xlsx");
+    /// # let workbook = Workbook::new("test-chart-add_series-5.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # write_worksheet(&mut worksheet)?; // write worksheet contents
     /// # let mut chart = workbook.add_chart(ChartType::Column);

@@ -231,7 +231,7 @@ mod test {
 
     #[test]
     fn test_autofilter() -> Result<(), XlsxError> {
-        let workbook = Workbook::new("test-worksheet_autofilter.xlsx");
+        let workbook = Workbook::new("test-worksheet_autofilter.xlsx")?;
         // ------------
         let mut worksheet1 = workbook.add_worksheet(Some("Sheet 1"))?;
         create_sheet(&mut worksheet1)?;

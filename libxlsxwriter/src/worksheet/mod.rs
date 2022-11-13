@@ -364,7 +364,7 @@ pub const LXW_DEF_COL_WIDTH_PIXELS: u32 = 64;
 /// ```rust
 /// use xlsxwriter::*;
 /// # fn main() -> Result<(), XlsxError> {
-/// let workbook = Workbook::new("test-worksheet.xlsx");
+/// let workbook = Workbook::new("test-worksheet.xlsx")?;
 /// let mut worksheet = workbook.add_worksheet(None)?;
 /// worksheet.write_string(0, 0, "Hello, excel", None)?;
 /// workbook.close()
@@ -382,7 +382,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_comment-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_comment-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_comment(0, 0, "This is some comment text")?;
     /// worksheet.write_comment(1, 0, "This cell also has a comment")?;
@@ -438,7 +438,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_number-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_number-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_number(0, 0, 123456.0, None)?;
     /// worksheet.write_number(1, 0, 2.3451, None)?;
@@ -454,7 +454,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx")?;
     /// let format = workbook.add_format()
     ///     .set_num_format("$#,##0.00");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -493,7 +493,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_string-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_string-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_string(0, 0, "This phrase is English!", None)?;
     /// # workbook.close()
@@ -506,7 +506,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx")?;
     /// let format = workbook.add_format()
     ///     .set_bold();
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -520,7 +520,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_string-3.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_string-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_string(0, 0, "こんにちは、世界！", None)?;
     /// # workbook.close()
@@ -555,7 +555,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_formula-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_formula-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_formula(0, 0, "=B3 + 6", None)?;
     /// worksheet.write_formula(1, 0, "=SIN(PI()/4)", None)?;
@@ -576,7 +576,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_formula-2.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_formula-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// // OK
     /// worksheet.write_formula(0, 0, "=SUM(1, 2, 3)", None)?;
@@ -616,7 +616,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_array_formula-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_array_formula-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_array_formula(4, 0, 6, 0, "{=TREND(C5:C7,B5:B7)}", None)?;
     /// # workbook.close()
@@ -626,7 +626,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_array_formula-2.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_array_formula-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_array_formula(1, 0, 1, 0, "{=SUM(B1:C1*B2:C2)}", None)?;
     /// # workbook.close()
@@ -663,7 +663,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let datetime = DateTime::new(2013, 2, 28, 12, 0, 0.0);
     /// let datetime_format = workbook.add_format()
@@ -706,7 +706,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let url_format = workbook.add_format()
     ///     .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
@@ -719,7 +719,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut url_format = workbook.add_format()
     /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
@@ -735,7 +735,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut url_format = workbook.add_format()
     /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
@@ -749,7 +749,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_url-4.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_url-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut worksheet2 = workbook.add_worksheet(None)?;
     /// # let mut worksheet3 = workbook.add_worksheet(Some("Sales Data"))?;
@@ -794,7 +794,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_boolean-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_boolean-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_boolean(0, 0, true, None)?;
     /// worksheet.write_boolean(1, 0, false, None)?;
@@ -828,7 +828,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut url_format = workbook.add_format()
     /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
@@ -866,7 +866,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_formula_num-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_formula_num-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut url_format = workbook.add_format()
     /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
@@ -916,7 +916,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_formula_str-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_formula_str-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut url_format = workbook.add_format()
     /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
@@ -960,7 +960,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_write_richtext-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_write_richtext-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let mut bold = workbook.add_format()
     ///     .set_bold();
@@ -1239,7 +1239,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_insert_image-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_insert_image-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.insert_image(2, 1, "../images/simple1.png")?;
     /// # workbook.close()
@@ -1278,7 +1278,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_insert_image_opt-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_insert_image_opt-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.insert_image_opt(
     ///     2, 1,
@@ -1325,7 +1325,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_insert_image_buffer-1.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_insert_image_buffer-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let data = include_bytes!("../../../images/simple1.png");
     /// worksheet.insert_image_buffer(0, 0, &data[..])?;

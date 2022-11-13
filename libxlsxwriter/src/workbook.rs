@@ -12,7 +12,7 @@ use std::rc::Rc;
 /// ```rust
 /// use xlsxwriter::*;
 /// fn main() -> Result<(), XlsxError> {
-///     let workbook = Workbook::new("test-workbook.xlsx");
+///     let workbook = Workbook::new("test-workbook.xlsx")?;
 ///     let mut worksheet = workbook.add_worksheet(None)?;
 ///     worksheet.write_string(0, 0, "Hello Excel", None)?;
 ///     workbook.close()
@@ -44,17 +44,17 @@ impl Workbook {
 
     /// This function is used to create a new Excel workbook with a given filename.
     /// When specifying a filename it is recommended that you use an .xlsx extension or Excel will generate a warning when opening the file.
-    pub fn new(filename: &str) -> Workbook {
+    pub fn new(filename: &str) -> Result<Workbook, XlsxError> {
         unsafe {
-            let workbook_name = Box::pin(CString::new(filename).expect("Null Error"));
+            let workbook_name = Box::pin(CString::new(filename)?);
             let raw_workbook = libxlsxwriter_sys::workbook_new(workbook_name.as_ptr());
             if raw_workbook.is_null() {
                 unreachable!()
             }
-            Workbook {
+            Ok(Workbook {
                 workbook: raw_workbook,
                 const_str: Rc::new(RefCell::new(vec![workbook_name])),
-            }
+            })
         }
     }
 
@@ -214,7 +214,7 @@ impl Workbook {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// let workbook = Workbook::new("test-workbook-define_name.xlsx");
+    /// let workbook = Workbook::new("test-workbook-define_name.xlsx")?;
     /// let mut worksheet = workbook.add_worksheet(None)?;
     /// workbook.define_name("Exchange_rate", "=0.95");
     /// worksheet.write_formula(0, 0, "=Exchange_rate", None);

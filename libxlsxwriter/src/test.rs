@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn test_simple1() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("../target/simple1.xlsx");
+    let workbook = Workbook::new("../target/simple1.xlsx")?;
     let format1 = workbook.add_format().set_font_color(FormatColor::Red);
 
     let format2 = workbook
@@ -37,7 +37,7 @@ fn test_simple1() -> Result<(), XlsxError> {
 
 #[test]
 fn test_sample1() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("../target/test.xlsx");
+    let workbook = Workbook::new("../target/test.xlsx")?;
 
     let format1 = workbook
         .add_format()
@@ -86,7 +86,7 @@ fn test_sample1() -> Result<(), XlsxError> {
 
 #[test]
 fn test_add_table1() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("test-worksheet_add_table-2.xlsx");
+    let workbook = Workbook::new("test-worksheet_add_table-2.xlsx")?;
     let mut worksheet = workbook.add_worksheet(None)?;
     worksheet.write_string(0, 0, "header 1", None)?;
     worksheet.write_string(0, 1, "header 2", None)?;
@@ -117,7 +117,7 @@ fn test_add_table1() -> Result<(), XlsxError> {
 
 #[test]
 fn test_add_table2() -> Result<(), XlsxError> {
-    let workbook = Workbook::new("test-worksheet_add_table-3.xlsx");
+    let workbook = Workbook::new("test-worksheet_add_table-3.xlsx")?;
     let mut worksheet = workbook.add_worksheet(None)?;
     worksheet.write_string(0, 0, "header 1", None)?;
     worksheet.write_string(0, 1, "header 2", None)?;

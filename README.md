@@ -47,7 +47,7 @@ Example
 ![Result Image](images/simple1.png)
 
 ```rust
-let workbook = Workbook::new("target/simple1.xlsx");
+let workbook = Workbook::new("target/simple1.xlsx")?;
 let format1 = workbook.add_format().set_font_color(FormatColor::Red);
 
 let format2 = workbook

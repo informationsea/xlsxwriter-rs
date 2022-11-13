@@ -295,7 +295,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_validation-cell-3.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_validation-cell-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let mut validation = DataValidation::new(
     ///     DataValidationType::Integer,
@@ -343,7 +343,7 @@ impl<'a> Worksheet<'a> {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// # let workbook = Workbook::new("test-worksheet_validation-cell-4.xlsx");
+    /// # let workbook = Workbook::new("test-worksheet_validation-cell-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let mut validation = DataValidation::new(
     ///     DataValidationType::List,
@@ -397,7 +397,7 @@ mod test {
 
     #[test]
     fn test_validation() -> Result<(), XlsxError> {
-        let workbook = Workbook::new("test-worksheet_validation-cell-1.xlsx");
+        let workbook = Workbook::new("test-worksheet_validation-cell-1.xlsx")?;
         let mut validation = DataValidation::new(
             DataValidationType::Integer,
             DataValidationCriteria::Between,
@@ -427,7 +427,7 @@ mod test {
 
     #[test]
     fn test_validation2() -> Result<(), XlsxError> {
-        let workbook = Workbook::new("test-worksheet_validation-cell-2.xlsx");
+        let workbook = Workbook::new("test-worksheet_validation-cell-2.xlsx")?;
         let mut validation = DataValidation::new(
             DataValidationType::List,
             DataValidationCriteria::None,

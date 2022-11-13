@@ -1,7 +1,7 @@
 use xlsxwriter::{FormatAlignment, FormatColor, FormatUnderline, Workbook};
 
 fn main() -> Result<(), xlsxwriter::XlsxError> {
-    let workbook = Workbook::new("target/simple1.xlsx");
+    let workbook = Workbook::new("target/simple1.xlsx")?;
     let format1 = workbook.add_format().set_font_color(FormatColor::Red);
 
     let format2 = workbook
