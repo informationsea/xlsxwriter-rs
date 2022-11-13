@@ -2,6 +2,8 @@ mod filter;
 mod table;
 mod validation;
 
+use crate::CStringHelper;
+
 use super::{convert_bool, Chart, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -330,16 +332,16 @@ impl CommentOptions {
     pub(crate) fn into_internal(
         &self,
         workbook: &Workbook,
-    ) -> libxlsxwriter_sys::lxw_comment_options {
-        libxlsxwriter_sys::lxw_comment_options {
+    ) -> Result<libxlsxwriter_sys::lxw_comment_options, XlsxError> {
+        Ok(libxlsxwriter_sys::lxw_comment_options {
             visible: self.visible.into_internal() as u8,
-            author: workbook.register_option_str(self.author.as_deref()) as *mut std::ffi::c_char,
+            author: workbook.register_option_str(self.author.as_deref())? as *mut std::ffi::c_char,
             width: self.width.unwrap_or_default(),
             height: self.height.unwrap_or_default(),
             x_scale: self.x_scale.unwrap_or_default(),
             y_scale: self.y_scale.unwrap_or_default(),
             color: self.color.value(),
-            font_name: workbook.register_option_str(self.font_name.as_deref())
+            font_name: workbook.register_option_str(self.font_name.as_deref())?
                 as *mut std::ffi::c_char,
             font_size: self.font_size.unwrap_or_default(),
             font_family: self.font_family.unwrap_or_default(),
@@ -347,7 +349,7 @@ impl CommentOptions {
             start_col: self.start_col,
             x_offset: self.x_offset,
             y_offset: self.y_offset,
-        }
+        })
     }
 }
 
@@ -415,13 +417,13 @@ impl<'a> Worksheet<'a> {
         text: &str,
         options: &CommentOptions,
     ) -> Result<(), XlsxError> {
-        let mut options = options.into_internal(self._workbook);
+        let mut options = options.into_internal(self._workbook)?;
         unsafe {
             let result = libxlsxwriter_sys::worksheet_write_comment_opt(
                 self.worksheet,
                 row,
                 col,
-                self._workbook.register_str(text),
+                self._workbook.register_str(text)?,
                 &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -532,12 +534,13 @@ impl<'a> Worksheet<'a> {
         text: &str,
         format: Option<&Format>,
     ) -> Result<(), XlsxError> {
+        let mut c_string_helper = CStringHelper::new();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_write_string(
                 self.worksheet,
                 row,
                 col,
-                CString::new(text).unwrap().as_c_str().as_ptr(),
+                c_string_helper.add(text)?,
                 format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {

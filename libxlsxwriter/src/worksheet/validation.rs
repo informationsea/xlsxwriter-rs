@@ -1,5 +1,6 @@
 use crate::{
-    convert_validation_bool, CStringHelper, Worksheet, WorksheetCol, WorksheetRow, XlsxError,
+    convert_validation_bool, try_to_vec, CStringHelper, Worksheet, WorksheetCol, WorksheetRow,
+    XlsxError,
 };
 
 use super::DateTime;
@@ -222,7 +223,11 @@ impl DataValidation {
             error_message: None,
         }
     }
-    pub(crate) fn to_c_struct(&self, c_string_helper: &mut CStringHelper) -> CDataValidation {
+
+    pub(crate) fn to_c_struct(
+        &self,
+        c_string_helper: &mut CStringHelper,
+    ) -> Result<CDataValidation, XlsxError> {
         let mut _value_list: Option<Vec<Vec<u8>>> = self.value_list.as_ref().map(|x| {
             x.iter()
                 .map(|y| {
@@ -233,16 +238,16 @@ impl DataValidation {
                 })
                 .collect()
         });
-        let mut _value_list_ptr: Option<Vec<*mut c_char>> = self.value_list.as_ref().map(|x| {
-            x.iter()
-                .map(|y| c_string_helper.add(y) as *mut c_char)
-                .collect()
-        });
+        let mut _value_list_ptr: Option<Vec<*mut c_char>> = self
+            .value_list
+            .as_ref()
+            .map(|x| try_to_vec(x.iter().map(|y| Ok(c_string_helper.add(y)? as *mut c_char))))
+            .transpose()?;
         if let Some(l) = _value_list_ptr.as_mut() {
             l.push(std::ptr::null_mut());
         }
 
-        CDataValidation {
+        Ok(CDataValidation {
             data_validation: libxlsxwriter_sys::lxw_data_validation {
                 validate: self.validate.value(),
                 criteria: self.criteria.value(),
@@ -252,7 +257,7 @@ impl DataValidation {
                 error_type: self.error_type.value(),
                 dropdown: convert_validation_bool(self.dropdown),
                 value_number: self.value_number,
-                value_formula: c_string_helper.add_opt(self.value_formula.as_deref())
+                value_formula: c_string_helper.add_opt(self.value_formula.as_deref())?
                     as *mut c_char,
                 value_list: _value_list_ptr
                     .as_mut()
@@ -260,22 +265,22 @@ impl DataValidation {
                     .unwrap_or(std::ptr::null_mut()),
                 value_datetime: (&self.value_datetime).into(),
                 minimum_number: self.minimum_number,
-                minimum_formula: c_string_helper.add_opt(self.minimum_formula.as_deref())
+                minimum_formula: c_string_helper.add_opt(self.minimum_formula.as_deref())?
                     as *mut c_char,
                 minimum_datetime: (&self.minimum_datetime).into(),
                 maximum_number: self.maximum_number,
-                maximum_formula: c_string_helper.add_opt(self.maximum_formula.as_deref())
+                maximum_formula: c_string_helper.add_opt(self.maximum_formula.as_deref())?
                     as *mut c_char,
                 maximum_datetime: (&self.maximum_datetime).into(),
-                input_title: c_string_helper.add_opt(self.input_title.as_deref()) as *mut c_char,
-                input_message: c_string_helper.add_opt(self.input_message.as_deref())
+                input_title: c_string_helper.add_opt(self.input_title.as_deref())? as *mut c_char,
+                input_message: c_string_helper.add_opt(self.input_message.as_deref())?
                     as *mut c_char,
-                error_title: c_string_helper.add_opt(self.error_title.as_deref()) as *mut c_char,
-                error_message: c_string_helper.add_opt(self.error_message.as_deref())
+                error_title: c_string_helper.add_opt(self.error_title.as_deref())? as *mut c_char,
+                error_message: c_string_helper.add_opt(self.error_message.as_deref())?
                     as *mut c_char,
             },
             _value_list_ptr,
-        }
+        })
     }
 }
 
@@ -318,7 +323,7 @@ impl<'a> Worksheet<'a> {
     ) -> Result<(), XlsxError> {
         unsafe {
             let mut c_string_helper = CStringHelper::new();
-            let mut validation = validation.to_c_struct(&mut c_string_helper);
+            let mut validation = validation.to_c_struct(&mut c_string_helper)?;
             let result = libxlsxwriter_sys::worksheet_data_validation_cell(
                 self.worksheet,
                 row,
@@ -371,7 +376,9 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_row,
                 last_col,
-                &mut validation.to_c_struct(&mut c_string_helper).data_validation,
+                &mut validation
+                    .to_c_struct(&mut c_string_helper)?
+                    .data_validation,
             );
             std::mem::drop(c_string_helper);
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {

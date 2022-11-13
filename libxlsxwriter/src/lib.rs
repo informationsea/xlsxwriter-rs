@@ -110,20 +110,31 @@ impl CStringHelper {
         }
     }
 
-    pub fn add(&mut self, s: &str) -> *const c_char {
+    pub fn add(&mut self, s: &str) -> Result<*const c_char, XlsxError> {
         let s = Box::pin(CString::new(s).unwrap());
         let p = s.as_ptr();
         self.strings.push(s);
-        p
+        Ok(p)
     }
 
-    pub fn add_opt(&mut self, s: Option<&str>) -> *const c_char {
+    pub fn add_opt(&mut self, s: Option<&str>) -> Result<*const c_char, XlsxError> {
         if let Some(s) = s {
             self.add(s)
         } else {
-            std::ptr::null()
+            Ok(std::ptr::null())
         }
     }
+}
+
+pub(crate) fn try_to_vec<I, T>(it: I) -> Result<Vec<T>, XlsxError>
+where
+    I: std::iter::Iterator<Item = Result<T, XlsxError>>,
+{
+    let mut r = Vec::new();
+    for one in it {
+        r.push(one?);
+    }
+    Ok(r)
 }
 
 #[cfg(test)]

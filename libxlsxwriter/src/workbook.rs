@@ -1,4 +1,6 @@
-use super::{error, Chart, ChartType, Format, Worksheet, XlsxError};
+use crate::CStringHelper;
+
+use super::{Chart, ChartType, Format, Worksheet, XlsxError};
 use std::cell::RefCell;
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -22,21 +24,21 @@ pub struct Workbook {
 }
 
 impl Workbook {
-    pub(crate) fn register_str(&self, s: &str) -> *const c_char {
-        let c = Box::pin(CString::new(s).expect("Cannot create CString from string"));
+    pub(crate) fn register_str(&self, s: &str) -> Result<*const c_char, XlsxError> {
+        let c = Box::pin(CString::new(s)?);
         let p = c.as_ptr();
         self.const_str.borrow_mut().push(c);
-        p
+        Ok(p)
     }
 
-    pub(crate) fn register_option_str(&self, s: Option<&str>) -> *const c_char {
+    pub(crate) fn register_option_str(&self, s: Option<&str>) -> Result<*const c_char, XlsxError> {
         if let Some(s) = s {
-            let c = Box::pin(CString::new(s).expect("Cannot create CString from string"));
+            let c = Box::pin(CString::new(s)?);
             let p = c.as_ptr();
             self.const_str.borrow_mut().push(c);
-            p
+            Ok(p)
         } else {
-            std::ptr::null()
+            Ok(std::ptr::null())
         }
     }
 
@@ -60,7 +62,7 @@ impl Workbook {
     /// ```rust
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
-    /// let workbook = Workbook::new_with_options("test-workbook_with_options.xlsx", true, Some("target"), true);
+    /// let workbook = Workbook::new_with_options("test-workbook_with_options.xlsx", true, Some("target"), true)?;
     /// let mut worksheet = workbook.add_worksheet(None)?;
     /// worksheet.write_string(0, 0, "Hello Excel", None)?;
     /// workbook.close()
@@ -93,16 +95,11 @@ impl Workbook {
         constant_memory: bool,
         tmpdir: Option<&str>,
         use_zip64: bool,
-    ) -> Workbook {
-        let tmpdir_vec = tmpdir.map(|x| CString::new(x).unwrap().as_bytes_with_nul().to_vec());
+    ) -> Result<Workbook, XlsxError> {
+        let mut c_string_helper = CStringHelper::new();
+        let tmpdir_ptr = c_string_helper.add_opt(tmpdir)?;
 
         unsafe {
-            let tmpdir_ptr = if let Some(tmpdir) = tmpdir_vec.as_ref() {
-                tmpdir.as_ptr()
-            } else {
-                std::ptr::null()
-            };
-
             let mut workbook_options = libxlsxwriter_sys::lxw_workbook_options {
                 constant_memory: constant_memory as u8,
                 tmpdir: tmpdir_ptr as *mut c_char,
@@ -116,10 +113,10 @@ impl Workbook {
             if raw_workbook.is_null() {
                 unreachable!()
             }
-            Workbook {
+            Ok(Workbook {
                 workbook: raw_workbook,
                 const_str: Rc::new(RefCell::new(vec![workbook_name])),
-            }
+            })
         }
     }
 
@@ -153,7 +150,7 @@ impl Workbook {
             }
 
             if worksheet.is_null() {
-                return Err(XlsxError::new(error::UNKNOWN_ERROR_CODE));
+                return Err(XlsxError::unknown_error());
             }
 
             Ok(Worksheet {

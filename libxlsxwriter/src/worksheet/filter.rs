@@ -1,4 +1,4 @@
-use crate::{Workbook, Worksheet, WorksheetCol, WorksheetRow, XlsxError};
+use crate::{try_to_vec, CStringHelper, Worksheet, WorksheetCol, WorksheetRow, XlsxError};
 
 /// And/or operator conditions when using 2 filter rules with `filter_column2`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -88,13 +88,16 @@ pub struct FilterRule {
 }
 
 impl FilterRule {
-    pub(crate) fn into_internal(&self, workbook: &Workbook) -> libxlsxwriter_sys::lxw_filter_rule {
-        libxlsxwriter_sys::lxw_filter_rule {
+    pub(crate) fn into_internal(
+        &self,
+        c_string_helper: &mut CStringHelper,
+    ) -> Result<libxlsxwriter_sys::lxw_filter_rule, XlsxError> {
+        Ok(libxlsxwriter_sys::lxw_filter_rule {
             criteria: self.criteria.into_internal() as u8,
-            value_string: workbook.register_option_str(self.value_string.as_deref())
+            value_string: c_string_helper.add_opt(self.value_string.as_deref())?
                 as *mut std::ffi::c_char,
             value: self.value.unwrap_or_default(),
-        }
+        })
     }
 }
 
@@ -136,7 +139,8 @@ impl<'a> Worksheet<'a> {
         rule: &FilterRule,
     ) -> Result<(), XlsxError> {
         unsafe {
-            let mut rule_converted = rule.into_internal(self._workbook);
+            let mut c_string_helper = CStringHelper::new();
+            let mut rule_converted = rule.into_internal(&mut c_string_helper)?;
             let e = libxlsxwriter_sys::worksheet_filter_column(
                 self.worksheet,
                 col,
@@ -160,8 +164,9 @@ impl<'a> Worksheet<'a> {
         and_or: FilterOperator,
     ) -> Result<(), XlsxError> {
         unsafe {
-            let mut rule_converted1 = rule1.into_internal(self._workbook);
-            let mut rule_converted2 = rule2.into_internal(self._workbook);
+            let mut c_string_helper = CStringHelper::new();
+            let mut rule_converted1 = rule1.into_internal(&mut c_string_helper)?;
+            let mut rule_converted2 = rule2.into_internal(&mut c_string_helper)?;
             let e = libxlsxwriter_sys::worksheet_filter_column2(
                 self.worksheet,
                 col,
@@ -182,10 +187,11 @@ impl<'a> Worksheet<'a> {
         list: &[&str],
     ) -> Result<(), XlsxError> {
         let mut cstring_helper = crate::CStringHelper::new();
-        let mut cstr_list: Vec<_> = list
-            .iter()
-            .map(|x| cstring_helper.add(x) as *mut std::ffi::c_char)
-            .collect();
+        let mut cstr_list: Vec<_> = try_to_vec(
+            list.iter()
+                .map(|x| Ok(cstring_helper.add(x)? as *mut std::ffi::c_char)),
+        )?;
+        cstr_list.push(std::ptr::null_mut());
         unsafe {
             let result = libxlsxwriter_sys::worksheet_filter_list(
                 self.worksheet,
@@ -202,7 +208,7 @@ impl<'a> Worksheet<'a> {
 
 #[cfg(test)]
 mod test {
-    use crate::RowColOptions;
+    use crate::{RowColOptions, Workbook};
 
     use super::*;
 
