@@ -1,4 +1,6 @@
-use crate::{try_to_vec, CStringHelper, Worksheet, WorksheetCol, WorksheetRow, XlsxError};
+use crate::{
+    try_to_vec, CStringHelper, StringOrFloat, Worksheet, WorksheetCol, WorksheetRow, XlsxError,
+};
 
 /// And/or operator conditions when using 2 filter rules with `filter_column2`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -80,23 +82,31 @@ impl FilterCriteria {
     }
 }
 
+/// Options for autofilter rules.
 #[derive(Debug, Clone, PartialEq, PartialOrd, Default)]
 pub struct FilterRule {
+    /// The FilterCriteria to define the rule.
     pub criteria: FilterCriteria,
-    pub value_string: Option<String>,
-    pub value: Option<f64>,
+    /// value to which the criteria applies.
+    pub value: StringOrFloat,
 }
 
 impl FilterRule {
+    pub fn new<T: Into<StringOrFloat>>(criteria: FilterCriteria, value: T) -> Self {
+        FilterRule {
+            criteria,
+            value: value.into(),
+        }
+    }
+
     pub(crate) fn into_internal(
         &self,
         c_string_helper: &mut CStringHelper,
     ) -> Result<libxlsxwriter_sys::lxw_filter_rule, XlsxError> {
         Ok(libxlsxwriter_sys::lxw_filter_rule {
             criteria: self.criteria.into_internal() as u8,
-            value_string: c_string_helper.add_opt(self.value_string.as_deref())?
-                as *mut std::ffi::c_char,
-            value: self.value.unwrap_or_default(),
+            value_string: c_string_helper.add_opt(self.value.to_str())? as *mut std::ffi::c_char,
+            value: self.value.to_f64().unwrap_or_default(),
         })
     }
 }
@@ -131,7 +141,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function can be used to filter columns in a autofilter range based on single rule conditions.
     ///
-    /// The `col` parameter is a zero indexed column number and must refer to a column in an existing autofilter created with `autofilter`.
+    /// The `col` parameter is a zero indexed column number and must refer to a column in an existing autofilter created with [`Worksheet::autofilter`].
     /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.
     pub fn filter_column(
         &mut self,
@@ -235,11 +245,7 @@ mod test {
         // ------------
         let mut worksheet1 = workbook.add_worksheet(Some("Sheet 1"))?;
         create_sheet(&mut worksheet1)?;
-        let worksheet1_criteria = FilterRule {
-            criteria: FilterCriteria::GreaterThan,
-            value: Some(10.),
-            value_string: None,
-        };
+        let worksheet1_criteria = FilterRule::new(FilterCriteria::GreaterThan, 10.0);
         worksheet1.filter_column(0, &worksheet1_criteria)?;
         let mut hidden_row = RowColOptions::new(true, 0, false);
         for i in 1..=10 {
@@ -248,16 +254,8 @@ mod test {
         // ------------
         let mut worksheet2 = workbook.add_worksheet(Some("Sheet 2"))?;
         create_sheet(&mut worksheet2)?;
-        let worksheet2_criteria1 = FilterRule {
-            criteria: FilterCriteria::GreaterThanOrEqualTo,
-            value: Some(3.),
-            value_string: None,
-        };
-        let worksheet2_criteria2 = FilterRule {
-            criteria: FilterCriteria::LessThan,
-            value: Some(5.5),
-            value_string: None,
-        };
+        let worksheet2_criteria1 = FilterRule::new(FilterCriteria::GreaterThanOrEqualTo, 3.0);
+        let worksheet2_criteria2 = FilterRule::new(FilterCriteria::LessThan, 5.5);
         worksheet2.filter_column2(
             1,
             &worksheet2_criteria1,

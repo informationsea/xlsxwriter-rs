@@ -137,5 +137,58 @@ where
     Ok(r)
 }
 
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
+pub enum StringOrFloat {
+    String(String),
+    Float(f64),
+}
+
+impl Default for StringOrFloat {
+    fn default() -> Self {
+        StringOrFloat::Float(0.)
+    }
+}
+
+impl StringOrFloat {
+    pub fn to_string(self) -> Option<String> {
+        match self {
+            StringOrFloat::String(x) => Some(x),
+            StringOrFloat::Float(_) => None,
+        }
+    }
+
+    pub fn to_str(&self) -> Option<&str> {
+        match self {
+            StringOrFloat::String(x) => Some(x.as_str()),
+            StringOrFloat::Float(_) => None,
+        }
+    }
+
+    pub fn to_f64(&self) -> Option<f64> {
+        match self {
+            StringOrFloat::String(_) => None,
+            StringOrFloat::Float(x) => Some(*x),
+        }
+    }
+}
+
+impl From<&str> for StringOrFloat {
+    fn from(val: &str) -> Self {
+        StringOrFloat::String(val.to_string())
+    }
+}
+
+impl From<String> for StringOrFloat {
+    fn from(val: String) -> Self {
+        StringOrFloat::String(val)
+    }
+}
+
+impl From<f64> for StringOrFloat {
+    fn from(val: f64) -> Self {
+        StringOrFloat::Float(val)
+    }
+}
+
 #[cfg(test)]
 mod test;
