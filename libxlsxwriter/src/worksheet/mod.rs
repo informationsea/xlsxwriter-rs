@@ -353,9 +353,9 @@ impl CommentOptions {
     }
 }
 
-pub const LXW_DEF_ROW_HEIGHT: f64 = 8.43;
+pub const LXW_DEF_ROW_HEIGHT: f64 = 15.0;
 pub const LXW_DEF_ROW_HEIGHT_PIXELS: u32 = 20;
-pub const LXW_DEF_COL_WIDTH: f64 = 15.0;
+pub const LXW_DEF_COL_WIDTH: f64 = 8.43;
 pub const LXW_DEF_COL_WIDTH_PIXELS: u32 = 64;
 
 /// The Worksheet object represents an Excel worksheet. It handles operations such as writing data to cells or formatting worksheet layout.
