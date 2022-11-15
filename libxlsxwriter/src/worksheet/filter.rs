@@ -105,7 +105,7 @@ impl FilterRule {
     ) -> Result<libxlsxwriter_sys::lxw_filter_rule, XlsxError> {
         Ok(libxlsxwriter_sys::lxw_filter_rule {
             criteria: self.criteria.into_internal() as u8,
-            value_string: c_string_helper.add_opt(self.value.to_str())? as *mut std::ffi::c_char,
+            value_string: c_string_helper.add_opt(self.value.to_str())? as *mut std::os::raw::c_char,
             value: self.value.to_f64().unwrap_or_default(),
         })
     }
@@ -268,7 +268,7 @@ impl<'a> Worksheet<'a> {
         let mut cstring_helper = crate::CStringHelper::new();
         let mut cstr_list: Vec<_> = try_to_vec(
             list.iter()
-                .map(|x| Ok(cstring_helper.add(x)? as *mut std::ffi::c_char)),
+                .map(|x| Ok(cstring_helper.add(x)? as *mut std::os::raw::c_char)),
         )?;
         cstr_list.push(std::ptr::null_mut());
         unsafe {
