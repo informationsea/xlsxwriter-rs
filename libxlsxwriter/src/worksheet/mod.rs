@@ -335,14 +335,14 @@ impl CommentOptions {
     ) -> Result<libxlsxwriter_sys::lxw_comment_options, XlsxError> {
         Ok(libxlsxwriter_sys::lxw_comment_options {
             visible: self.visible.into_internal() as u8,
-            author: workbook.register_option_str(self.author.as_deref())? as *mut std::ffi::c_char,
+            author: workbook.register_option_str(self.author.as_deref())? as *mut c_char,
             width: self.width.unwrap_or_default(),
             height: self.height.unwrap_or_default(),
             x_scale: self.x_scale.unwrap_or_default(),
             y_scale: self.y_scale.unwrap_or_default(),
             color: self.color.value(),
             font_name: workbook.register_option_str(self.font_name.as_deref())?
-                as *mut std::ffi::c_char,
+                as *mut c_char,
             font_size: self.font_size.unwrap_or_default(),
             font_family: self.font_family.unwrap_or_default(),
             start_row: self.start_row,
