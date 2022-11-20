@@ -304,12 +304,8 @@ impl<'a> Worksheet<'a> {
     /// );
     /// validation.value_number = 10.;
     ///
-    /// # let format = workbook
-    /// #    .add_format()
-    /// #    .set_border(crate::FormatBorder::Dashed);
-    /// #
     /// worksheet.write_string(0, 0, "10 or greater", None)?;
-    /// # worksheet.write_blank(1, 0, Some(&format))?;
+    /// # worksheet.write_blank(1, 0, Some(&Format::new().set_border(FormatBorder::Dashed)))?;
     /// worksheet.data_validation_cell(1, 0, &validation)?;
     /// # workbook.close()
     /// # }
@@ -393,7 +389,7 @@ impl<'a> Worksheet<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::Workbook;
+    use crate::{Format, FormatBorder, Workbook};
 
     #[test]
     fn test_validation() -> Result<(), XlsxError> {
@@ -403,10 +399,6 @@ mod test {
             DataValidationCriteria::Between,
             DataValidationErrorType::Stop,
         );
-
-        let format = workbook
-            .add_format()
-            .set_border(crate::FormatBorder::Dashed);
 
         validation.show_input = true;
         validation.show_error = true;
@@ -419,7 +411,7 @@ mod test {
         validation.error_message = Some("Error Message".to_string());
         let mut worksheet = workbook.add_worksheet(None)?;
         worksheet.write_string(0, 0, "validation test", None)?;
-        worksheet.write_blank(1, 0, Some(&format))?;
+        worksheet.write_blank(1, 0, Some(&Format::new().set_border(FormatBorder::Dashed)))?;
         worksheet.data_validation_cell(1, 0, &validation)?;
         workbook.close()?;
         Ok(())
@@ -439,15 +431,15 @@ mod test {
         validation.error_message = Some("Error Message".to_string());
         validation.value_list = Some(vec!["VALUE1".to_string(), "VALUE2".to_string()]);
 
-        let format = workbook
-            .add_format()
-            .set_border(crate::FormatBorder::Dashed);
-
         let mut worksheet = workbook.add_worksheet(None)?;
         worksheet.write_string(0, 0, "input list", None)?;
         for i in 1..=10 {
             for j in 0..=1 {
-                worksheet.write_blank(i, j, Some(&format))?;
+                worksheet.write_blank(
+                    i,
+                    j,
+                    Some(&Format::new().set_border(FormatBorder::Dashed)),
+                )?;
             }
         }
 

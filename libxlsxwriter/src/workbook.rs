@@ -2,6 +2,7 @@ use crate::CStringHelper;
 
 use super::{Chart, ChartType, Format, Worksheet, XlsxError};
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::pin::Pin;
@@ -21,9 +22,38 @@ use std::rc::Rc;
 pub struct Workbook {
     workbook: *mut libxlsxwriter_sys::lxw_workbook,
     pub(crate) const_str: Rc<RefCell<Vec<Pin<Box<CString>>>>>,
+    format_map: Rc<RefCell<HashMap<Format, *mut libxlsxwriter_sys::lxw_format>>>,
 }
 
 impl Workbook {
+    pub(crate) fn get_internal_format(
+        &self,
+        format: &Format,
+    ) -> Result<*mut libxlsxwriter_sys::lxw_format, XlsxError> {
+        let mut map = self.format_map.borrow_mut();
+        if let Some(p) = map.get(format) {
+            Ok(*p)
+        } else {
+            unsafe {
+                let new_format = libxlsxwriter_sys::workbook_add_format(self.workbook);
+                format.set_internal_format(new_format)?;
+                map.insert(format.clone(), new_format);
+                Ok(new_format)
+            }
+        }
+    }
+
+    pub(crate) fn get_internal_option_format(
+        &self,
+        format: Option<&Format>,
+    ) -> Result<*mut libxlsxwriter_sys::lxw_format, XlsxError> {
+        if let Some(format) = format {
+            Ok(self.get_internal_format(format)?)
+        } else {
+            Ok(std::ptr::null_mut())
+        }
+    }
+
     pub(crate) fn register_str(&self, s: &str) -> Result<*const c_char, XlsxError> {
         let c = Box::pin(CString::new(s)?);
         let p = c.as_ptr();
@@ -54,6 +84,7 @@ impl Workbook {
             Ok(Workbook {
                 workbook: raw_workbook,
                 const_str: Rc::new(RefCell::new(vec![workbook_name])),
+                format_map: Rc::new(RefCell::new(HashMap::new())),
             })
         }
     }
@@ -116,6 +147,7 @@ impl Workbook {
             Ok(Workbook {
                 workbook: raw_workbook,
                 const_str: Rc::new(RefCell::new(vec![workbook_name])),
+                format_map: Rc::new(RefCell::new(HashMap::new())),
             })
         }
     }
@@ -160,38 +192,30 @@ impl Workbook {
         }
     }
 
-    pub fn get_worksheet<'a>(&'a self, sheet_name: &str) -> Option<Worksheet<'a>> {
+    pub fn get_worksheet<'a>(
+        &'a self,
+        sheet_name: &str,
+    ) -> Result<Option<Worksheet<'a>>, XlsxError> {
         unsafe {
             let worksheet = libxlsxwriter_sys::workbook_get_worksheet_by_name(
                 self.workbook,
-                CString::new(sheet_name)
-                    .expect("Null Error")
-                    .as_c_str()
-                    .as_ptr(),
+                CString::new(sheet_name)?.as_c_str().as_ptr(),
             );
             if worksheet.is_null() {
-                None
+                Ok(None)
             } else {
-                Some(Worksheet {
+                Ok(Some(Worksheet {
                     _workbook: self,
                     worksheet,
-                })
+                }))
             }
         }
     }
 
+    // only for compatibility
+    //
     pub fn add_format(&self) -> Format {
-        unsafe {
-            let format = libxlsxwriter_sys::workbook_add_format(self.workbook);
-            if format.is_null() {
-                unreachable!();
-            }
-
-            Format {
-                _workbook: self,
-                format,
-            }
-        }
+        Format::new()
     }
 
     pub fn add_chart(&self, chart_type: ChartType) -> Chart {

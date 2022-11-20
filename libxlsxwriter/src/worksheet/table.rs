@@ -11,7 +11,7 @@ use super::{Format, Worksheet};
 ///
 /// Please read [libxslxwriter document](https://libxlsxwriter.github.io/working_with_tables.html) to learn more.
 #[derive(Default)]
-pub struct TableColumn<'a> {
+pub struct TableColumn {
     /// Set the header name/caption for the column. If NULL the header defaults to Column 1, Column 2, etc.
     pub header: Option<String>,
 
@@ -25,10 +25,10 @@ pub struct TableColumn<'a> {
     pub total_function: TableTotalFunction,
 
     /// Set the format for the column header.
-    pub header_format: Option<Format<'a>>,
+    pub header_format: Option<Format>,
 
     /// Set the format for the data rows in the column.
-    pub format: Option<Format<'a>>,
+    pub format: Option<Format>,
 
     /// Set the formula value for the column total (not generally required).
     pub total_value: f64,
@@ -157,7 +157,7 @@ impl From<TableTotalFunction> for u8 {
 /// # }
 /// ```
 #[derive(Default)]
-pub struct TableOptions<'a> {
+pub struct TableOptions {
     /**
      * The name parameter is used to set the name of the table. This parameter is optional and by
      * default tables are named Table1, Table2, etc. in the worksheet order that they are added.
@@ -194,7 +194,7 @@ pub struct TableOptions<'a> {
     pub total_row: bool,
 
     /// The columns parameter can be used to set properties for columns within the table.
-    pub columns: Option<Vec<TableColumn<'a>>>,
+    pub columns: Option<Vec<TableColumn>>,
 }
 
 impl<'a> Worksheet<'a> {
@@ -228,7 +228,7 @@ impl<'a> Worksheet<'a> {
         first_col: WorksheetCol,
         last_row: WorksheetRow,
         last_col: WorksheetCol,
-        options: Option<TableOptions<'a>>,
+        options: Option<TableOptions>,
     ) -> Result<(), XlsxError> {
         let mut cstring_helper = CStringHelper::new();
 
@@ -262,16 +262,14 @@ impl<'a> Worksheet<'a> {
                                         .add_opt(y.total_string.as_deref())?
                                         as *mut c_char,
                                     total_function: y.total_function.into(),
-                                    header_format: y
-                                        .header_format
-                                        .as_ref()
-                                        .map(|x| x.format)
-                                        .unwrap_or(std::ptr::null_mut()),
-                                    format: y
-                                        .format
-                                        .as_ref()
-                                        .map(|x| x.format)
-                                        .unwrap_or(std::ptr::null_mut()),
+                                    header_format: self
+                                        ._workbook
+                                        .get_internal_option_format(y.header_format.as_ref())
+                                        .unwrap(), // fix here
+                                    format: self
+                                        ._workbook
+                                        .get_internal_option_format(y.format.as_ref())
+                                        .unwrap(), // fix here
                                     total_value: y.total_value,
                                 })
                             },

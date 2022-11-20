@@ -1,5 +1,4 @@
-use super::Workbook;
-use std::ffi::CString;
+use crate::{CStringHelper, XlsxError};
 
 #[allow(clippy::unreadable_literal)]
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
@@ -102,11 +101,6 @@ pub enum FormatAlignment {
     Justify,
     CenterAcross,
     Distributed,
-    VerticalTop,
-    VerticalBottom,
-    VerticalCenter,
-    VerticalJustify,
-    VerticalDistributed,
 }
 
 impl FormatAlignment {
@@ -124,19 +118,40 @@ impl FormatAlignment {
             FormatAlignment::Distributed => {
                 libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_DISTRIBUTED
             }
-            FormatAlignment::VerticalTop => {
+        };
+        value as u8
+    }
+}
+
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
+pub enum FormatVerticalAlignment {
+    None,
+    VerticalTop,
+    VerticalBottom,
+    VerticalCenter,
+    VerticalJustify,
+    VerticalDistributed,
+}
+
+impl FormatVerticalAlignment {
+    pub fn value(self) -> u8 {
+        let value = match self {
+            FormatVerticalAlignment::None => {
+                libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_NONE
+            }
+            FormatVerticalAlignment::VerticalTop => {
                 libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_VERTICAL_TOP
             }
-            FormatAlignment::VerticalBottom => {
+            FormatVerticalAlignment::VerticalBottom => {
                 libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_VERTICAL_BOTTOM
             }
-            FormatAlignment::VerticalCenter => {
+            FormatVerticalAlignment::VerticalCenter => {
                 libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_VERTICAL_CENTER
             }
-            FormatAlignment::VerticalJustify => {
+            FormatVerticalAlignment::VerticalJustify => {
                 libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_VERTICAL_JUSTIFY
             }
-            FormatAlignment::VerticalDistributed => {
+            FormatVerticalAlignment::VerticalDistributed => {
                 libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_VERTICAL_DISTRIBUTED
             }
         };
@@ -272,221 +287,323 @@ impl FormatBorder {
     }
 }
 
-/// This Format object has the functions and properties that are available for formatting cells in Excel.
-///
-/// The properties of a cell that can be formatted include: fonts, colors, patterns, borders, alignment and number formatting.
-pub struct Format<'a> {
-    pub(crate) _workbook: &'a Workbook,
-    pub(crate) format: *mut libxlsxwriter_sys::lxw_format,
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Hash, Default)]
+pub struct Format {
+    font_name: Option<String>,
+    // font size / 100
+    font_size: Option<u32>,
+    font_color: Option<FormatColor>,
+    bold: bool,
+    italic: bool,
+    underline: Option<FormatUnderline>,
+    font_strikeout: bool,
+    font_script: Option<FormatScript>,
+    num_format: Option<String>,
+    unlocked: bool,
+    hidden: bool,
+    align: Option<FormatAlignment>,
+    vertical_align: Option<FormatVerticalAlignment>,
+    rotation: Option<i16>,
+    text_wrap: bool,
+    indent: Option<u8>,
+    shrink: bool,
+    pattern: Option<FormatPatterns>,
+    bg_color: Option<FormatColor>,
+    fg_color: Option<FormatColor>,
+    border: Option<FormatBorder>,
+    bottom: Option<FormatBorder>,
+    top: Option<FormatBorder>,
+    left: Option<FormatBorder>,
+    right: Option<FormatBorder>,
+    border_color: Option<FormatColor>,
+    bottom_color: Option<FormatColor>,
+    top_color: Option<FormatColor>,
+    left_color: Option<FormatColor>,
+    right_color: Option<FormatColor>,
 }
 
-impl<'a> Format<'a> {
-    pub fn set_font_name(self, font_name: &str) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_font_name(
-                self.format,
-                CString::new(font_name).unwrap().as_c_str().as_ptr(),
-            );
-        }
+impl Format {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn set_font_name(&mut self, font_name: &str) -> &mut Self {
+        self.font_name = Some(font_name.to_string());
         self
     }
 
-    pub fn set_font_size(self, font_size: f64) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_font_size(self.format, font_size);
-        }
+    pub fn set_font_size(&mut self, font_size: f64) -> &mut Self {
+        self.font_size = Some((font_size * 100.).round() as u32);
         self
     }
 
-    pub fn set_font_color(self, font_color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_font_color(self.format, font_color.value());
-        }
+    pub fn set_font_color(&mut self, font_color: FormatColor) -> &mut Self {
+        self.font_color = Some(font_color);
         self
     }
 
-    pub fn set_bold(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_bold(self.format);
-        }
+    pub fn set_bold(&mut self) -> &mut Self {
+        self.bold = true;
         self
     }
 
-    pub fn set_italic(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_italic(self.format);
-        }
+    pub fn set_italic(&mut self) -> &mut Self {
+        self.italic = true;
         self
     }
 
-    pub fn set_underline(self, underline: FormatUnderline) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_underline(self.format, underline.value());
-        }
+    pub fn set_underline(&mut self, underline: FormatUnderline) -> &mut Self {
+        self.underline = Some(underline);
         self
     }
 
-    pub fn set_font_strikeout(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_font_strikeout(self.format);
-        }
+    pub fn set_font_strikeout(&mut self) -> &mut Self {
+        self.font_strikeout = true;
         self
     }
 
-    pub fn set_font_script(self, script: FormatScript) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_font_script(self.format, script.value());
-        }
+    pub fn set_font_script(&mut self, script: FormatScript) -> &mut Self {
+        self.font_script = Some(script);
         self
     }
 
-    pub fn set_num_format(self, num_format: &str) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_num_format(
-                self.format,
-                CString::new(num_format).unwrap().as_c_str().as_ptr(),
-            );
-        }
+    pub fn set_num_format(&mut self, num_format: &str) -> &mut Self {
+        self.num_format = Some(num_format.to_string());
         self
     }
 
-    pub fn set_font_unlocked(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_unlocked(self.format);
-        }
+    pub fn set_unlocked(&mut self) -> &mut Self {
+        self.unlocked = true;
         self
     }
 
-    pub fn set_font_hidden(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_hidden(self.format);
-        }
+    pub fn set_hidden(&mut self) -> &mut Self {
+        self.hidden = true;
         self
     }
 
-    pub fn set_align(self, align: FormatAlignment) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_align(self.format, align.value());
-        }
+    pub fn set_align(&mut self, align: FormatAlignment) -> &mut Self {
+        self.align = Some(align);
         self
     }
 
-    pub fn set_text_wrap(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_text_wrap(self.format);
-        }
+    pub fn set_vertical_align(&mut self, align: FormatVerticalAlignment) -> &mut Self {
+        self.vertical_align = Some(align);
         self
     }
 
-    pub fn set_rotation(self, angle: i16) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_rotation(self.format, angle);
-        }
+    pub fn set_text_wrap(&mut self) -> &mut Self {
+        self.text_wrap = true;
         self
     }
 
-    pub fn set_indent(self, level: u8) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_indent(self.format, level);
-        }
+    pub fn set_rotation(&mut self, angle: i16) -> &mut Self {
+        self.rotation = Some(angle);
         self
     }
 
-    pub fn set_shrink(self) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_shrink(self.format);
-        }
+    pub fn set_indent(&mut self, level: u8) -> &mut Self {
+        self.indent = Some(level);
         self
     }
 
-    pub fn set_pattern(self, pattern: FormatPatterns) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_pattern(self.format, pattern.value());
-        }
+    pub fn set_shrink(&mut self) -> &mut Self {
+        self.shrink = true;
         self
     }
 
-    pub fn set_bg_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_bg_color(self.format, color.value());
-        }
+    pub fn set_pattern(&mut self, pattern: FormatPatterns) -> &mut Self {
+        self.pattern = Some(pattern);
         self
     }
 
-    pub fn set_fg_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_fg_color(self.format, color.value());
-        }
+    pub fn set_bg_color(&mut self, color: FormatColor) -> &mut Self {
+        self.bg_color = Some(color);
         self
     }
 
-    pub fn set_border(self, border: FormatBorder) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_border(self.format, border.value());
-        }
+    pub fn set_fg_color(&mut self, color: FormatColor) -> &mut Self {
+        self.fg_color = Some(color);
         self
     }
 
-    pub fn set_border_bottom(self, border: FormatBorder) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_bottom(self.format, border.value());
-        }
+    pub fn set_border(&mut self, border: FormatBorder) -> &mut Self {
+        self.border = Some(border);
         self
     }
 
-    pub fn set_border_top(self, border: FormatBorder) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_top(self.format, border.value());
-        }
+    pub fn set_border_bottom(&mut self, border: FormatBorder) -> &mut Self {
+        self.bottom = Some(border);
         self
     }
 
-    pub fn set_border_left(self, border: FormatBorder) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_left(self.format, border.value());
-        }
+    pub fn set_border_top(&mut self, border: FormatBorder) -> &mut Self {
+        self.top = Some(border);
         self
     }
 
-    pub fn set_border_right(self, border: FormatBorder) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_right(self.format, border.value());
-        }
+    pub fn set_border_left(&mut self, border: FormatBorder) -> &mut Self {
+        self.left = Some(border);
         self
     }
 
-    pub fn set_border_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_border_color(self.format, color.value());
-        }
+    pub fn set_border_right(&mut self, border: FormatBorder) -> &mut Self {
+        self.right = Some(border);
         self
     }
 
-    pub fn set_border_bottom_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_bottom_color(self.format, color.value());
-        }
+    pub fn set_border_color(&mut self, color: FormatColor) -> &mut Self {
+        self.border_color = Some(color);
         self
     }
 
-    pub fn set_border_top_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_top_color(self.format, color.value());
-        }
+    pub fn set_border_bottom_color(&mut self, color: FormatColor) -> &mut Self {
+        self.bottom_color = Some(color);
         self
     }
 
-    pub fn set_border_left_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_left_color(self.format, color.value());
-        }
+    pub fn set_border_top_color(&mut self, color: FormatColor) -> &mut Self {
+        self.top_color = Some(color);
         self
     }
 
-    pub fn set_border_right_color(self, color: FormatColor) -> Self {
-        unsafe {
-            libxlsxwriter_sys::format_set_right_color(self.format, color.value());
-        }
+    pub fn set_border_left_color(&mut self, color: FormatColor) -> &mut Self {
+        self.left_color = Some(color);
         self
+    }
+
+    pub fn set_border_right_color(&mut self, color: FormatColor) -> &mut Self {
+        self.right_color = Some(color);
+        self
+    }
+
+    pub(crate) fn set_internal_format(
+        &self,
+        format: *mut libxlsxwriter_sys::lxw_format,
+    ) -> Result<(), XlsxError> {
+        let mut c_string_helper = CStringHelper::new();
+        unsafe {
+            if let Some(font_name) = self.font_name.as_deref() {
+                libxlsxwriter_sys::format_set_font_name(format, c_string_helper.add(font_name)?);
+            }
+
+            if let Some(font_size) = self.font_size {
+                let font_size: f64 = font_size.into();
+                libxlsxwriter_sys::format_set_font_size(format, font_size / 100.0);
+            }
+
+            if let Some(font_color) = self.font_color {
+                libxlsxwriter_sys::format_set_font_color(format, font_color.value());
+            }
+
+            if self.bold {
+                libxlsxwriter_sys::format_set_bold(format);
+            }
+
+            if self.italic {
+                libxlsxwriter_sys::format_set_italic(format);
+            }
+
+            if let Some(underline) = self.underline {
+                libxlsxwriter_sys::format_set_underline(format, underline.value());
+            }
+
+            if self.font_strikeout {
+                libxlsxwriter_sys::format_set_font_strikeout(format);
+            }
+
+            if let Some(font_script) = self.font_script {
+                libxlsxwriter_sys::format_set_font_script(format, font_script.value());
+            }
+
+            if let Some(num_format) = self.num_format.as_deref() {
+                libxlsxwriter_sys::format_set_num_format(format, c_string_helper.add(num_format)?);
+            }
+
+            if self.unlocked {
+                libxlsxwriter_sys::format_set_unlocked(format);
+            }
+
+            if self.hidden {
+                libxlsxwriter_sys::format_set_hidden(format);
+            }
+
+            if let Some(align) = self.align {
+                libxlsxwriter_sys::format_set_align(format, align.value());
+            }
+
+            if let Some(vertical_align) = self.vertical_align {
+                libxlsxwriter_sys::format_set_align(format, vertical_align.value());
+            }
+
+            if let Some(angle) = self.rotation {
+                libxlsxwriter_sys::format_set_rotation(format, angle);
+            }
+
+            if self.text_wrap {
+                libxlsxwriter_sys::format_set_text_wrap(format);
+            }
+
+            if let Some(indent) = self.indent {
+                libxlsxwriter_sys::format_set_indent(format, indent);
+            }
+
+            if self.shrink {
+                libxlsxwriter_sys::format_set_shrink(format);
+            }
+
+            if let Some(pattern) = self.pattern {
+                libxlsxwriter_sys::format_set_pattern(format, pattern.value());
+            }
+
+            if let Some(bg_color) = self.bg_color {
+                libxlsxwriter_sys::format_set_bg_color(format, bg_color.value());
+            }
+
+            if let Some(fg_color) = self.fg_color {
+                libxlsxwriter_sys::format_set_bg_color(format, fg_color.value());
+            }
+
+            if let Some(style) = self.border {
+                libxlsxwriter_sys::format_set_border(format, style.value());
+            }
+
+            if let Some(style) = self.bottom {
+                libxlsxwriter_sys::format_set_bottom(format, style.value());
+            }
+
+            if let Some(style) = self.top {
+                libxlsxwriter_sys::format_set_top(format, style.value());
+            }
+
+            if let Some(style) = self.left {
+                libxlsxwriter_sys::format_set_left(format, style.value());
+            }
+
+            if let Some(style) = self.right {
+                libxlsxwriter_sys::format_set_right(format, style.value());
+            }
+
+            if let Some(color) = self.border_color {
+                libxlsxwriter_sys::format_set_border_color(format, color.value());
+            }
+
+            if let Some(color) = self.bottom_color {
+                libxlsxwriter_sys::format_set_bottom_color(format, color.value());
+            }
+
+            if let Some(color) = self.top_color {
+                libxlsxwriter_sys::format_set_top_color(format, color.value());
+            }
+
+            if let Some(color) = self.left_color {
+                libxlsxwriter_sys::format_set_left_color(format, color.value());
+            }
+
+            if let Some(color) = self.right_color {
+                libxlsxwriter_sys::format_set_right_color(format, color.value());
+            }
+        }
+        Ok(())
     }
 }

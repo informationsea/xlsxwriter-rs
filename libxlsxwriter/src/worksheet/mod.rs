@@ -341,8 +341,7 @@ impl CommentOptions {
             x_scale: self.x_scale.unwrap_or_default(),
             y_scale: self.y_scale.unwrap_or_default(),
             color: self.color.value(),
-            font_name: workbook.register_option_str(self.font_name.as_deref())?
-                as *mut c_char,
+            font_name: workbook.register_option_str(self.font_name.as_deref())? as *mut c_char,
             font_size: self.font_size.unwrap_or_default(),
             font_family: self.font_family.unwrap_or_default(),
             start_row: self.start_row,
@@ -455,10 +454,8 @@ impl<'a> Worksheet<'a> {
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx")?;
-    /// let format = workbook.add_format()
-    ///     .set_num_format("$#,##0.00");
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// worksheet.write_number(0, 0, 1234.567, Some(&format))?;
+    /// worksheet.write_number(0, 0, 1234.567, Some(&Format::new().set_num_format("$#,##0.00")))?;
     /// # workbook.close()
     /// # }
     /// ```
@@ -479,7 +476,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 number,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -507,10 +504,8 @@ impl<'a> Worksheet<'a> {
     /// # use xlsxwriter::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx")?;
-    /// let format = workbook.add_format()
-    ///     .set_bold();
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// worksheet.write_string(0, 0, "This phrase is Bold!", Some(&format))?;
+    /// worksheet.write_string(0, 0, "This phrase is Bold!", Some(&Format::new().set_bold()))?;
     /// # workbook.close()
     /// # }
     /// ```
@@ -541,7 +536,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 c_string_helper.add(text)?,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -593,13 +588,14 @@ impl<'a> Worksheet<'a> {
         formula: &str,
         format: Option<&Format>,
     ) -> Result<(), XlsxError> {
+        let mut c_string_helper = CStringHelper::new();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_write_formula(
                 self.worksheet,
                 row,
                 col,
-                CString::new(formula).unwrap().as_c_str().as_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                c_string_helper.add(formula)?,
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -641,6 +637,7 @@ impl<'a> Worksheet<'a> {
         formula: &str,
         format: Option<&Format>,
     ) -> Result<(), XlsxError> {
+        let mut c_string_helper = CStringHelper::new();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_write_array_formula(
                 self.worksheet,
@@ -648,8 +645,8 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_row,
                 last_col,
-                CString::new(formula).unwrap().as_c_str().as_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                c_string_helper.add(formula)?,
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -666,9 +663,7 @@ impl<'a> Worksheet<'a> {
     /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let datetime = DateTime::new(2013, 2, 28, 12, 0, 0.0);
-    /// let datetime_format = workbook.add_format()
-    ///     .set_num_format("mmm d yyyy hh:mm AM/PM");
-    /// worksheet.write_datetime(1, 0, &datetime, Some(&datetime_format))?;
+    /// worksheet.write_datetime(1, 0, &datetime, Some(&Format::new().set_num_format("mmm d yyyy hh:mm AM/PM")))?;
     /// # workbook.close()
     /// # }
     /// ```
@@ -691,7 +686,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 &mut xls_datetime,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -708,8 +703,8 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let url_format = workbook.add_format()
-    ///     .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// let mut url_format = Format::new();
+    /// url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
     /// # workbook.close()
     /// # }
@@ -721,8 +716,8 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format()
-    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = Format::new();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "ftp://www.python.org/", Some(&url_format))?;
     /// worksheet.write_url(1, 0, "http://www.python.org/", Some(&url_format))?;
     /// worksheet.write_url(2, 0, "https://www.python.org/", Some(&url_format))?;
@@ -737,8 +732,8 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format()
-    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = Format::new();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "http://libxlsxwriter.github.io", Some(&url_format))?;
     /// worksheet.write_string(0, 0, "Read the documentation.", Some(&url_format))?;
     /// # workbook.close()
@@ -753,8 +748,8 @@ impl<'a> Worksheet<'a> {
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// # let mut worksheet2 = workbook.add_worksheet(None)?;
     /// # let mut worksheet3 = workbook.add_worksheet(Some("Sales Data"))?;
-    /// # let mut url_format = workbook.add_format()
-    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
+    /// # let mut url_format = Format::new();
+    /// # url_format.set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_url(0, 0, "internal:Sheet2!A1", Some(&url_format))?;
     /// worksheet.write_url(1, 0, "internal:Sheet2!B2", Some(&url_format))?;
     /// worksheet.write_url(2, 0, "internal:Sheet2!A1:B2", Some(&url_format))?;
@@ -779,8 +774,8 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                CString::new(url).unwrap().as_c_str().as_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                CString::new(url)?.as_c_str().as_ptr(),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -814,7 +809,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 if value { 1 } else { 0 },
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -830,9 +825,7 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format()
-    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
-    /// worksheet.write_blank(1, 1, Some(&url_format));
+    /// worksheet.write_blank(1, 1, None);
     /// # workbook.close()
     /// # }
     /// ```
@@ -852,7 +845,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -868,8 +861,6 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_formula_num-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format()
-    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_formula_num(1, 1, "=1 + 2", None, 3.0);
     /// # workbook.close()
     /// # }
@@ -900,8 +891,8 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                CString::new(formula).unwrap().as_c_str().as_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                CString::new(formula)?.as_c_str().as_ptr(),
+                self._workbook.get_internal_option_format(format)?,
                 number,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -918,8 +909,6 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_formula_str-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// # let mut url_format = workbook.add_format()
-    /// #   .set_underline(FormatUnderline::Single).set_font_color(FormatColor::Blue);
     /// worksheet.write_formula_str(1, 1, "=\"A\" & \"B\"", None, "AB");
     /// # workbook.close()
     /// # }
@@ -944,8 +933,8 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                CString::new(formula).unwrap().as_c_str().as_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                CString::new(formula)?.as_c_str().as_ptr(),
+                self._workbook.get_internal_option_format(format)?,
                 CString::new(result).unwrap().as_c_str().as_ptr(),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -962,17 +951,13 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_richtext-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let mut bold = workbook.add_format()
-    ///     .set_bold();
-    /// let mut italic = workbook.add_format()
-    ///     .set_italic();
     /// worksheet.write_rich_string(
     ///     0, 0,
     ///     &[
     ///         ("This is ", None),
-    ///         ("bold", Some(&bold)),
+    ///         ("bold", Some(&Format::new().set_bold())),
     ///         (" and this is ", None),
-    ///         ("italic", Some(&italic))
+    ///         ("italic", Some(&Format::new().set_italic()))
     ///     ],
     ///     None
     /// )?;
@@ -1018,7 +1003,7 @@ impl<'a> Worksheet<'a> {
             .iter()
             .zip(c_str.iter_mut())
             .map(|(x, y)| libxlsxwriter_sys::lxw_rich_string_tuple {
-                format: x.1.map(|z| z.format).unwrap_or(std::ptr::null_mut()),
+                format: self._workbook.get_internal_option_format(x.1).unwrap(), // Fix here
                 string: y.as_mut_ptr() as *mut c_char,
             })
             .collect();
@@ -1034,7 +1019,7 @@ impl<'a> Worksheet<'a> {
                 row,
                 col,
                 rich_text_ptr.as_mut_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1055,7 +1040,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 height,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1078,7 +1063,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 height,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
                 &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1103,7 +1088,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 pixels,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1126,7 +1111,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 pixels,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
                 &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1150,7 +1135,7 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_col,
                 width,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1175,7 +1160,7 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_col,
                 width,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
                 &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1199,7 +1184,7 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_col,
                 pixels,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1224,7 +1209,7 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_col,
                 pixels,
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                self._workbook.get_internal_option_format(format)?,
                 &mut options,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1417,8 +1402,8 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_row,
                 last_col,
-                CString::new(string).unwrap().as_c_str().as_ptr(),
-                format.map(|x| x.format).unwrap_or(std::ptr::null_mut()),
+                CString::new(string)?.as_c_str().as_ptr(),
+                self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
