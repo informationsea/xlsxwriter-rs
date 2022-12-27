@@ -140,7 +140,7 @@ impl From<TableTotalFunction> for u8 {
 
 /// Options used to define worksheet tables.
 /// ```rust
-/// # use xlsxwriter::*;
+/// # use xlsxwriter::prelude::*;
 /// # fn main() -> Result<(), XlsxError> {
 /// # let workbook = Workbook::new("test-worksheet_add_table-1.xlsx")?;
 /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -204,7 +204,7 @@ impl<'a> Worksheet<'a> {
     /// default formatting.
     ///
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_add_table-0.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;

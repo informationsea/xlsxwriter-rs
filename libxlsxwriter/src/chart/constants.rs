@@ -1,26 +1,4 @@
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
-pub enum ChartType {
-    None,
-    Area,
-    AreaStacked,
-    AreaStackedPercent,
-    Bar,
-    BarStacked,
-    Column,
-    ColumnStacked,
-    ColumnStackedPercent,
-    Doughnut,
-    Line,
-    Pie,
-    Scatter,
-    ScatterStraight,
-    ScatterStraightWithMarkers,
-    ScatterSmooth,
-    ScatterSmoothWithMarkers,
-    Radar,
-    RadarWithMarkers,
-    RadarFilled,
-}
+use super::{ChartDashType, ChartMarkerType, ChartPatternType, ChartType};
 
 impl ChartType {
     pub(crate) fn value(self) -> u8 {
@@ -62,18 +40,6 @@ impl ChartType {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum ChartDashType {
-    Solid,
-    RoundDot,
-    SquareDot,
-    Dash,
-    DashDot,
-    LongDash,
-    LongDashDot,
-    LongDashDotDot,
-}
-
 impl ChartDashType {
     pub(crate) fn value(self) -> u8 {
         let value = match self {
@@ -104,108 +70,6 @@ impl ChartDashType {
         };
         value as u8
     }
-}
-
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum ChartPatternType {
-    /// None pattern.
-    None,
-    /// 5 Percent pattern.
-    Percent5,
-    /// 10 Percent pattern.
-    Percent10,
-    /// 20 Percent pattern.
-    Percent20,
-    /// 25 Percent pattern.
-    Percent25,
-    /// 30 Percent pattern.
-    Percent30,
-    /// 40 Percent pattern.
-    Percent40,
-    /// 50 Percent pattern.
-    Percent50,
-    /// 60 Percent pattern.
-    Percent60,
-    /// 70 Percent pattern.
-    Percent70,
-    /// 75 Percent pattern.
-    Percent75,
-    /// 80 Percent pattern.
-    Percent80,
-    /// 90 Percent pattern.
-    Percent90,
-    /// Light downward diagonal pattern.
-    LightDownwardDiagonal,
-    /// Light upward diagonal pattern.
-    LightUpwardDiagonal,
-    /// Dark downward diagonal pattern.
-    DarkDownwardDiagonal,
-    /// Dark upward diagonal pattern.
-    DarkUpwardDiagonal,
-    /// Wide downward diagonal pattern.
-    WideDownwardDiagonal,
-    /// Wide upward diagonal pattern.
-    WideUpwardDiagonal,
-    /// Light vertical pattern.
-    LightVertical,
-    /// Light horizontal pattern.
-    LightHorizontal,
-    /// Narrow vertical pattern.
-    NarrowVertical,
-    /// Narrow horizontal pattern.
-    NarrowHorizontal,
-    /// Dark vertical pattern.
-    DarkVertical,
-    /// Dark horizontal pattern.
-    DarkHorizontal,
-    /// Dashed downward diagonal pattern.
-    DashedDownwardDiagonal,
-    /// Dashed upward diagonal pattern.
-    DashedUpwardDiagonal,
-    /// Dashed horizontal pattern.
-    DashedHorizontal,
-    /// Dashed vertical pattern.
-    DashedVertical,
-    /// Small confetti pattern.
-    SmallConfetti,
-    /// Large confetti pattern.
-    LargeConfetti,
-    /// Zigzag pattern.    
-    Zigzag,
-    /// Wave pattern.
-    Wave,
-    /// Diagonal brick pattern.
-    DiagonalBrick,
-    ///Horizontal brick pattern.
-    HorizontalBrick,
-    /// Weave pattern.
-    Weave,
-    /// Plaid pattern.
-    Plaid,
-    /// Divot pattern.
-    Divot,
-    /// Dotted grid pattern.
-    DottedGrid,
-    /// Dotted diamond pattern.
-    DottedDiamond,
-    /// Shingle pattern.
-    Shingle,
-    /// Trellis pattern.
-    Trellis,
-    /// Sphere pattern.
-    Sphere,
-    /// Small grid pattern.
-    SmallGrid,
-    /// Large grid pattern.
-    LargeGrid,
-    /// Small check pattern.
-    SmallCheck,
-    /// Large check pattern.
-    LargeCheck,
-    /// Outlined diamond pattern.
-    OutlinedDiamond,
-    /// Solid diamond pattern.
-    SolidDiamond,
 }
 
 impl ChartPatternType {
@@ -361,21 +225,6 @@ impl ChartPatternType {
         };
         value as u8
     }
-}
-
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum ChartMarkerType {
-    MarkerAutomatic,
-    MarkerNone,
-    MarkerSquare,
-    MarkerDiamond,
-    MarkerTriangle,
-    MarkerX,
-    MarkerStar,
-    MarkerShortDash,
-    MarkerLongDash,
-    MarkerCircle,
-    MarkerPlus,
 }
 
 impl ChartMarkerType {

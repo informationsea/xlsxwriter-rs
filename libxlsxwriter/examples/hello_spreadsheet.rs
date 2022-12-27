@@ -1,6 +1,4 @@
-use xlsxwriter::{
-    Format, FormatAlignment, FormatColor, FormatUnderline, FormatVerticalAlignment, Workbook,
-};
+use xlsxwriter::{format::*, Workbook};
 
 fn main() -> Result<(), xlsxwriter::XlsxError> {
     let workbook = Workbook::new("target/simple1.xlsx")?;

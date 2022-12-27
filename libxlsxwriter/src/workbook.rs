@@ -11,7 +11,7 @@ use std::rc::Rc;
 /// The Workbook is the main object exposed by the libxlsxwriter library. It represents the entire spreadsheet as you see it in Excel and internally it represents the Excel file as it is written on disk.
 ///
 /// ```rust
-/// use xlsxwriter::*;
+/// use xlsxwriter::prelude::*;
 /// fn main() -> Result<(), XlsxError> {
 ///     let workbook = Workbook::new("test-workbook.xlsx")?;
 ///     let mut worksheet = workbook.add_worksheet(None)?;
@@ -91,7 +91,7 @@ impl Workbook {
 
     /// This function is the same as the [`Workbook::new()`] constructor but allows additional options to be set.
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// let workbook = Workbook::new_with_options("test-workbook_with_options.xlsx", true, Some("target"), true)?;
     /// let mut worksheet = workbook.add_worksheet(None)?;
@@ -192,6 +192,7 @@ impl Workbook {
         }
     }
 
+    /// This function returns a [`Worksheet`] object reference based on its name.
     pub fn get_worksheet<'a>(
         &'a self,
         sheet_name: &str,
@@ -212,12 +213,16 @@ impl Workbook {
         }
     }
 
-    // only for compatibility
-    //
+    /// Create new format struct.
+    ///
+    /// This function available only for compatibility. Please use [`Format::new`] to create new Format object.
+    #[deprecated(since = "0.6", note = "Replaced with Format::new()")]
     pub fn add_format(&self) -> Format {
         Format::new()
     }
 
+    /// [`Workbook::add_chart`] function creates a new chart object that can be added to a worksheet.
+    /// Available chart types are defined in [`ChartType`].
     pub fn add_chart(&self, chart_type: ChartType) -> Chart {
         unsafe {
             let chart = libxlsxwriter_sys::workbook_add_chart(self.workbook, chart_type.value());
@@ -236,7 +241,7 @@ impl Workbook {
     /// a single cell or a range of cells in a workbook:
     /// These defined names can then be used in formulas:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// let workbook = Workbook::new("test-workbook-define_name.xlsx")?;
     /// let mut worksheet = workbook.add_worksheet(None)?;
@@ -264,6 +269,8 @@ impl Workbook {
         }
     }
 
+    /// The [`Workbook::close`] function closes a Workbook object, writes the Excel file to disk,
+    /// frees any memory allocated internally to the Workbook and frees the object itself.
     pub fn close(mut self) -> Result<(), XlsxError> {
         unsafe {
             let result = libxlsxwriter_sys::workbook_close(self.workbook);

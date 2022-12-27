@@ -105,7 +105,8 @@ impl FilterRule {
     ) -> Result<libxlsxwriter_sys::lxw_filter_rule, XlsxError> {
         Ok(libxlsxwriter_sys::lxw_filter_rule {
             criteria: self.criteria.into_internal() as u8,
-            value_string: c_string_helper.add_opt(self.value.to_str())? as *mut std::os::raw::c_char,
+            value_string: c_string_helper.add_opt(self.value.to_str())?
+                as *mut std::os::raw::c_char,
             value: self.value.to_f64().unwrap_or_default(),
         })
     }
@@ -143,7 +144,8 @@ impl<'a> Worksheet<'a> {
     /// This function can be used to filter columns in a autofilter range based on single rule conditions.
     ///
     /// ```rust
-    /// use xlsxwriter::*;
+    /// use xlsxwriter::prelude::*;
+    /// # use xlsxwriter::worksheet::filter::*;
     ///
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_filter_column.xlsx")?;
@@ -188,7 +190,8 @@ impl<'a> Worksheet<'a> {
     /// This function can be used to filter columns in a autofilter range based on two rule conditions.
     ///
     /// ```rust
-    /// use xlsxwriter::*;
+    /// use xlsxwriter::prelude::*;
+    /// # use xlsxwriter::worksheet::filter::*;
     ///
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_filter_column2.xlsx")?;
@@ -239,7 +242,7 @@ impl<'a> Worksheet<'a> {
     /// and [`Worksheet::filter_column2()`].
     ///
     /// ```rust
-    /// use xlsxwriter::*;
+    /// use xlsxwriter::prelude::*;
     ///
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_filter_list.xlsx")?;

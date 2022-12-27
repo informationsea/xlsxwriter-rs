@@ -1,3 +1,4 @@
+use super::XlsxError;
 use std::error::Error;
 use std::ffi;
 use std::fmt::{self, Display};
@@ -10,21 +11,16 @@ pub(crate) enum XlsxErrorSource {
     NulError(std::ffi::NulError),
 }
 
-#[derive(Debug)]
-pub struct XlsxError {
-    pub(crate) source: XlsxErrorSource,
-}
-
 impl Error for XlsxError {}
 
 impl XlsxError {
-    pub fn new(error: libxlsxwriter_sys::lxw_error) -> XlsxError {
+    pub(crate) fn new(error: libxlsxwriter_sys::lxw_error) -> XlsxError {
         XlsxError {
             source: XlsxErrorSource::LibXlsxWriter(error),
         }
     }
 
-    pub fn unknown_error() -> XlsxError {
+    pub(crate) fn unknown_error() -> XlsxError {
         XlsxError {
             source: XlsxErrorSource::Unknown,
         }

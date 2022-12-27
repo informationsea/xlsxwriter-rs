@@ -1,3 +1,5 @@
+use crate::{table::*, worksheet::DateTime};
+
 use super::*;
 
 #[test]
@@ -48,7 +50,7 @@ fn test_simple1() -> Result<(), XlsxError> {
 fn test_sample1() -> Result<(), XlsxError> {
     let workbook = Workbook::new("../target/test.xlsx")?;
 
-    let mut format1 = workbook.add_format();
+    let mut format1 = Format::new();
     format1
         .set_bold()
         .set_font_name("Arial")
@@ -56,17 +58,17 @@ fn test_sample1() -> Result<(), XlsxError> {
         .set_italic()
         .set_underline(FormatUnderline::Single);
 
-    let mut format2 = workbook.add_format();
+    let mut format2 = Format::new();
     format2
         .set_font_color(FormatColor::Blue)
         .set_underline(FormatUnderline::Double);
 
-    let mut format3 = workbook.add_format();
+    let mut format3 = Format::new();
     format3
         .set_font_color(FormatColor::Blue)
         .set_underline(FormatUnderline::Single);
 
-    let mut format4 = workbook.add_format();
+    let mut format4 = Format::new();
     format4.set_num_format("mmm d yyyy hh:mm AM/PM");
 
     let mut sheet = workbook.add_worksheet(None)?;

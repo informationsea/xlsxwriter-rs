@@ -1,16 +1,5 @@
 use super::super::{convert_bool, FormatColor};
-use super::constants::*;
-
-/// Struct to represent a chart pattern.
-#[derive(Copy, Clone, PartialEq, PartialOrd)]
-pub struct ChartPattern {
-    /// The pattern foreground color.
-    pub fg_color: FormatColor,
-    /// The pattern background color.
-    pub bg_color: FormatColor,
-    /// The pattern type.
-    pub chart_pattern: ChartPatternType,
-}
+use super::{ChartDashType, ChartFill, ChartLine, ChartPattern, ChartPatternType};
 
 impl ChartPattern {
     pub fn new(fg_color: FormatColor, bg_color: FormatColor, pattern: ChartPatternType) -> Self {
@@ -28,21 +17,6 @@ impl ChartPattern {
             type_: self.chart_pattern.value(),
         }
     }
-}
-
-/// Struct to represent a chart line.
-#[derive(Copy, Clone, PartialEq, PartialOrd)]
-pub struct ChartLine {
-    /// The chart font color.
-    pub color: FormatColor,
-    /// Turn off/hide line. Set to `false` or `true`.
-    pub none: bool,
-    /// Width of the line in increments of 0.25. Default is 2.25.
-    pub width: f32,
-    /// The line dash type.
-    pub dash_type: ChartDashType,
-    /// Set the transparency of the line. 0 - 100. Default 0.
-    pub transparency: u8,
 }
 
 impl ChartLine {
@@ -71,17 +45,6 @@ impl Default for ChartLine {
             transparency: 0,
         }
     }
-}
-
-/// Struct to represent a chart fill.
-#[derive(Clone, PartialEq, PartialOrd)]
-pub struct ChartFill {
-    /// The chart font color.
-    pub color: FormatColor,
-    /// Turn off/hide line. Set to false or true.
-    pub none: bool,
-    /// Set the transparency of the fill. 0 - 100. Default 0.
-    pub transparency: u8,
 }
 
 impl ChartFill {

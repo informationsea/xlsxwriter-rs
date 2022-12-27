@@ -1,6 +1,8 @@
-mod filter;
-mod table;
-mod validation;
+pub mod conditional_format;
+mod datetime;
+pub mod filter;
+pub mod table;
+pub mod validation;
 
 use crate::CStringHelper;
 
@@ -8,9 +10,7 @@ use super::{convert_bool, Chart, Format, FormatColor, Workbook, XlsxError};
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-pub use filter::*;
-pub use table::*;
-pub use validation::*;
+pub use datetime::*;
 
 /// Integer data type to represent a column value. Equivalent to `u16`.
 ///
@@ -30,32 +30,6 @@ pub struct DateTime {
     pub hour: i8,
     pub min: i8,
     pub second: f64,
-}
-
-impl DateTime {
-    pub fn new(year: i16, month: i8, day: i8, hour: i8, min: i8, second: f64) -> DateTime {
-        DateTime {
-            year,
-            month,
-            day,
-            hour,
-            min,
-            second,
-        }
-    }
-}
-
-impl From<&DateTime> for libxlsxwriter_sys::lxw_datetime {
-    fn from(datetime: &DateTime) -> Self {
-        libxlsxwriter_sys::lxw_datetime {
-            year: datetime.year.into(),
-            month: datetime.month.into(),
-            day: datetime.day.into(),
-            hour: datetime.hour.into(),
-            min: datetime.min.into(),
-            sec: datetime.second,
-        }
-    }
 }
 
 /// Options for modifying images inserted via [Worksheet.insert_image_opt()](struct.Worksheet.html#method.insert_image_opt).
@@ -87,6 +61,7 @@ impl From<&ImageOptions> for libxlsxwriter_sys::lxw_image_options {
     }
 }
 
+/// Paper sizes
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
 pub enum PaperType {
     PrinterDefault,
@@ -129,6 +104,7 @@ impl PaperType {
     }
 }
 
+/// Options for header and footer
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct HeaderFooterOptions {
     pub margin: f64,
@@ -169,6 +145,7 @@ impl GridLines {
     }
 }
 
+/// Sheet protection
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
 pub struct Protection {
     pub no_select_locked_cells: bool,
@@ -280,6 +257,7 @@ impl Default for RowColOptions {
     }
 }
 
+/// Comment display type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CommentDisplayType {
     Default,
@@ -352,16 +330,20 @@ impl CommentOptions {
     }
 }
 
+/// Default Excel row height in character units.
 pub const LXW_DEF_ROW_HEIGHT: f64 = 15.0;
+/// Default Excel row height in pixels.
 pub const LXW_DEF_ROW_HEIGHT_PIXELS: u32 = 20;
+/// Default Excel column width in character units.
 pub const LXW_DEF_COL_WIDTH: f64 = 8.43;
+/// Default Excel column width in pixels.
 pub const LXW_DEF_COL_WIDTH_PIXELS: u32 = 64;
 
 /// The Worksheet object represents an Excel worksheet. It handles operations such as writing data to cells or formatting worksheet layout.
 ///
 /// A Worksheet object isn't created directly. Instead a worksheet is created by calling the `workbook.add_worksheet()` function from a [Workbook](struct.Workbook.html) object:
 /// ```rust
-/// use xlsxwriter::*;
+/// use xlsxwriter::prelude::*;
 /// # fn main() -> Result<(), XlsxError> {
 /// let workbook = Workbook::new("test-worksheet.xlsx")?;
 /// let mut worksheet = workbook.add_worksheet(None)?;
@@ -379,7 +361,7 @@ pub struct Worksheet<'a> {
 impl<'a> Worksheet<'a> {
     /// This function writes the comment of a cell
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_comment-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -435,7 +417,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function writes numeric types to the cell specified by row and column:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_number-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -451,7 +433,7 @@ impl<'a> Worksheet<'a> {
     /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a Format object.
     ///
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_number-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -488,7 +470,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function writes a string to the cell specified by row and column:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_string-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -501,7 +483,7 @@ impl<'a> Worksheet<'a> {
     /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a Format object:
     ///
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_string-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -513,7 +495,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// Unicode strings are supported in UTF-8 encoding.
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_string-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -548,7 +530,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function writes a formula or function to the cell specified by row and column:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_formula-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -569,7 +551,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// Formulas must be written with the US style separator/range operator which is a comma (not semi-colon). Therefore a formula with multiple values should be written as follows:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_formula-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -610,7 +592,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// Array formulas can return a single value or a range or values. For array formulas that return a range of values you must specify the range that the return values will be written to. This is why this function has first_ and last_ row/column parameters:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_array_formula-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -620,7 +602,7 @@ impl<'a> Worksheet<'a> {
     /// ```
     /// If the array formula returns a single value then the first_ and last_ parameters should be the same:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_array_formula-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -658,7 +640,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function can be used to write a date or time to the cell specified by row and column:
     /// ```rust
-    /// use xlsxwriter::*;
+    /// use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_datetime-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -669,7 +651,7 @@ impl<'a> Worksheet<'a> {
     /// ```
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_datetime-1.png)
     ///
-    /// The `format` parameter should be used to apply formatting to the cell using a [Format](struct.Format.html) object as shown above. Without a date format the datetime will appear as a number only.
+    /// The `format` parameter should be used to apply formatting to the cell using a [`Format`] object as shown above. Without a date format the datetime will appear as a number only.
     ///
     /// See [Working with Dates and Times](https://libxlsxwriter.github.io/working_with_dates.html) for more information about handling dates and times in libxlsxwriter.
     pub fn write_datetime(
@@ -699,7 +681,7 @@ impl<'a> Worksheet<'a> {
     /// This function is used to write a URL/hyperlink to a worksheet cell specified by row and column.
     /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a [Format](struct.Format.html) object. The typical worksheet format for a hyperlink is a blue underline:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -712,7 +694,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// The usual web style URI's are supported: `http://`, `https://`, `ftp://` and `mailto:` :
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-2.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -728,7 +710,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// An Excel hyperlink is comprised of two elements: the displayed string and the non-displayed link. By default the displayed string is the same as the link. However, it is possible to overwrite it with any other libxlsxwriter type using the appropriate `Worksheet.write_*()` function. The most common case is to overwrite the displayed link text with another string:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -742,7 +724,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// Two local URIs are supported: `internal:` and `external:`. These are used for hyperlinks to internal worksheet references or external workbook and worksheet references:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_url-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -787,7 +769,7 @@ impl<'a> Worksheet<'a> {
 
     /// Write an Excel boolean to the cell specified by row and column:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_boolean-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -821,7 +803,7 @@ impl<'a> Worksheet<'a> {
 
     /// Write a blank cell specified by row and column:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_blank-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -857,7 +839,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function writes a formula or Excel function to the cell specified by row and column with a user defined numeric result:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_formula_num-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -905,7 +887,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function writes a formula or Excel function to the cell specified by row and column with a user defined string result:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_formula_str-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -947,7 +929,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function is used to write strings with multiple formats. For example to write the string 'This is bold and this is italic' you would use the following:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_write_richtext-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -1222,7 +1204,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function can be used to insert a image into a worksheet. The image can be in PNG, JPEG or BMP format:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_insert_image-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -1264,7 +1246,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function is like Worksheet.insert_image() function except that it takes an optional `ImageOptions` struct to scale and position the image:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_insert_image_opt-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -1311,7 +1293,7 @@ impl<'a> Worksheet<'a> {
 
     /// This function can be used to insert a image into a worksheet from a memory buffer:
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_insert_image_buffer-1.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;

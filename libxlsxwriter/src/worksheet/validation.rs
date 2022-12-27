@@ -293,7 +293,8 @@ pub(crate) struct CDataValidation {
 impl<'a> Worksheet<'a> {
     /// This function is used to construct an Excel data validation or to limit the user input to a dropdown list of values
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
+    /// # use xlsxwriter::worksheet::validation::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_validation-cell-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
@@ -337,7 +338,8 @@ impl<'a> Worksheet<'a> {
 
     /// The this function is the same as the `data_validation_cell()`, see above, except the data validation is applied to a range of cells.
     /// ```rust
-    /// # use xlsxwriter::*;
+    /// # use xlsxwriter::prelude::*;
+    /// # use xlsxwriter::worksheet::validation::*;
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_validation-cell-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;

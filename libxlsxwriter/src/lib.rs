@@ -1,7 +1,10 @@
 //! xlsxwriter-rs
 //! =============
 //!
-//! Rust binding of [libxlsxwriter](https://github.com/jmcnamara/libxlsxwriter)
+//! Rust binding of [libxlsxwriter](https://github.com/jmcnamara/libxlsxwriter).
+//!
+//! If you are looking for native rust port of libxlsxwriter, please try
+//! [rust_xlsxwriter](https://crates.io/crates/rust_xlsxwriter) which is developed by original libxlsxwriter author.
 //!
 //! ** API of this library is not stable. **
 //!
@@ -12,6 +15,9 @@
 //! * Full Excel formatting.
 //! * Merged cells.
 //! * Autofilters.
+//! * Table.
+//! * Conditional Format.
+//! * Validation.
 //! * Data validation and drop down lists.
 //! * Worksheet PNG/JPEG images.
 //! * Cell comments.
@@ -26,7 +32,7 @@
 //! ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/simple1.png)
 //!
 //! ```rust
-//! use xlsxwriter::*;
+//! use xlsxwriter::prelude::*;
 //!
 //! # fn main() -> Result<(), XlsxError> {
 //! let workbook = Workbook::new("simple1.xlsx")?;
@@ -54,22 +60,51 @@
 //!
 //! Please read [original libxlsxwriter document](https://libxlsxwriter.github.io/worksheet_8h.html) for description missing functions.
 //! Most of this document is based on libxlsxwriter document.
+//!
+//! Migration Guide
+//! ---------------
+//!
+//! ### Upgrade from prior version 0.5
+//!
+//! 1. Replace `use xlsxwriter::*` with `use xlsxwriter::prelude::*`
+//! 2. Use [`Format::new`] instead of [`Workbook::add_format`]
+//! 3. [`Format`] object's methods now return mutable reference. Please rewrite code to adopt this change.
+//! 4. Some functions now return `Result<T, XlsxError>`. Please rewrite code to adopt this change.
 
 extern crate libxlsxwriter_sys;
 
-mod chart;
+/// Manipulate Charts.
+pub mod chart;
 mod error;
-mod format;
-mod workbook;
-mod worksheet;
+
+/// Manipulate Formats.
+pub mod format;
+
+/// xlsxwriter prelude.
+pub mod prelude;
+
+/// Manipulate Workbook.
+pub mod workbook;
+
+/// Manipulate Worksheets.
+pub mod worksheet;
 
 use std::{ffi::CString, os::raw::c_char, pin::Pin};
 
-pub use chart::*;
-pub use error::XlsxError;
-pub use format::*;
-pub use workbook::*;
-pub use worksheet::*;
+use chart::*;
+use error::XlsxErrorSource;
+use format::*;
+use worksheet::*;
+
+pub use format::Format;
+pub use workbook::Workbook;
+pub use worksheet::Worksheet;
+
+/// The error types for xlsxwriter.
+#[derive(Debug)]
+pub struct XlsxError {
+    pub(crate) source: XlsxErrorSource,
+}
 
 fn convert_bool(value: bool) -> u8 {
     let result = if value {
@@ -128,6 +163,7 @@ where
     Ok(r)
 }
 
+/// String value or float number value
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum StringOrFloat {
     String(String),

@@ -14,9 +14,15 @@ categories = ["api-bindings", "encoding", "text-processing"]
 license = "Apache-2.0"
 
 [features]
+default = ["chrono"]
 no-md5 = ["libxlsxwriter-sys/no-md5"]
 use-openssl-md5 = ["libxlsxwriter-sys/use-openssl-md5"]
 system-zlib = ["libxlsxwriter-sys/system-zlib"]
+chrono = ["dep:chrono"]
 
 [dependencies]
-libxlsxwriter-sys = {path = "../libxlsxwriter-sys", version = "^1.1.4"}
+libxlsxwriter-sys = {path = "../libxlsxwriter-sys", version = "=1.1.5-a"}
+chrono = { version = "0.4", optional = true }
+
+[dev-dependencies]
+chrono = { version = "0.4" }

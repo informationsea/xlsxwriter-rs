@@ -1,6 +1,6 @@
 [submodule "libxlsxwriter-sys/third_party/libxlsxwriter"]
 	path = libxlsxwriter-sys/third_party/libxlsxwriter
-	url = https://github.com/jmcnamara/libxlsxwriter.git
+	url = https://github.com/informationsea/libxlsxwriter.git
 [submodule "libxlsxwriter-sys/third_party/zlib"]
 	path = libxlsxwriter-sys/third_party/zlib
 	url = https://github.com/madler/zlib.git
