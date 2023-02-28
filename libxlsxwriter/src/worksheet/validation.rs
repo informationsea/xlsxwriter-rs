@@ -7,14 +7,14 @@ use super::DateTime;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
 pub enum DataValidationType {
     None,
     Integer,
     IntegerFormula,
     Decimal,
     DecimalFormula,
-    List,
+    List(Vec<String>),
     ListFormula,
     Date,
     DateFormula,
@@ -44,7 +44,7 @@ impl DataValidationType {
             DataValidationType::DecimalFormula => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_DECIMAL_FORMULA
             }
-            DataValidationType::List => {
+            DataValidationType::List(_) => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_LIST
             }
             DataValidationType::ListFormula => {
@@ -159,8 +159,6 @@ pub struct DataValidation {
     pub value_formula: Option<String>,
     /// This parameter is used to set a list of strings for a drop down list. The `value_formula` parameter can also be used to specify a list
     /// from an Excel cell range. Note, the string list is restricted by Excel to 255 characters, including comma separators.
-    pub value_list: Option<Vec<String>>,
-    /// This parameter is used to set the limiting value to which the date or time criteria is applied using a DateTime struct.
     pub value_datetime: DateTime,
     /// This parameter is the same as value_number but for the minimum value when a BETWEEN criteria is used.
     pub minimum_number: f64,
@@ -209,7 +207,6 @@ impl DataValidation {
             dropdown: true,
             value_number: 0.,
             value_formula: None,
-            value_list: None,
             value_datetime: DateTime::default(),
             minimum_number: 0.,
             minimum_formula: None,
@@ -228,28 +225,29 @@ impl DataValidation {
         &self,
         c_string_helper: &mut CStringHelper,
     ) -> Result<CDataValidation, XlsxError> {
-        let mut _value_list: Option<Vec<Vec<u8>>> = self.value_list.as_ref().map(|x| {
-            x.iter()
-                .map(|y| {
-                    CString::new(y as &str)
-                        .unwrap()
-                        .into_bytes_with_nul()
-                        .to_vec()
+        let mut _value_list: Option<Vec<Vec<u8>>> = match &self.validate {
+            DataValidationType::List(v) => {
+                let mapped_vec = v.iter().map(|y| {
+                CString::new(y as &str)
+                    .unwrap()
+                    .into_bytes_with_nul()
+                    .to_vec()
                 })
-                .collect()
-        });
-        let mut _value_list_ptr: Option<Vec<*mut c_char>> = self
-            .value_list
-            .as_ref()
-            .map(|x| try_to_vec(x.iter().map(|y| Ok(c_string_helper.add(y)? as *mut c_char))))
-            .transpose()?;
+                .collect();
+                Some(mapped_vec)},
+            _ => None
+        };
+        let mut _value_list_ptr: Option<Vec<*mut c_char>> = match self.validate.clone() {
+            DataValidationType::List(v) => Some(try_to_vec(v.iter().map(|y| Ok(c_string_helper.add(y)? as *mut c_char)))).transpose()?,
+            _ => None
+        };
         if let Some(l) = _value_list_ptr.as_mut() {
             l.push(std::ptr::null_mut());
         }
 
         Ok(CDataValidation {
             data_validation: libxlsxwriter_sys::lxw_data_validation {
-                validate: self.validate.value(),
+                validate: self.validate.clone().value(),
                 criteria: self.criteria.value(),
                 ignore_blank: convert_validation_bool(self.ignore_blank),
                 show_input: convert_validation_bool(self.show_input),
@@ -344,11 +342,10 @@ impl<'a> Worksheet<'a> {
     /// # let workbook = Workbook::new("test-worksheet_validation-cell-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
     /// let mut validation = DataValidation::new(
-    ///     DataValidationType::List,
+    ///     DataValidationType::List(vec!["VALUE1".to_string(), "VALUE2".to_string(), "VALUE3".to_string()]),
     ///     DataValidationCriteria::None,
     ///     DataValidationErrorType::Stop,
     /// );
-    /// validation.value_list = Some(vec!["VALUE1".to_string(), "VALUE2".to_string(), "VALUE3".to_string()]);
     ///
     /// # let format = workbook
     /// #    .add_format()
@@ -423,7 +420,7 @@ mod test {
     fn test_validation2() -> Result<(), XlsxError> {
         let workbook = Workbook::new("test-worksheet_validation-cell-2.xlsx")?;
         let mut validation = DataValidation::new(
-            DataValidationType::List,
+            DataValidationType::List(vec!["VALUE1".to_string(), "VALUE2".to_string()]),
             DataValidationCriteria::None,
             DataValidationErrorType::Warning,
         );
@@ -431,7 +428,6 @@ mod test {
         validation.input_message = Some("Input Message".to_string());
         validation.error_title = Some("Error Title".to_string());
         validation.error_message = Some("Error Message".to_string());
-        validation.value_list = Some(vec!["VALUE1".to_string(), "VALUE2".to_string()]);
 
         let mut worksheet = workbook.add_worksheet(None)?;
         worksheet.write_string(0, 0, "input list", None)?;
