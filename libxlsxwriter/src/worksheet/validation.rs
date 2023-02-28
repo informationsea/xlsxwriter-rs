@@ -7,71 +7,73 @@ use super::DateTime;
 use std::ffi::CString;
 use std::os::raw::c_char;
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum DataValidationType {
-    None,
-    Integer,
-    IntegerFormula,
-    Decimal,
-    DecimalFormula,
-    List(Vec<String>),
-    ListFormula,
-    Date,
-    DateFormula,
-    Time,
-    TimeFormula,
-    Length,
-    LengthFormula,
-    CustomFormula,
+    Integer{ignore_blank: bool, number_options: DataValidationNumberOptions<i64> },
+    IntegerFormula{ignore_blank: bool, formula: String },
+    Decimal{ignore_blank: bool, number_options: DataValidationNumberOptions<f64> },
+    DecimalFormula{ignore_blank: bool, formula: String },
+    List{ignore_blank: bool, dropdown: bool, values: Vec<String> },
+    ListFormula{ignore_blank: bool, formula: String },
+    Date{ignore_blank: bool, number_options: DataValidationNumberOptions<DateTime> },
+    DateFormula{ignore_blank: bool, formula: String },
+    Time{ignore_blank: bool, number_options: DataValidationNumberOptions<DateTime> },
+    TimeFormula{ignore_blank: bool, formula: String },
+    Length{ignore_blank: bool, number_options: DataValidationNumberOptions<usize> },
+    LengthFormula{ignore_blank: bool, formula: String },
+    CustomFormula{ignore_blank: bool, formula: String },
     Any,
 }
 
-impl DataValidationType {
-    fn value(self) -> u8 {
-        let value = match self {
-            DataValidationType::None => {
-                libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_NONE
-            }
-            DataValidationType::Integer => {
+pub struct DataValidation {
+    input_message: Option<InputMessageOptions>,
+    error_alert: Option<ErrorAlertOptions>,
+    validation_type: DataValidationType
+}
+
+impl DataValidation {
+    fn value(&self) -> u8 {
+        let value = match self.validation_type {
+            DataValidationType::Integer{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_INTEGER
             }
-            DataValidationType::IntegerFormula => {
+            DataValidationType::IntegerFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_INTEGER_FORMULA
             }
-            DataValidationType::Decimal => {
+            DataValidationType::Decimal{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_DECIMAL
             }
-            DataValidationType::DecimalFormula => {
+            DataValidationType::DecimalFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_DECIMAL_FORMULA
             }
-            DataValidationType::List(_) => {
+            DataValidationType::List{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_LIST
             }
-            DataValidationType::ListFormula => {
+            DataValidationType::ListFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_LIST_FORMULA
             }
-            DataValidationType::Date => {
+            DataValidationType::Date{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_DATE
             }
-            DataValidationType::DateFormula => {
+            DataValidationType::DateFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_DATE_FORMULA
             }
-            DataValidationType::Time => {
+            DataValidationType::Time{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_TIME
             }
-            DataValidationType::TimeFormula => {
+            DataValidationType::TimeFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_TIME_FORMULA
             }
-            DataValidationType::Length => {
+            DataValidationType::Length{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_LENGTH
             }
-            DataValidationType::LengthFormula => {
+            DataValidationType::LengthFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_LENGTH_FORMULA
             }
-            DataValidationType::CustomFormula => {
+            DataValidationType::CustomFormula{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_CUSTOM_FORMULA
             }
-            DataValidationType::Any => {
+            DataValidationType::Any{..} => {
                 libxlsxwriter_sys::lxw_validation_types_LXW_VALIDATION_TYPE_ANY
             }
         };
@@ -79,31 +81,42 @@ impl DataValidationType {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
-pub enum DataValidationCriteria {
-    None,
-    Between,
-    NotBetween,
-    EqualTo,
-    NotEqualTo,
-    GreaterThan,
-    LessThan,
-    GreaterThanOrEqualTo,
-    LessThanOrEqualTo,
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct InputMessageOptions {
+    pub title: String,
+    pub message: String
 }
 
-impl DataValidationCriteria {
-    fn value(self) -> u8 {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ErrorAlertOptions {
+    pub style: DataValidationErrorType,
+    pub title: String,
+    pub message: String
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, PartialOrd)]
+pub enum DataValidationNumberOptions<T> {
+    Between(T, T),
+    NotBetween(T, T),
+    EqualTo(T),
+    NotEqualTo(T),
+    GreaterThan(T),
+    LessThan(T),
+    GreaterThanOrEqualTo(T),
+    LessThanOrEqualTo(T),
+}
+
+impl<T> DataValidationNumberOptions<T> {
+    fn value(&self) -> u8 {
         let value = match self {
-            DataValidationCriteria::None => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NONE,
-            DataValidationCriteria::Between => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_BETWEEN,
-            DataValidationCriteria::NotBetween => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NOT_BETWEEN,
-            DataValidationCriteria::EqualTo => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_EQUAL_TO,
-            DataValidationCriteria::NotEqualTo => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NOT_EQUAL_TO,
-            DataValidationCriteria::GreaterThan => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_GREATER_THAN,
-            DataValidationCriteria::LessThan => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_LESS_THAN,
-            DataValidationCriteria::GreaterThanOrEqualTo => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_GREATER_THAN_OR_EQUAL_TO,
-            DataValidationCriteria::LessThanOrEqualTo => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_LESS_THAN_OR_EQUAL_TO,
+            DataValidationNumberOptions::Between(_, _) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_BETWEEN,
+            DataValidationNumberOptions::NotBetween(_, _) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NOT_BETWEEN,
+            DataValidationNumberOptions::EqualTo(_) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_EQUAL_TO,
+            DataValidationNumberOptions::NotEqualTo(_) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_NOT_EQUAL_TO,
+            DataValidationNumberOptions::GreaterThan(_) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_GREATER_THAN,
+            DataValidationNumberOptions::LessThan(_) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_LESS_THAN,
+            DataValidationNumberOptions::GreaterThanOrEqualTo(_) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_GREATER_THAN_OR_EQUAL_TO,
+            DataValidationNumberOptions::LessThanOrEqualTo(_) => libxlsxwriter_sys::lxw_validation_criteria_LXW_VALIDATION_CRITERIA_LESS_THAN_OR_EQUAL_TO,
         };
         value as u8
     }
@@ -133,101 +146,17 @@ impl DataValidationErrorType {
     }
 }
 
-/// Worksheet data validation options.
-#[derive(Debug, Clone, PartialEq)]
-pub struct DataValidation {
-    /// Set the validation type.    
-    pub validate: DataValidationType,
-    /// Set the validation criteria type to select the data.
-    pub criteria: DataValidationCriteria,
-    /// Controls whether a data validation is not applied to blank data in the cell.
-    pub ignore_blank: bool,
-    /// This parameter is used to toggle on and off the 'Show input message when cell is selected' option in the Excel data validation dialog.
-    ///  When the option is off an input message is not displayed even if it has been set using `input_message`.
-    pub show_input: bool,
-    /// This parameter is used to toggle on and off the 'Show error alert after invalid data is entered' option in the Excel data validation dialog.
-    /// When the option is off an error message is not displayed even if it has been set using `error_message`.
-    pub show_error: bool,
-    /// This parameter is used to specify the type of error dialog that is displayed.
-    pub error_type: DataValidationErrorType,
-    /// This parameter is used to toggle on and off the 'In-cell dropdown' option in the Excel data validation dialog.
-    /// When the option is on a dropdown list will be shown for list validations.
-    pub dropdown: bool,
-    /// This parameter is used to set the limiting value to which the criteria is applied using a whole or decimal number.
-    pub value_number: f64,
-    /// This parameter is used to set the limiting value to which the criteria is applied using a cell reference. It is valid for any of the _FORMULA validation types.
-    pub value_formula: Option<String>,
-    /// This parameter is used to set a list of strings for a drop down list. The `value_formula` parameter can also be used to specify a list
-    /// from an Excel cell range. Note, the string list is restricted by Excel to 255 characters, including comma separators.
-    pub value_datetime: DateTime,
-    /// This parameter is the same as value_number but for the minimum value when a BETWEEN criteria is used.
-    pub minimum_number: f64,
-    /// This parameter is the same as value_formula but for the minimum value when a BETWEEN criteria is used.
-    pub minimum_formula: Option<String>,
-    /// This parameter is the same as value_datetime but for the minimum value when a BETWEEN criteria is used.
-    pub minimum_datetime: DateTime,
-    /// This parameter is the same as value_number but for the maximum value when a BETWEEN criteria is used.
-    pub maximum_number: f64,
-    /// This parameter is the same as value_formula but for the maximum value when a BETWEEN criteria is used.
-    pub maximum_formula: Option<String>,
-    /// This parameter is the same as value_datetime but for the maximum value when a BETWEEN criteria is used.
-    pub maximum_datetime: DateTime,
-    /// The input_title parameter is used to set the title of the input message that is displayed when a cell is entered.
-    /// It has no default value and is only displayed if the input message is displayed. See the `input_message` parameter below.
-    ///
-    /// The maximum title length is 32 characters.
-    pub input_title: Option<String>,
-    /// The input_message parameter is used to set the input message that is displayed when a cell is entered. It has no default value.
-    ///
-    /// The message can be split over several lines using newlines. The maximum message length is 255 characters.
-    pub input_message: Option<String>,
-    /// The error_title parameter is used to set the title of the error message that is displayed when the data validation criteria is not met.
-    /// The default error title is 'Microsoft Excel'. The maximum title length is 32 characters.
-    pub error_title: Option<String>,
-    /// The error_message parameter is used to set the error message that is displayed when a cell is entered. The default error message is
-    /// "The value you entered is not valid. A user has restricted values that can be entered into the cell".
-    ///
-    /// The message can be split over several lines using newlines. The maximum message length is 255 characters.
-    pub error_message: Option<String>,
-}
-
 impl DataValidation {
-    pub fn new(
-        validate: DataValidationType,
-        criteria: DataValidationCriteria,
-        error_type: DataValidationErrorType,
-    ) -> DataValidation {
-        DataValidation {
-            validate,
-            criteria,
-            ignore_blank: true,
-            show_input: true,
-            show_error: true,
-            error_type,
-            dropdown: true,
-            value_number: 0.,
-            value_formula: None,
-            value_datetime: DateTime::default(),
-            minimum_number: 0.,
-            minimum_formula: None,
-            minimum_datetime: DateTime::default(),
-            maximum_number: 0.,
-            maximum_formula: None,
-            maximum_datetime: DateTime::default(),
-            input_title: None,
-            input_message: None,
-            error_title: None,
-            error_message: None,
-        }
+    pub fn new(validation_type: DataValidationType, input_message: Option<InputMessageOptions>, error_alert: Option<ErrorAlertOptions>) -> Self {
+        DataValidation { input_message, error_alert, validation_type }
     }
-
     pub(crate) fn to_c_struct(
         &self,
         c_string_helper: &mut CStringHelper,
     ) -> Result<CDataValidation, XlsxError> {
-        let mut _value_list: Option<Vec<Vec<u8>>> = match &self.validate {
-            DataValidationType::List(v) => {
-                let mapped_vec = v.iter().map(|y| {
+        let mut _value_list: Option<Vec<Vec<u8>>> = match &self.validation_type {
+            DataValidationType::List{values, ..} => {
+                let mapped_vec = values.iter().map(|y| {
                 CString::new(y as &str)
                     .unwrap()
                     .into_bytes_with_nul()
@@ -237,44 +166,146 @@ impl DataValidation {
                 Some(mapped_vec)},
             _ => None
         };
-        let mut _value_list_ptr: Option<Vec<*mut c_char>> = match self.validate.clone() {
-            DataValidationType::List(v) => Some(try_to_vec(v.iter().map(|y| Ok(c_string_helper.add(y)? as *mut c_char)))).transpose()?,
+        let mut _value_list_ptr: Option<Vec<*mut c_char>> = match &self.validation_type {
+            DataValidationType::List{values, ..} => Some(try_to_vec(values.iter().map(|y| Ok(c_string_helper.add(y)? as *mut c_char)))).transpose()?,
             _ => None
         };
         if let Some(l) = _value_list_ptr.as_mut() {
             l.push(std::ptr::null_mut());
         }
-
+        let(minimum_number, maximum_number) = match self.validation_type {
+            DataValidationType::Integer { number_options: 
+                DataValidationNumberOptions::Between(x, y) | 
+                DataValidationNumberOptions::NotBetween(x, y), .. } => (x as f64, y as f64), 
+            DataValidationType::Decimal { number_options: 
+                DataValidationNumberOptions::Between(x, y) | 
+                DataValidationNumberOptions::NotBetween(x, y), .. } => (x, y), 
+            DataValidationType::Length { number_options: 
+                DataValidationNumberOptions::Between(x, y) | 
+                DataValidationNumberOptions::NotBetween(x, y), .. } => (x as f64, y as f64), 
+            _ => (0., 0.)
+        };
+        let (minimum_datetime, maximum_datetime) = match &self.validation_type {
+            DataValidationType::Date { number_options: 
+                DataValidationNumberOptions::Between(x, y) | 
+                DataValidationNumberOptions::NotBetween(x, y), .. } => (x.into(), y.into()), 
+            DataValidationType::Time { number_options: 
+                DataValidationNumberOptions::Between(x, y) | 
+                DataValidationNumberOptions::NotBetween(x, y), .. } => (x.into(), y.into()), 
+            _ => ((&DateTime::default()).into(), (&DateTime::default()).into())
+        };
         Ok(CDataValidation {
             data_validation: libxlsxwriter_sys::lxw_data_validation {
-                validate: self.validate.clone().value(),
-                criteria: self.criteria.value(),
-                ignore_blank: convert_validation_bool(self.ignore_blank),
-                show_input: convert_validation_bool(self.show_input),
-                show_error: convert_validation_bool(self.show_error),
-                error_type: self.error_type.value(),
-                dropdown: convert_validation_bool(self.dropdown),
-                value_number: self.value_number,
-                value_formula: c_string_helper.add_opt(self.value_formula.as_deref())?
+                validate: (&self).value(),
+                criteria: match &self.validation_type {
+                    DataValidationType::Date { number_options, ..} | DataValidationType::Time{ number_options, ..} => number_options.value(),
+                    DataValidationType::Integer { number_options, .. } => number_options.value(),
+                    DataValidationType::Length { number_options, .. }=> number_options.value(),
+                    DataValidationType::Decimal { number_options, ..} => number_options.value(),
+                    _ => 0u8,
+                },
+                ignore_blank: convert_validation_bool( match self.validation_type {
+                    DataValidationType::Any => false,
+                    DataValidationType::CustomFormula{ ignore_blank, ..} |
+                    DataValidationType::Date { ignore_blank, ..} |
+                    DataValidationType::DateFormula { ignore_blank, ..} |
+                    DataValidationType::Decimal { ignore_blank, ..} |
+                    DataValidationType::DecimalFormula { ignore_blank, .. } |
+                    DataValidationType::Integer { ignore_blank, ..} |
+                    DataValidationType::IntegerFormula { ignore_blank, ..} |
+                    DataValidationType::Length { ignore_blank, ..} |
+                    DataValidationType::LengthFormula { ignore_blank, .. } |
+                    DataValidationType::List { ignore_blank, ..} |
+                    DataValidationType::ListFormula { ignore_blank, .. } |
+                    DataValidationType::Time { ignore_blank, ..} |
+                    DataValidationType::TimeFormula { ignore_blank, .. } => ignore_blank
+                }),
+                show_input: convert_validation_bool( self.input_message.is_some()),
+                show_error: convert_validation_bool(self.error_alert.is_some()),
+                error_type: self.error_alert.as_ref().map(|x| x.style).unwrap_or(DataValidationErrorType::Stop).value(),
+                dropdown: convert_validation_bool( match self.validation_type {
+                    DataValidationType::List { dropdown, .. } => dropdown,
+                    _ => true
+                }),
+                value_number: match self.validation_type {
+                    DataValidationType::Integer { number_options: 
+                        DataValidationNumberOptions::EqualTo(value) | 
+                        DataValidationNumberOptions::NotEqualTo(value) |
+                        DataValidationNumberOptions::GreaterThan(value) | 
+                        DataValidationNumberOptions::GreaterThanOrEqualTo(value) | 
+                        DataValidationNumberOptions::LessThan(value) |
+                        DataValidationNumberOptions::LessThanOrEqualTo(value), 
+                        ..
+                    } => value as f64,
+                    DataValidationType::Decimal { number_options: 
+                        DataValidationNumberOptions::EqualTo(value) | 
+                        DataValidationNumberOptions::NotEqualTo(value) |
+                        DataValidationNumberOptions::GreaterThan(value) | 
+                        DataValidationNumberOptions::GreaterThanOrEqualTo(value) | 
+                        DataValidationNumberOptions::LessThan(value) |
+                        DataValidationNumberOptions::LessThanOrEqualTo(value), 
+                        ..
+                    } => value,
+                    DataValidationType::Length { number_options: 
+                        DataValidationNumberOptions::EqualTo(value) | 
+                        DataValidationNumberOptions::NotEqualTo(value) |
+                        DataValidationNumberOptions::GreaterThan(value) | 
+                        DataValidationNumberOptions::GreaterThanOrEqualTo(value) | 
+                        DataValidationNumberOptions::LessThan(value) |
+                        DataValidationNumberOptions::LessThanOrEqualTo(value), 
+                        ..
+                    } => value as f64,
+                    _ => 0.
+                },
+                value_formula: c_string_helper.add_opt( match &self.validation_type {
+                    DataValidationType::IntegerFormula{ formula, .. } |
+                    DataValidationType::DecimalFormula{ formula, .. } |
+                    DataValidationType::ListFormula{ formula, .. } |
+                    DataValidationType::TimeFormula{ formula, .. } |
+                    DataValidationType::DateFormula{ formula, .. } |
+                    DataValidationType::LengthFormula{ formula, .. } |
+                    DataValidationType::CustomFormula { formula, .. } => Some(&formula),
+                    _ => Some(""),
+                })?
                     as *mut c_char,
                 value_list: _value_list_ptr
                     .as_mut()
                     .map(|x| x.as_mut_ptr())
                     .unwrap_or(std::ptr::null_mut()),
-                value_datetime: (&self.value_datetime).into(),
-                minimum_number: self.minimum_number,
-                minimum_formula: c_string_helper.add_opt(self.minimum_formula.as_deref())?
+                value_datetime: (&match &self.validation_type {
+                        DataValidationType::Date { number_options: 
+                            DataValidationNumberOptions::EqualTo(value) | 
+                            DataValidationNumberOptions::NotEqualTo(value) |
+                            DataValidationNumberOptions::GreaterThan(value) | 
+                            DataValidationNumberOptions::GreaterThanOrEqualTo(value) | 
+                            DataValidationNumberOptions::LessThan(value) |
+                            DataValidationNumberOptions::LessThanOrEqualTo(value), 
+                            .. 
+                        } => value.clone(),
+                        DataValidationType::Time { number_options: 
+                            DataValidationNumberOptions::EqualTo(value) | 
+                            DataValidationNumberOptions::NotEqualTo(value) |
+                            DataValidationNumberOptions::GreaterThan(value) | 
+                            DataValidationNumberOptions::GreaterThanOrEqualTo(value) | 
+                            DataValidationNumberOptions::LessThan(value) |
+                            DataValidationNumberOptions::LessThanOrEqualTo(value), 
+                            .. 
+                        } => value.clone(),
+                        _ => DateTime::default()
+                }).into(),
+                minimum_number,
+                minimum_formula: c_string_helper.add_opt(Some(""))?
                     as *mut c_char,
-                minimum_datetime: (&self.minimum_datetime).into(),
-                maximum_number: self.maximum_number,
-                maximum_formula: c_string_helper.add_opt(self.maximum_formula.as_deref())?
+                minimum_datetime,
+                maximum_number,
+                maximum_formula: c_string_helper.add_opt(Some(""))?
                     as *mut c_char,
-                maximum_datetime: (&self.maximum_datetime).into(),
-                input_title: c_string_helper.add_opt(self.input_title.as_deref())? as *mut c_char,
-                input_message: c_string_helper.add_opt(self.input_message.as_deref())?
+                maximum_datetime,
+                input_title: c_string_helper.add_opt(self.input_message.clone().map(|x| x.title).as_deref())? as *mut c_char,
+                input_message: c_string_helper.add_opt(self.input_message.clone().map(|x| x.message).as_deref())?
                     as *mut c_char,
-                error_title: c_string_helper.add_opt(self.error_title.as_deref())? as *mut c_char,
-                error_message: c_string_helper.add_opt(self.error_message.as_deref())?
+                error_title: c_string_helper.add_opt(self.error_alert.clone().map(|x| x.title).as_deref())? as *mut c_char,
+                error_message: c_string_helper.add_opt(self.error_alert.clone().map(|x| x.message).as_deref())?
                     as *mut c_char,
             },
             _value_list_ptr,
@@ -296,12 +327,18 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_validation-cell-3.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let mut validation = DataValidation::new(
-    ///     DataValidationType::Integer,
-    ///     DataValidationCriteria::GreaterThanOrEqualTo,
-    ///     DataValidationErrorType::Warning,
+    /// let validation = DataValidation::new(
+    ///     DataValidationType::Integer {
+    ///         number_options: DataValidationNumberOptions::GreaterThanOrEqualTo(10),
+    ///         ignore_blank: true
+    ///     },
+    ///     None,
+    ///     Some(ErrorAlertOptions { 
+    ///         style: DataValidationErrorType::Warning, 
+    ///         title: String::new(), 
+    ///         message: String::new()
+    ///     })
     /// );
-    /// validation.value_number = 10.;
     ///
     /// worksheet.write_string(0, 0, "10 or greater", None)?;
     /// # worksheet.write_blank(1, 0, Some(&Format::new().set_border(FormatBorder::Dashed)))?;
@@ -341,10 +378,14 @@ impl<'a> Worksheet<'a> {
     /// # fn main() -> Result<(), XlsxError> {
     /// # let workbook = Workbook::new("test-worksheet_validation-cell-4.xlsx")?;
     /// # let mut worksheet = workbook.add_worksheet(None)?;
-    /// let mut validation = DataValidation::new(
-    ///     DataValidationType::List(vec!["VALUE1".to_string(), "VALUE2".to_string(), "VALUE3".to_string()]),
-    ///     DataValidationCriteria::None,
-    ///     DataValidationErrorType::Stop,
+    /// let validation = DataValidation::new(
+    ///     DataValidationType::List {
+    ///         values: vec!["VALUE1".to_string(), "VALUE2".to_string(), "VALUE3".to_string()],
+    ///         dropdown: true,
+    ///         ignore_blank: true
+    ///     },
+    ///     None,
+    ///     None
     /// );
     ///
     /// # let format = workbook
@@ -393,21 +434,21 @@ mod test {
     #[test]
     fn test_validation() -> Result<(), XlsxError> {
         let workbook = Workbook::new("test-worksheet_validation-cell-1.xlsx")?;
-        let mut validation = DataValidation::new(
-            DataValidationType::Integer,
-            DataValidationCriteria::Between,
-            DataValidationErrorType::Stop,
+        let validation = DataValidation::new(
+            DataValidationType::Integer { 
+                ignore_blank: true,
+                number_options: DataValidationNumberOptions::Between(0, 2) 
+            },
+            Some(InputMessageOptions { 
+                title: "Input Title".to_string(), 
+                message: "Value must be 0 to 2".to_string()
+            }),
+            Some(ErrorAlertOptions { 
+                style: DataValidationErrorType::Stop, 
+                title: "Error Title".to_string(), 
+                message: "Value must be 0 to 2".to_string()
+            }) 
         );
-
-        validation.show_input = true;
-        validation.show_error = true;
-        validation.ignore_blank = true;
-        validation.minimum_number = 0.;
-        validation.maximum_number = 2.;
-        validation.input_title = Some("Input Title".to_string());
-        validation.input_message = Some("Value must be 0 to 2".to_string());
-        validation.error_title = Some("Error Title".to_string());
-        validation.error_message = Some("Error Message".to_string());
         let mut worksheet = workbook.add_worksheet(None)?;
         worksheet.write_string(0, 0, "validation test", None)?;
         worksheet.write_blank(1, 0, Some(&Format::new().set_border(FormatBorder::Dashed)))?;
@@ -419,15 +460,22 @@ mod test {
     #[test]
     fn test_validation2() -> Result<(), XlsxError> {
         let workbook = Workbook::new("test-worksheet_validation-cell-2.xlsx")?;
-        let mut validation = DataValidation::new(
-            DataValidationType::List(vec!["VALUE1".to_string(), "VALUE2".to_string()]),
-            DataValidationCriteria::None,
-            DataValidationErrorType::Warning,
+        let validation = DataValidation::new(
+            DataValidationType::List { 
+                ignore_blank: true, 
+                dropdown: true, 
+                values: vec!["VALUE1".to_string(), "VALUE2".to_string()] 
+            },
+            Some(InputMessageOptions { 
+                title: "Input Title".to_string(), 
+                message: "Input Message".to_string()
+            }),
+            Some(ErrorAlertOptions { 
+                style: DataValidationErrorType::Warning, 
+                title: "Error Title".to_string(), 
+                message: "Error Message".to_string()
+            }), 
         );
-        validation.input_title = Some("Input Title".to_string());
-        validation.input_message = Some("Input Message".to_string());
-        validation.error_title = Some("Error Title".to_string());
-        validation.error_message = Some("Error Message".to_string());
 
         let mut worksheet = workbook.add_worksheet(None)?;
         worksheet.write_string(0, 0, "input list", None)?;
