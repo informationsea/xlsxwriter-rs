@@ -135,6 +135,8 @@ impl Workbook {
                 constant_memory: constant_memory as u8,
                 tmpdir: tmpdir_ptr as *mut c_char,
                 use_zip64: use_zip64 as u8,
+                output_buffer: std::ptr::null_mut(),
+                output_buffer_size: std::ptr::null_mut(),
             };
 
             let workbook_name = Box::pin(CString::new(filename).expect("Null Error"));
