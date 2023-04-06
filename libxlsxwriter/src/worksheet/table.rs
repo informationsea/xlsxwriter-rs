@@ -310,7 +310,7 @@ impl<'a> Worksheet<'a> {
                     .map(|x| x as *mut libxlsxwriter_sys::lxw_table_options)
                     .unwrap_or(std::ptr::null_mut()),
             );
-            std::mem::drop(options);
+
             std::mem::drop(columns_ptr);
             std::mem::drop(columns);
 

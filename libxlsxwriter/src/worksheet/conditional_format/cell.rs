@@ -34,7 +34,7 @@ pub enum ConditionalFormatCellCriteria {
 }
 
 impl ConditionalFormatCellCriteria {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         c_string_helper: &mut CStringHelper,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
@@ -150,7 +150,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
     pub fn cell_not_equal_to<V: Into<StringOrFloat>>(
         value: V,
         format: &Format,
@@ -240,7 +240,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
     pub fn cell_greater_than_or_equal_to<V: Into<StringOrFloat>>(
         value: V,
         format: &Format,

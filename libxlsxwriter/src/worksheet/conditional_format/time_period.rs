@@ -6,7 +6,7 @@ use crate::{Format, XlsxError};
 /// See [`ConditionalFormat::time_period`] to learn more
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ConditionalFormatTimePeriodCriteria {
-    /// Format cells with a date of yesterday.    
+    /// Format cells with a date of yesterday.
     Yesterday,
     /// Format cells with a date of today.
     Today,
@@ -29,8 +29,8 @@ pub enum ConditionalFormatTimePeriodCriteria {
 }
 
 impl ConditionalFormatTimePeriodCriteria {
-    pub(crate) fn into_internal_value(
-        &self,
+    pub(crate) fn to_internal_value(
+        self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
     ) -> Result<(), XlsxError> {
         conditional_format.type_ =

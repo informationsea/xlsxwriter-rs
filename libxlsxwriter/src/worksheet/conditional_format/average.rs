@@ -28,8 +28,8 @@ pub enum ConditionalFormatAverageCriteria {
 }
 
 impl ConditionalFormatAverageCriteria {
-    pub(crate) fn into_internal_value(
-        &self,
+    pub(crate) fn to_internal_value(
+        self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
     ) -> Result<(), XlsxError> {
         conditional_format.type_ =

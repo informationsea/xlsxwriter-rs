@@ -132,8 +132,8 @@ impl ConditionalIconSet {
         self
     }
 
-    pub(crate) fn into_internal_value(
-        &self,
+    pub(crate) fn to_internal_value(
+        self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
     ) -> Result<(), XlsxError> {
         conditional_format.type_ =
@@ -143,6 +143,12 @@ impl ConditionalIconSet {
         conditional_format.icons_only = convert_bool(self.icons_only);
 
         Ok(())
+    }
+}
+
+impl Default for ConditionalIconSet {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -181,7 +187,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
 
     pub fn icon_set(icon_set: &ConditionalIconSet) -> ConditionalFormat {
         ConditionalFormat::IconSet(*icon_set)

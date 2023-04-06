@@ -196,23 +196,23 @@ impl From<ConditionalFormatCellCriteria> for ConditionalFormatTypes {
 }
 
 impl ConditionalFormatTypes {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         c_string_helper: &mut CStringHelper,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
     ) -> Result<(), XlsxError> {
         match self {
             ConditionalFormatTypes::Cell(criteria) => {
-                criteria.into_internal_value(c_string_helper, conditional_format)?;
+                criteria.to_internal_value(c_string_helper, conditional_format)?;
             }
             ConditionalFormatTypes::Text(criteria) => {
-                criteria.into_internal_value(c_string_helper, conditional_format)?;
+                criteria.to_internal_value(c_string_helper, conditional_format)?;
             }
             ConditionalFormatTypes::TimePeriod(criteria) => {
-                criteria.into_internal_value(conditional_format)?;
+                criteria.to_internal_value(conditional_format)?;
             }
             ConditionalFormatTypes::Average(criteria) => {
-                criteria.into_internal_value(conditional_format)?;
+                criteria.to_internal_value(conditional_format)?;
             }
             ConditionalFormatTypes::Duplicate => {
                 conditional_format.type_ =
@@ -583,7 +583,7 @@ impl ConditionalFormat {
         }
     }
 
-    pub(crate) fn into_internal_type(
+    pub(crate) fn to_internal_type(
         &self,
         workbook: &Workbook,
         c_string_helper: &mut CStringHelper,
@@ -629,19 +629,19 @@ impl ConditionalFormat {
             ConditionalFormat::ConditionType { criteria, format } => {
                 let internal_format = workbook.get_internal_format(format)?;
                 conditional_format.format = internal_format;
-                criteria.into_internal_value(c_string_helper, &mut conditional_format)?;
+                criteria.to_internal_value(c_string_helper, &mut conditional_format)?;
             }
             ConditionalFormat::TwoColorScale(criteria) => {
-                criteria.into_internal_value(c_string_helper, &mut conditional_format)?;
+                criteria.to_internal_value(c_string_helper, &mut conditional_format)?;
             }
             ConditionalFormat::ThreeColorScale(criteria) => {
-                criteria.into_internal_value(c_string_helper, &mut conditional_format)?;
+                criteria.to_internal_value(c_string_helper, &mut conditional_format)?;
             }
             ConditionalFormat::DataBar(val) => {
-                val.into_internal_value(&mut conditional_format, c_string_helper)?;
+                val.to_internal_value(&mut conditional_format, c_string_helper)?;
             }
             ConditionalFormat::IconSet(val) => {
-                val.into_internal_value(&mut conditional_format)?;
+                val.to_internal_value(&mut conditional_format)?;
             }
         }
 
@@ -659,7 +659,7 @@ impl<'a> Worksheet<'a> {
         let mut c_string_helper = CStringHelper::new();
         unsafe {
             let mut conditional_format =
-                conditional_format.into_internal_type(self._workbook, &mut c_string_helper)?;
+                conditional_format.to_internal_type(self._workbook, &mut c_string_helper)?;
             let result = libxlsxwriter_sys::worksheet_conditional_format_cell(
                 self.worksheet,
                 row,
@@ -687,7 +687,7 @@ impl<'a> Worksheet<'a> {
         let mut c_string_helper = CStringHelper::new();
         unsafe {
             let mut conditional_format =
-                conditional_format.into_internal_type(self._workbook, &mut c_string_helper)?;
+                conditional_format.to_internal_type(self._workbook, &mut c_string_helper)?;
             let result = libxlsxwriter_sys::worksheet_conditional_format_range(
                 self.worksheet,
                 first_row,

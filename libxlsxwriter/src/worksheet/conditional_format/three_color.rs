@@ -7,7 +7,7 @@ use super::{
 /// The 3 Color Scale type is used to specify Excel's "3 Color Scale" style conditional format.
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct ThreeColorScaleCriteria {
-    /// The rule used for the minimum condition in Color Scale conditional formats.    
+    /// The rule used for the minimum condition in Color Scale conditional formats.
     pub min_rule_type: ConditionalFormatRuleTypes,
     /// The rule used for the middle condition in Color Scale conditional formats.
     pub mid_rule_type: ConditionalFormatRuleTypes,
@@ -28,7 +28,7 @@ pub struct ThreeColorScaleCriteria {
 }
 
 impl ThreeColorScaleCriteria {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         c_string_helper: &mut CStringHelper,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
@@ -134,7 +134,7 @@ impl ConditionalFormat {
     /// # )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
 
     pub fn three_color_scale<
         V1: Into<StringOrFloat>,

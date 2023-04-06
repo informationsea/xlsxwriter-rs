@@ -99,7 +99,7 @@ impl From<ConditionalDataBar> for ConditionalFormat {
 }
 
 impl ConditionalDataBar {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
         c_string_helper: &mut CStringHelper,

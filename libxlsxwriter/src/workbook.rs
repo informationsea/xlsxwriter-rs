@@ -98,7 +98,7 @@ impl Workbook {
     /// worksheet.write_string(0, 0, "Hello Excel", None)?;
     /// workbook.close()
     /// # }
-    /// ```    
+    /// ```
     ///
     /// The options that can be set are:
     /// * `constant_memory`: This option reduces the amount of data stored in memory so that large files can be written efficiently.
@@ -218,7 +218,7 @@ impl Workbook {
     /// Create new format struct.
     ///
     /// This function available only for compatibility. Please use [`Format::new`] to create new Format object.
-    #[deprecated(since = "0.6", note = "Replaced with Format::new()")]
+    #[deprecated(since = "0.6.0", note = "Replaced with Format::new()")]
     pub fn add_format(&self) -> Format {
         Format::new()
     }

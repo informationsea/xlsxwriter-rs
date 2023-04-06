@@ -238,7 +238,7 @@ impl RowColOptions {
         }
     }
 
-    pub(crate) fn into_internal(&self) -> libxlsxwriter_sys::lxw_row_col_options {
+    pub(crate) fn to_internal(&self) -> libxlsxwriter_sys::lxw_row_col_options {
         libxlsxwriter_sys::lxw_row_col_options {
             hidden: convert_bool(self.hidden),
             level: self.level,
@@ -292,7 +292,7 @@ pub struct CommentOptions {
 }
 
 impl CommentOptions {
-    pub(crate) fn into_internal(
+    pub(crate) fn to_internal(
         &self,
         workbook: &Workbook,
     ) -> Result<libxlsxwriter_sys::lxw_comment_options, XlsxError> {
@@ -383,7 +383,7 @@ impl<'a> Worksheet<'a> {
         text: &str,
         options: &CommentOptions,
     ) -> Result<(), XlsxError> {
-        let mut options = options.into_internal(self._workbook)?;
+        let mut options = options.to_internal(self._workbook)?;
         unsafe {
             let result = libxlsxwriter_sys::worksheet_write_comment_opt(
                 self.worksheet,
@@ -1025,7 +1025,7 @@ impl<'a> Worksheet<'a> {
         options: &RowColOptions,
     ) -> Result<(), XlsxError> {
         unsafe {
-            let mut options = options.into_internal();
+            let mut options = options.to_internal();
             let result = libxlsxwriter_sys::worksheet_set_row_opt(
                 self.worksheet,
                 row,
@@ -1072,7 +1072,7 @@ impl<'a> Worksheet<'a> {
         format: Option<&Format>,
         options: &RowColOptions,
     ) -> Result<(), XlsxError> {
-        let mut options = options.into_internal();
+        let mut options = options.to_internal();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_row_pixels_opt(
                 self.worksheet,
@@ -1120,7 +1120,7 @@ impl<'a> Worksheet<'a> {
         format: Option<&Format>,
         options: &RowColOptions,
     ) -> Result<(), XlsxError> {
-        let mut options = options.into_internal();
+        let mut options = options.to_internal();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_column_opt(
                 self.worksheet,
@@ -1169,7 +1169,7 @@ impl<'a> Worksheet<'a> {
         format: Option<&Format>,
         options: &mut RowColOptions,
     ) -> Result<(), XlsxError> {
-        let mut options = options.into_internal();
+        let mut options = options.to_internal();
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_column_pixels_opt(
                 self.worksheet,

@@ -89,7 +89,7 @@ impl FilterRule {
         }
     }
 
-    pub(crate) fn into_internal(
+    pub(crate) fn to_internal(
         &self,
         c_string_helper: &mut CStringHelper,
     ) -> Result<libxlsxwriter_sys::lxw_filter_rule, XlsxError> {
@@ -164,7 +164,7 @@ impl<'a> Worksheet<'a> {
     ) -> Result<(), XlsxError> {
         unsafe {
             let mut c_string_helper = CStringHelper::new();
-            let mut rule_converted = rule.into_internal(&mut c_string_helper)?;
+            let mut rule_converted = rule.to_internal(&mut c_string_helper)?;
             let e = libxlsxwriter_sys::worksheet_filter_column(
                 self.worksheet,
                 col,
@@ -211,8 +211,8 @@ impl<'a> Worksheet<'a> {
     ) -> Result<(), XlsxError> {
         unsafe {
             let mut c_string_helper = CStringHelper::new();
-            let mut rule_converted1 = rule1.into_internal(&mut c_string_helper)?;
-            let mut rule_converted2 = rule2.into_internal(&mut c_string_helper)?;
+            let mut rule_converted1 = rule1.to_internal(&mut c_string_helper)?;
+            let mut rule_converted2 = rule2.to_internal(&mut c_string_helper)?;
             let e = libxlsxwriter_sys::worksheet_filter_column2(
                 self.worksheet,
                 col,
