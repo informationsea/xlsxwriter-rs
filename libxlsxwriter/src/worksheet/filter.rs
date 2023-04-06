@@ -309,9 +309,9 @@ mod test {
         create_sheet(&mut worksheet1)?;
         let worksheet1_criteria = FilterRule::new(FilterCriteria::GreaterThan, 10.0);
         worksheet1.filter_column(0, &worksheet1_criteria)?;
-        let mut hidden_row = RowColOptions::new(true, 0, false);
+        let hidden_row = RowColOptions::new(true, 0, false);
         for i in 1..=10 {
-            worksheet1.set_row_opt(i, 13.2, None, &mut hidden_row)?;
+            worksheet1.set_row_opt(i, 13.2, None, &hidden_row)?;
         }
         // ------------
         let mut worksheet2 = workbook.add_worksheet(Some("Sheet 2"))?;
@@ -327,7 +327,7 @@ mod test {
         for i in 1..20 {
             let value: f64 = i.into();
             if (value / 2.0) < 3. || 5.5 <= (value / 2.0) {
-                worksheet2.set_row_opt(i, 13.2, None, &mut hidden_row)?;
+                worksheet2.set_row_opt(i, 13.2, None, &hidden_row)?;
             }
         }
         // --------------
@@ -336,7 +336,7 @@ mod test {
         worksheet3.filter_list(2, &["TEXT02", "TEXT03"])?;
         for i in 1..20 {
             if i != 2 && i != 3 {
-                worksheet3.set_row_opt(i, 13.2, None, &mut hidden_row)?;
+                worksheet3.set_row_opt(i, 13.2, None, &hidden_row)?;
             }
         }
 
