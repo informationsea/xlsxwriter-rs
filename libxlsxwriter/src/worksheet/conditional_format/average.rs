@@ -5,7 +5,7 @@ use crate::XlsxError;
 /// See [`super::ConditionalFormat::average`] to learn usage.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ConditionalFormatAverageCriteria {
-    /// Format cells above the average for the range.     
+    /// Format cells above the average for the range.
     AverageAbove,
     /// Format cells below the average for the range.
     AverageBelow,

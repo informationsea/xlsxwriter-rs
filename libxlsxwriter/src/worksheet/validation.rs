@@ -196,7 +196,7 @@ impl DataValidation {
         };
         Ok(CDataValidation {
             data_validation: libxlsxwriter_sys::lxw_data_validation {
-                validate: (&self).value(),
+                validate: self.value(),
                 criteria: match &self.validation_type {
                     DataValidationType::Date { number_options, ..} | DataValidationType::Time{ number_options, ..} => number_options.value(),
                     DataValidationType::Integer { number_options, .. } => number_options.value(),
@@ -264,7 +264,7 @@ impl DataValidation {
                     DataValidationType::TimeFormula{ formula, .. } |
                     DataValidationType::DateFormula{ formula, .. } |
                     DataValidationType::LengthFormula{ formula, .. } |
-                    DataValidationType::CustomFormula { formula, .. } => Some(&formula),
+                    DataValidationType::CustomFormula { formula, .. } => Some(formula),
                     _ => Some(""),
                 })?
                     as *mut c_char,
@@ -451,7 +451,7 @@ mod test {
         );
         let mut worksheet = workbook.add_worksheet(None)?;
         worksheet.write_string(0, 0, "validation test", None)?;
-        worksheet.write_blank(1, 0, Some(&Format::new().set_border(FormatBorder::Dashed)))?;
+        worksheet.write_blank(1, 0, Some(Format::new().set_border(FormatBorder::Dashed)))?;
         worksheet.data_validation_cell(1, 0, &validation)?;
         workbook.close()?;
         Ok(())
@@ -484,7 +484,7 @@ mod test {
                 worksheet.write_blank(
                     i,
                     j,
-                    Some(&Format::new().set_border(FormatBorder::Dashed)),
+                    Some(Format::new().set_border(FormatBorder::Dashed)),
                 )?;
             }
         }

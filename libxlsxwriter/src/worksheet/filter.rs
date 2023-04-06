@@ -3,16 +3,11 @@ use crate::{
 };
 
 /// And/or operator conditions when using 2 filter rules with `filter_column2`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum FilterOperator {
+    #[default]
     FilterAnd,
     FilterOr,
-}
-
-impl Default for FilterOperator {
-    fn default() -> Self {
-        FilterOperator::FilterAnd
-    }
 }
 
 impl FilterOperator {
@@ -25,9 +20,10 @@ impl FilterOperator {
 }
 
 /// Criteria used to define an autofilter rule condition.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum FilterCriteria {
     /// Filter cells equal to a value.
+    #[default]
     EqualTo,
     /// Filter cells not equal to a value.
     NotEqualTo,
@@ -43,12 +39,6 @@ pub enum FilterCriteria {
     Blanks,
     /// Filter cells that are not blank.
     NonBlanks,
-}
-
-impl Default for FilterCriteria {
-    fn default() -> Self {
-        FilterCriteria::EqualTo
-    }
 }
 
 impl FilterCriteria {
@@ -262,7 +252,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// ```
     ///
-    /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.    
+    /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.
     pub fn filter_list(
         &mut self,
         col: crate::WorksheetCol,

@@ -184,6 +184,6 @@ impl ConditionalFormat {
     /// ```    
 
     pub fn icon_set(icon_set: &ConditionalIconSet) -> ConditionalFormat {
-        ConditionalFormat::IconSet(icon_set.clone())
+        ConditionalFormat::IconSet(*icon_set)
     }
 }

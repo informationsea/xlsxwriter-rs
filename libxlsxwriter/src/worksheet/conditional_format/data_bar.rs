@@ -3,20 +3,15 @@ use crate::{convert_bool, prelude::FormatColor, CStringHelper, StringOrFloat, Xl
 use super::{set_max_value, set_min_value, ConditionalFormat, ConditionalFormatRuleTypes};
 
 /// Values used to set the bar direction of a conditional format data bar.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum ConditionalFormatBarDirection {
-    /// Data bar direction is set by Excel based on the context of the data displayed.    
+    /// Data bar direction is set by Excel based on the context of the data displayed.
+    #[default]
     Context,
     /// Data bar direction is from right to left.
     RightToLeft,
     /// Data bar direction is from left to right.
     LeftToRight,
-}
-
-impl Default for ConditionalFormatBarDirection {
-    fn default() -> Self {
-        ConditionalFormatBarDirection::Context
-    }
 }
 
 impl ConditionalFormatBarDirection {
@@ -31,20 +26,15 @@ impl ConditionalFormatBarDirection {
 }
 
 /// Values used to set the position of the axis in a conditional format data bar.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum ConditionalBarAxisPosition {
-    /// Data bar axis position is set by Excel based on the context of the data displayed.    
+    /// Data bar axis position is set by Excel based on the context of the data displayed.
+    #[default]
     Automatic,
     /// Data bar axis position is set at the midpoint.
     Midpoint,
     /// Data bar axis is turned off.
     None,
-}
-
-impl Default for ConditionalBarAxisPosition {
-    fn default() -> Self {
-        ConditionalBarAxisPosition::Automatic
-    }
 }
 
 impl ConditionalBarAxisPosition {
@@ -272,7 +262,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
 
     pub fn data_bar(data_bar: &ConditionalDataBar) -> ConditionalFormat {
         ConditionalFormat::DataBar(data_bar.clone())

@@ -161,7 +161,7 @@ impl ConditionalFormatRuleTypes {
 /// See [`ConditionalFormat`] to learn more
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum ConditionalFormatTypes {
-    /// The Cell type is the most common conditional formatting type. It is used when a format is applied to a cell based on a simple criterion.     
+    /// The Cell type is the most common conditional formatting type. It is used when a format is applied to a cell based on a simple criterion.
     Cell(ConditionalFormatCellCriteria),
     /// The Text type is used to specify Excel's "Specific Text" style conditional format.
     Text(ConditionalFormatTextCriteria),
@@ -189,9 +189,9 @@ pub enum ConditionalFormatTypes {
     Formula(String),
 }
 
-impl Into<ConditionalFormatTypes> for ConditionalFormatCellCriteria {
-    fn into(self) -> ConditionalFormatTypes {
-        ConditionalFormatTypes::Cell(self)
+impl From<ConditionalFormatCellCriteria> for ConditionalFormatTypes {
+    fn from(val: ConditionalFormatCellCriteria) -> Self {
+        ConditionalFormatTypes::Cell(val)
     }
 }
 
@@ -354,7 +354,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
     pub fn duplicate(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Duplicate,
@@ -381,7 +381,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```       
+    /// ```
     pub fn unique(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Unique,
@@ -409,7 +409,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
     pub fn top_num(num: u32, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Top(TopOrBottomCriteria::TopOrBottomNum(num)),
@@ -437,7 +437,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
     pub fn top_percent(percent: f64, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Top(TopOrBottomCriteria::TopOrBottomPercent(percent)),
@@ -464,7 +464,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
     pub fn blanks(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Blanks,
@@ -491,7 +491,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
     pub fn no_blanks(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::NoBlanks,
@@ -575,7 +575,7 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
     pub fn formula(formula: &str, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Formula(formula.to_string()),

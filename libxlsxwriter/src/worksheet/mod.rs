@@ -222,7 +222,7 @@ impl From<&Protection> for libxlsxwriter_sys::lxw_protection {
 }
 
 /// Options struct for the `set_column()` and `set_row()` functions.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub struct RowColOptions {
     hidden: bool,
     level: u8,
@@ -247,28 +247,13 @@ impl RowColOptions {
     }
 }
 
-impl Default for RowColOptions {
-    fn default() -> Self {
-        RowColOptions {
-            hidden: false,
-            level: 0,
-            collapsed: false,
-        }
-    }
-}
-
 /// Comment display type
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum CommentDisplayType {
+    #[default]
     Default,
     Hidden,
     Visible,
-}
-
-impl Default for CommentDisplayType {
-    fn default() -> Self {
-        CommentDisplayType::Default
-    }
 }
 
 impl CommentDisplayType {
