@@ -92,6 +92,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn time_period(
         time_period: ConditionalFormatTimePeriodCriteria,
         format: &Format,

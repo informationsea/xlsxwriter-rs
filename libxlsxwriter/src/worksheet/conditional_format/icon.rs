@@ -109,6 +109,7 @@ pub struct ConditionalIconSet {
 }
 
 impl ConditionalIconSet {
+    #[must_use]
     pub fn new() -> Self {
         ConditionalIconSet {
             style: ConditionalIconType::Icons5Rating,
@@ -117,16 +118,19 @@ impl ConditionalIconSet {
         }
     }
 
+    #[must_use]
     pub fn style(mut self, style: ConditionalIconType) -> Self {
         self.style = style;
         self
     }
 
+    #[must_use]
     pub fn reverse_icons(mut self, reverse_icons: bool) -> Self {
         self.reverse_icons = reverse_icons;
         self
     }
 
+    #[must_use]
     pub fn icons_only(mut self, icons_only: bool) -> Self {
         self.icons_only = icons_only;
         self
@@ -187,6 +191,7 @@ impl ConditionalFormat {
     /// # }
     /// ```
 
+    #[must_use]
     pub fn icon_set(icon_set: &ConditionalIconSet) -> ConditionalFormat {
         ConditionalFormat::IconSet(*icon_set)
     }

@@ -147,6 +147,7 @@ impl DataValidationErrorType {
 }
 
 impl DataValidation {
+    #[must_use]
     pub fn new(
         validation_type: DataValidationType,
         input_message: Option<InputMessageOptions>,

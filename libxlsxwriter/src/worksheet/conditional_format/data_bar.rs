@@ -127,6 +127,7 @@ impl ConditionalDataBar {
         Ok(())
     }
 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -264,6 +265,7 @@ impl ConditionalFormat {
     /// # }
     /// ```
 
+    #[must_use]
     pub fn data_bar(data_bar: &ConditionalDataBar) -> ConditionalFormat {
         ConditionalFormat::DataBar(data_bar.clone())
     }

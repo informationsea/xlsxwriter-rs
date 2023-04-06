@@ -168,6 +168,7 @@ pub struct Protection {
 }
 
 impl Protection {
+    #[must_use]
     pub fn new() -> Protection {
         Protection {
             no_select_locked_cells: true,
@@ -230,6 +231,7 @@ pub struct RowColOptions {
 }
 
 impl RowColOptions {
+    #[must_use]
     pub fn new(hidden: bool, level: u8, collapsed: bool) -> Self {
         RowColOptions {
             hidden,

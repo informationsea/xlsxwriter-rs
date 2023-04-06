@@ -218,12 +218,14 @@ impl Workbook {
     ///
     /// This function available only for compatibility. Please use [`Format::new`] to create new Format object.
     #[deprecated(since = "0.6.0", note = "Replaced with Format::new()")]
+    #[must_use]
     pub fn add_format(&self) -> Format {
         Format::new()
     }
 
     /// [`Workbook::add_chart`] function creates a new chart object that can be added to a worksheet.
     /// Available chart types are defined in [`ChartType`].
+    #[must_use]
     pub fn add_chart(&self, chart_type: ChartType) -> Chart {
         unsafe {
             let chart = libxlsxwriter_sys::workbook_add_chart(self.workbook, chart_type.value());

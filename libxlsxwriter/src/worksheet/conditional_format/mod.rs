@@ -325,6 +325,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn average(
         average: ConditionalFormatAverageCriteria,
         format: &Format,
@@ -355,6 +356,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn duplicate(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Duplicate,
@@ -382,6 +384,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn unique(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Unique,
@@ -410,6 +413,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn top_num(num: u32, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Top(TopOrBottomCriteria::TopOrBottomNum(num)),
@@ -438,6 +442,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn top_percent(percent: f64, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Top(TopOrBottomCriteria::TopOrBottomPercent(percent)),
@@ -465,6 +470,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn blanks(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Blanks,
@@ -492,6 +498,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn no_blanks(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::NoBlanks,
@@ -520,6 +527,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn errors(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Errors,
@@ -548,6 +556,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn no_errors(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::NoErrors,
@@ -576,6 +585,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn formula(formula: &str, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Formula(formula.to_string()),

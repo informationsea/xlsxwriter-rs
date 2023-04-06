@@ -177,6 +177,7 @@ impl Default for StringOrFloat {
 }
 
 impl StringOrFloat {
+    #[must_use]
     pub fn to_string(self) -> Option<String> {
         match self {
             StringOrFloat::String(x) => Some(x),
@@ -184,6 +185,7 @@ impl StringOrFloat {
         }
     }
 
+    #[must_use]
     pub fn to_str(&self) -> Option<&str> {
         match self {
             StringOrFloat::String(x) => Some(x.as_str()),
@@ -191,6 +193,7 @@ impl StringOrFloat {
         }
     }
 
+    #[must_use]
     pub fn to_f64(&self) -> Option<f64> {
         match self {
             StringOrFloat::String(_) => None,

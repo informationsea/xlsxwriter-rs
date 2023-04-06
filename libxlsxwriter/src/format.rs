@@ -24,6 +24,7 @@ pub enum FormatColor {
 
 #[allow(clippy::unreadable_literal)]
 impl FormatColor {
+    #[must_use]
     pub fn value(self) -> u32 {
         match self {
             FormatColor::Black => 0x1000000,
@@ -56,6 +57,7 @@ pub enum FormatUnderline {
 }
 
 impl FormatUnderline {
+    #[must_use]
     pub fn value(self) -> u8 {
         let value = match self {
             FormatUnderline::Single => {
@@ -82,6 +84,7 @@ pub enum FormatScript {
 }
 
 impl FormatScript {
+    #[must_use]
     pub fn value(self) -> u8 {
         let value = match self {
             FormatScript::SuperScript => libxlsxwriter_sys::lxw_format_scripts_LXW_FONT_SUPERSCRIPT,
@@ -104,6 +107,7 @@ pub enum FormatAlignment {
 }
 
 impl FormatAlignment {
+    #[must_use]
     pub fn value(self) -> u8 {
         let value = match self {
             FormatAlignment::None => libxlsxwriter_sys::lxw_format_alignments_LXW_ALIGN_NONE,
@@ -134,6 +138,7 @@ pub enum FormatVerticalAlignment {
 }
 
 impl FormatVerticalAlignment {
+    #[must_use]
     pub fn value(self) -> u8 {
         let value = match self {
             FormatVerticalAlignment::None => {
@@ -183,6 +188,7 @@ pub enum FormatPatterns {
 }
 
 impl FormatPatterns {
+    #[must_use]
     pub fn value(self) -> u8 {
         let value = match self {
             FormatPatterns::None => libxlsxwriter_sys::lxw_format_patterns_LXW_PATTERN_NONE,
@@ -256,6 +262,7 @@ pub enum FormatBorder {
 }
 
 impl FormatBorder {
+    #[must_use]
     pub fn value(self) -> u8 {
         let value = match self {
             FormatBorder::None => libxlsxwriter_sys::lxw_format_borders_LXW_BORDER_NONE,
@@ -323,6 +330,7 @@ pub struct Format {
 }
 
 impl Format {
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
