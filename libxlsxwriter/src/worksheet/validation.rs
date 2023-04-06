@@ -166,12 +166,7 @@ impl DataValidation {
             DataValidationType::List { values, .. } => {
                 let mapped_vec = values
                     .iter()
-                    .map(|y| {
-                        CString::new(y as &str)
-                            .unwrap()
-                            .into_bytes_with_nul()
-                            .to_vec()
-                    })
+                    .map(|y| CString::new(y as &str).unwrap().into_bytes_with_nul())
                     .collect();
                 Some(mapped_vec)
             }
@@ -202,13 +197,13 @@ impl DataValidation {
             _ => (0., 0.)
         };
         let (minimum_datetime, maximum_datetime) = match &self.validation_type {
-            DataValidationType::Date { number_options: 
-                DataValidationNumberOptions::Between(x, y) | 
-                DataValidationNumberOptions::NotBetween(x, y), .. } => (x.into(), y.into()), 
-            DataValidationType::Time { number_options: 
-                DataValidationNumberOptions::Between(x, y) | 
-                DataValidationNumberOptions::NotBetween(x, y), .. } => (x.into(), y.into()), 
-            _ => ((&DateTime::default()).into(), (&DateTime::default()).into())
+            DataValidationType::Date { number_options:
+                DataValidationNumberOptions::Between(x, y)
+                | DataValidationNumberOptions::NotBetween(x, y), .. }
+            | DataValidationType::Time { number_options:
+                DataValidationNumberOptions::Between(x, y)
+                | DataValidationNumberOptions::NotBetween(x, y), .. } => (x.into(), y.into()),
+            _ => ((&DateTime::default()).into(), (&DateTime::default()).into()),
         };
         Ok(CDataValidation {
             data_validation: libxlsxwriter_sys::lxw_data_validation {
@@ -242,8 +237,7 @@ impl DataValidation {
                 error_type: self
                     .error_alert
                     .as_ref()
-                    .map(|x| x.style)
-                    .unwrap_or(DataValidationErrorType::Stop)
+                    .map_or(DataValidationErrorType::Stop, |x| x.style)
                     .value(),
                 dropdown: convert_validation_bool(match self.validation_type {
                     DataValidationType::List { dropdown, .. } => dropdown,
@@ -294,8 +288,7 @@ impl DataValidation {
                 })? as *mut c_char,
                 value_list: _value_list_ptr
                     .as_mut()
-                    .map(|x| x.as_mut_ptr())
-                    .unwrap_or(std::ptr::null_mut()),
+                    .map_or_else(std::ptr::null_mut, Vec::as_mut_ptr),
                 value_datetime: (&match &self.validation_type {
                     DataValidationType::Date {
                         number_options:
@@ -306,8 +299,8 @@ impl DataValidation {
                             | DataValidationNumberOptions::LessThan(value)
                             | DataValidationNumberOptions::LessThanOrEqualTo(value),
                         ..
-                    } => value.clone(),
-                    DataValidationType::Time {
+                    }
+                    | DataValidationType::Time {
                         number_options:
                             DataValidationNumberOptions::EqualTo(value)
                             | DataValidationNumberOptions::NotEqualTo(value)

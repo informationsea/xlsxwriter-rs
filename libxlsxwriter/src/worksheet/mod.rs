@@ -32,7 +32,7 @@ pub struct DateTime {
     pub second: f64,
 }
 
-/// Options for modifying images inserted via [Worksheet.insert_image_opt()](struct.Worksheet.html#method.insert_image_opt).
+/// Options for modifying images inserted via [`Worksheet.insert_image_opt`](struct.Worksheet.html#method.insert_image_opt).
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct ImageOptions {
     /// Offset from the left of the cell in pixels.
@@ -413,7 +413,7 @@ impl<'a> Worksheet<'a> {
     /// ```
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_number-1.png)
     ///
-    /// The native data type for all numbers in Excel is a IEEE-754 64-bit double-precision floating point, which is also the default type used by worksheet_write_number.
+    /// The native data type for all numbers in Excel is a IEEE-754 64-bit double-precision floating point, which is also the default type used by `worksheet_write_number`.
     ///
     /// The format parameter is used to apply formatting to the cell. This parameter can be `None` to indicate no formatting or it can be a Format object.
     ///
@@ -775,7 +775,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                if value { 1 } else { 0 },
+                value.into(),
                 self._workbook.get_internal_option_format(format)?,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -840,10 +840,10 @@ impl<'a> Worksheet<'a> {
     /// However, applications that don't have a facility to calculate formulas, such as Excel Viewer, or some mobile
     /// applications will only display the 0 results.
     ///
-    /// If required, the worksheet_write_formula_num() function can be used to specify a formula and its result.
+    /// If required, the `worksheet_write_formula_num` function can be used to specify a formula and its result.
     ///
     /// This function is rarely required and is only provided for compatibility with some third party applications.
-    /// For most applications the worksheet_write_formula() function is the recommended way of writing formulas.
+    /// For most applications the `worksheet_write_formula` function is the recommended way of writing formulas.
     #[allow(clippy::too_many_arguments)]
     pub fn write_formula_num(
         &mut self,
@@ -880,11 +880,11 @@ impl<'a> Worksheet<'a> {
     /// # workbook.close()
     /// # }
     /// ```
-    /// The worksheet_write_formula_str() function is similar to the worksheet_write_formula_num() function except it
-    /// writes a string result instead or a numeric result. See worksheet_write_formula_num() for more details on
+    /// The `worksheet_write_formula_str` function is similar to the `worksheet_write_formula_num` function except it
+    /// writes a string result instead or a numeric result. See `worksheet_write_formula_num` for more details on
     /// why/when these functions are required.
     ///
-    /// One place where the worksheet_write_formula_str() function may be required is to specify an empty result which
+    /// One place where the `worksheet_write_formula_str` function may be required is to specify an empty result which
     /// will force a recalculation of the formula when loaded in LibreOffice.
     #[allow(clippy::too_many_arguments)]
     pub fn write_formula_str(
@@ -933,7 +933,7 @@ impl<'a> Worksheet<'a> {
     /// ```
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-write_richtext-1.png)
     ///
-    /// The basic rule is to break the string into fragments and put a lxw_format object before the fragment that you want to format. So if we look at the above example again:
+    /// The basic rule is to break the string into fragments and put a `lxw_format` object before the fragment that you want to format. So if we look at the above example again:
     ///
     /// This is **bold** and this is *italic*
     ///
@@ -966,7 +966,7 @@ impl<'a> Worksheet<'a> {
             .map(|(x, y)| {
                 Ok(libxlsxwriter_sys::lxw_rich_string_tuple {
                     format: self._workbook.get_internal_option_format(x.1)?,
-                    string: y.as_mut_ptr() as *mut c_char,
+                    string: y.as_mut_ptr().cast::<c_char>(),
                 })
             })
             .collect::<Result<_, XlsxError>>()?;
@@ -1037,9 +1037,9 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    /// The set_row_pixels() function is the same as the [Worksheet::set_row()] function except that the height can be set in pixels.
+    /// The `set_row_pixels` function is the same as the [`Worksheet::set_row`] function except that the height can be set in pixels.
     ///
-    /// If you wish to set the format of a row without changing the height you can pass the default row height in pixels: [LXW_DEF_ROW_HEIGHT_PIXELS].
+    /// If you wish to set the format of a row without changing the height you can pass the default row height in pixels: [`LXW_DEF_ROW_HEIGHT_PIXELS`].
     pub fn set_row_pixels(
         &mut self,
         row: WorksheetRow,
@@ -1195,7 +1195,7 @@ impl<'a> Worksheet<'a> {
     /// ```
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-worksheet-insert_image-1.png)
     ///
-    /// The Worksheet.insert_image_opt() function takes additional optional parameters to position and scale the image, see below.
+    /// The `Worksheet.insert_image_opt` function takes additional optional parameters to position and scale the image, see below.
     ///
     /// ### Note
     /// The scaling of a image may be affected if is crosses a row that has its default height changed due to a font that is larger than
@@ -1225,7 +1225,7 @@ impl<'a> Worksheet<'a> {
         }
     }
 
-    /// This function is like Worksheet.insert_image() function except that it takes an optional `ImageOptions` struct to scale and position the image:
+    /// This function is like `Worksheet.insert_image` function except that it takes an optional `ImageOptions` struct to scale and position the image:
     /// ```rust
     /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {

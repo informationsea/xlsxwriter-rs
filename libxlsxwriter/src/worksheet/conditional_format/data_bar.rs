@@ -111,19 +111,19 @@ impl ConditionalDataBar {
         set_min_value(conditional_format, &self.min_value, c_string_helper)?;
         set_max_value(conditional_format, &self.max_value, c_string_helper)?;
         conditional_format.bar_only = convert_bool(self.bar_only);
-        conditional_format.bar_color = self.color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_color = self.color.map_or(0, FormatColor::value);
         conditional_format.bar_solid = convert_bool(self.solid);
-        conditional_format.bar_negative_color = self.negative_color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_negative_color = self.negative_color.map_or(0, FormatColor::value);
         conditional_format.bar_negative_color_same = convert_bool(self.negative_color_same);
-        conditional_format.bar_border_color = self.border_color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_border_color = self.border_color.map_or(0, FormatColor::value);
         conditional_format.bar_negative_border_color =
-            self.negative_border_color.map(|x| x.value()).unwrap_or(0);
+            self.negative_border_color.map_or(0, FormatColor::value);
         conditional_format.bar_negative_border_color_same =
             convert_bool(self.negative_border_color_same);
         conditional_format.bar_no_border = convert_bool(self.no_border);
         conditional_format.bar_direction = self.direction.into_internal_type();
         conditional_format.bar_axis_position = self.axis_position.into_internal_type();
-        conditional_format.bar_axis_color = self.axis_color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_axis_color = self.axis_color.map_or(0, FormatColor::value);
         Ok(())
     }
 

@@ -225,8 +225,9 @@ impl<'a> Worksheet<'a> {
         if options
             .as_ref()
             .and_then(|x| x.columns.as_ref())
-            .map(|x| x.len() as WorksheetCol != last_col - first_col + 1)
-            .unwrap_or(false)
+            .map_or(false, |x| {
+                x.len() as WorksheetCol != last_col - first_col + 1
+            })
         {
             return Err(XlsxError {
                 source: XlsxErrorSource::NumberOfColumnsIsNotMatched,
@@ -287,10 +288,9 @@ impl<'a> Worksheet<'a> {
                 style_type: options.style_type.into(),
                 style_type_number: options.style_type_number,
                 total_row: convert_bool(options.total_row),
-                columns: columns_ptr
-                    .as_ref()
-                    .map(|x| x.as_ptr() as *mut *mut libxlsxwriter_sys::lxw_table_column)
-                    .unwrap_or(std::ptr::null_mut()),
+                columns: columns_ptr.as_ref().map_or_else(std::ptr::null_mut, |x| {
+                    x.as_ptr() as *mut *mut libxlsxwriter_sys::lxw_table_column
+                }),
             })
         } else {
             None
@@ -303,10 +303,9 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_row,
                 last_col,
-                options
-                    .as_mut()
-                    .map(|x| x as *mut libxlsxwriter_sys::lxw_table_options)
-                    .unwrap_or(std::ptr::null_mut()),
+                options.as_mut().map_or_else(std::ptr::null_mut, |x| {
+                    x as *mut libxlsxwriter_sys::lxw_table_options
+                }),
             );
 
             std::mem::drop(columns_ptr);

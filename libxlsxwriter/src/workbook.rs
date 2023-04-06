@@ -111,7 +111,7 @@ impl Workbook {
     ///   off by default.
     ///
     /// ### Note
-    /// In constant_memory mode each row of in-memory data is written to disk and then freed when a new row is started via one
+    /// In `constant_memory` mode each row of in-memory data is written to disk and then freed when a new row is started via one
     /// of the `Worksheet::write_*()` functions. Therefore, once this option is active data should be written in sequential row
     /// by row order. For this reason [`Worksheet::merge_range()`] and some other row based functionality doesn't work in this mode.
     /// See [Constant Memory Mode](https://libxlsxwriter.github.io/working_with_memory.html#ww_mem_constant) for more details.
@@ -132,9 +132,9 @@ impl Workbook {
 
         unsafe {
             let mut workbook_options = libxlsxwriter_sys::lxw_workbook_options {
-                constant_memory: constant_memory as u8,
+                constant_memory: u8::from(constant_memory),
                 tmpdir: tmpdir_ptr as *mut c_char,
-                use_zip64: use_zip64 as u8,
+                use_zip64: u8::from(use_zip64),
                 output_buffer: std::ptr::null_mut(),
                 output_buffer_size: std::ptr::null_mut(),
             };
@@ -175,8 +175,7 @@ impl Workbook {
                 self.workbook,
                 name_cstr
                     .as_ref()
-                    .map(|x| x.as_ptr())
-                    .unwrap_or(std::ptr::null()),
+                    .map_or_else(std::ptr::null, |x| x.as_ptr()),
             );
 
             if let Some(name) = name_cstr {

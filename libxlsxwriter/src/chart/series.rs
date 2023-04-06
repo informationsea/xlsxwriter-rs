@@ -2,9 +2,9 @@ use super::{ChartFill, ChartLine, ChartMarkerType, ChartPattern, ChartSeries};
 use crate::{convert_bool, WorksheetCol, WorksheetRow, XlsxError};
 
 impl<'a> ChartSeries<'a> {
-    /// The categories and values of a chart data series are generally set using the chart_add_series() function and Excel range formulas like "=Sheet1!$A$2:$A$7".
+    /// The categories and values of a chart data series are generally set using the `chart_add_series` function and Excel range formulas like "=Sheet1!$A$2:$A$7".
     ///
-    /// The `ChartSeries.set_categories()` function is an alternative method that is easier to generate programmatically. It requires that you set the categories and values parameters in Chart.add_series() to `None` and then set them using row and column values in ChartSeries.set_categories() and ChartSeries.set_values():
+    /// The `ChartSeries.set_categories()` function is an alternative method that is easier to generate programmatically. It requires that you set the categories and values parameters in `Chart.add_series` to `None` and then set them using row and column values in `ChartSeries.set_categories` and `ChartSeries.set_values`:
     /// ```rust
     /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {

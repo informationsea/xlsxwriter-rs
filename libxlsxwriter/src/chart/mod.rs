@@ -12,7 +12,7 @@ use super::Workbook;
 
 /// The Chart object represents an Excel chart. It provides functions for adding data series to the chart and for configuring the chart.
 ///
-/// A Chart object isn't created directly. Instead a chart is created by calling the Workbook.add_chart() function from a Workbook object. For example:
+/// A Chart object isn't created directly. Instead a chart is created by calling the `Workbook.add_chart` function from a Workbook object. For example:
 /// ```rust
 /// use xlsxwriter::prelude::*;
 /// # fn main() -> Result<(), XlsxError> {
@@ -41,10 +41,10 @@ use super::Workbook;
 ///
 /// The basic procedure for adding a chart to a worksheet is:
 ///
-/// Create the chart with Workbook.add_chart().
-/// Add one or more data series to the chart which refers to data in the workbook using Chart.add_series().
+/// Create the chart with `Workbook.add_chart`.
+/// Add one or more data series to the chart which refers to data in the workbook using `Chart.add_series`.
 /// Configure the chart with the other available functions shown below.
-/// Insert the chart into a worksheet using Worksheet.insert_chart().
+/// Insert the chart into a worksheet using `Worksheet.insert_chart`.
 pub struct Chart<'a> {
     pub(crate) _workbook: &'a Workbook,
     pub(crate) chart: *mut libxlsxwriter_sys::lxw_chart,
@@ -53,7 +53,7 @@ pub struct Chart<'a> {
 impl<'a> Chart<'a> {
     /// In Excel a chart **series** is a collection of information that defines which data is plotted such as the categories and values. It is also used to define the formatting for the data.
     ///
-    /// For an libxlsxwriter chart object the chart_add_series() function is used to set the categories and values of the series:
+    /// For an libxlsxwriter chart object the `chart_add_series` function is used to set the categories and values of the series:
     /// ```rust
     /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
@@ -97,7 +97,7 @@ impl<'a> Chart<'a> {
     /// ```
     /// * values: This is the most important property of a series and is the only mandatory option for every chart object. This parameter links the chart with the worksheet data that it displays.
     ///
-    /// The categories and values should be a string formula like "=Sheet1!$A$2:$A$7" in the same way it is represented in Excel. This is convenient when recreating a chart from an example in Excel but it is trickier to generate programmatically. For these cases you can set the categories and values to None and use the ChartSeries.set_categories() and ChartSeries.set_values() functions:
+    /// The categories and values should be a string formula like "=Sheet1!$A$2:$A$7" in the same way it is represented in Excel. This is convenient when recreating a chart from an example in Excel but it is trickier to generate programmatically. For these cases you can set the categories and values to None and use the `ChartSeries.set_categories` and `ChartSeries.set_values` functions:
     /// ```rust
     /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
@@ -119,7 +119,7 @@ impl<'a> Chart<'a> {
     /// # Ok(())
     /// # }
     /// ```
-    /// As shown in the previous example the return value from Chart.add_series() is a `ChartSeries` struct. This can be used in other functions that configure a series.
+    /// As shown in the previous example the return value from `Chart.add_series` is a `ChartSeries` struct. This can be used in other functions that configure a series.
     ///
     /// More than one series can be added to a chart. The series numbering and order in the Excel chart will be the same as the order in which they are added in libxlsxwriter:
     ///
@@ -184,7 +184,7 @@ impl<'a> Chart<'a> {
         })
     }
 
-    /// The chart_title_set_name() function sets the name (title) for the chart. The name is displayed above the chart.
+    /// The `chart_title_set_name` function sets the name (title) for the chart. The name is displayed above the chart.
     /// The name parameter can also be a formula such as `=Sheet1!$A$1` to point to a cell in the workbook that contains the name.
     /// The Excel default is to have no chart title.
     pub fn add_title(&mut self, title: &str) -> Result<(), XlsxError> {
@@ -199,7 +199,7 @@ impl<'a> Chart<'a> {
 }
 
 /// Struct to represent an Excel chart data series.
-/// This struct is created using the chart.add_series() function. It is used in functions that modify a chart series but the members of the struct aren't modified directly.
+/// This struct is created using the `chart.add_series` function. It is used in functions that modify a chart series but the members of the struct aren't modified directly.
 pub struct ChartSeries<'a> {
     pub(crate) _workbook: &'a Workbook,
     pub(crate) chart_series: *mut libxlsxwriter_sys::lxw_chart_series,
