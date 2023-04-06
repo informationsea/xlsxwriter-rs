@@ -1746,7 +1746,7 @@ impl<'a> Worksheet<'a> {
                 convert_bool(symbols_below),
                 convert_bool(symbols_right),
                 convert_bool(auto_style),
-            )
+            );
         }
     }
 
@@ -1756,7 +1756,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 height,
                 convert_bool(hide_unused_rows),
-            )
+            );
         }
     }
 

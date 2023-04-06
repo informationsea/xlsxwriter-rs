@@ -189,7 +189,10 @@ impl<'a> Chart<'a> {
     /// The Excel default is to have no chart title.
     pub fn add_title(&mut self, title: &str) -> Result<(), XlsxError> {
         unsafe {
-            libxlsxwriter_sys::chart_title_set_name(self.chart, self._workbook.register_str(title)?)
+            libxlsxwriter_sys::chart_title_set_name(
+                self.chart,
+                self._workbook.register_str(title)?,
+            );
         }
         Ok(())
     }
@@ -339,7 +342,7 @@ pub enum ChartPatternType {
     SmallConfetti,
     /// Large confetti pattern.
     LargeConfetti,
-    /// Zigzag pattern.    
+    /// Zigzag pattern.
     Zigzag,
     /// Wave pattern.
     Wave,

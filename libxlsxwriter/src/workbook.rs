@@ -180,7 +180,7 @@ impl Workbook {
             );
 
             if let Some(name) = name_cstr {
-                self.const_str.borrow_mut().push(name)
+                self.const_str.borrow_mut().push(name);
             }
 
             if worksheet.is_null() {
