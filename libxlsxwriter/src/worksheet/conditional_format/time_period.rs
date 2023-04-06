@@ -1,5 +1,5 @@
 use super::{ConditionalFormat, ConditionalFormatTypes};
-use crate::{Format, XlsxError};
+use crate::Format;
 
 /// The Time Period type is used to specify Excel's "Dates Occurring" style conditional format.
 ///
@@ -32,7 +32,7 @@ impl ConditionalFormatTimePeriodCriteria {
     pub(crate) fn to_internal_value(
         self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
-    ) -> Result<(), XlsxError> {
+    ) {
         conditional_format.type_ =
             libxlsxwriter_sys::lxw_conditional_format_types_LXW_CONDITIONAL_TYPE_TIME_PERIOD as u8;
         match self {
@@ -67,7 +67,6 @@ impl ConditionalFormatTimePeriodCriteria {
                 conditional_format.criteria = libxlsxwriter_sys::lxw_conditional_criteria_LXW_CONDITIONAL_CRITERIA_TIME_PERIOD_NEXT_MONTH as u8;
             }
         }
-        Ok(())
     }
 }
 

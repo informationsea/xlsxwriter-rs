@@ -366,7 +366,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                CString::new(text).unwrap().as_c_str().as_ptr(),
+                CString::new(text)?.as_c_str().as_ptr(),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -902,7 +902,7 @@ impl<'a> Worksheet<'a> {
                 col,
                 CString::new(formula)?.as_c_str().as_ptr(),
                 self._workbook.get_internal_option_format(format)?,
-                CString::new(result).unwrap().as_c_str().as_ptr(),
+                CString::new(result)?.as_c_str().as_ptr(),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -957,23 +957,19 @@ impl<'a> Worksheet<'a> {
     ) -> Result<(), XlsxError> {
         let mut c_str: Vec<Vec<u8>> = text
             .iter()
-            .map(|x| {
-                CString::new(x.0)
-                    .unwrap()
-                    .as_c_str()
-                    .to_bytes_with_nul()
-                    .to_vec()
-            })
-            .collect();
+            .map(|x| Ok(CString::new(x.0)?.as_c_str().to_bytes_with_nul().to_vec()))
+            .collect::<Result<_, XlsxError>>()?;
 
         let mut rich_text: Vec<_> = text
             .iter()
             .zip(c_str.iter_mut())
-            .map(|(x, y)| libxlsxwriter_sys::lxw_rich_string_tuple {
-                format: self._workbook.get_internal_option_format(x.1).unwrap(), // Fix here
-                string: y.as_mut_ptr() as *mut c_char,
+            .map(|(x, y)| {
+                Ok(libxlsxwriter_sys::lxw_rich_string_tuple {
+                    format: self._workbook.get_internal_option_format(x.1)?,
+                    string: y.as_mut_ptr() as *mut c_char,
+                })
             })
-            .collect();
+            .collect::<Result<_, XlsxError>>()?;
         let mut rich_text_ptr: Vec<*mut libxlsxwriter_sys::lxw_rich_string_tuple> = rich_text
             .iter_mut()
             .map(|x| x as *mut libxlsxwriter_sys::lxw_rich_string_tuple)
@@ -1219,7 +1215,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                CString::new(filename).unwrap().as_c_str().as_ptr(),
+                CString::new(filename)?.as_c_str().as_ptr(),
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
                 Ok(())
@@ -1265,7 +1261,7 @@ impl<'a> Worksheet<'a> {
                 self.worksheet,
                 row,
                 col,
-                CString::new(filename).unwrap().as_c_str().as_ptr(),
+                CString::new(filename)?.as_c_str().as_ptr(),
                 &mut opt_struct,
             );
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1499,7 +1495,7 @@ impl<'a> Worksheet<'a> {
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_header(
                 self.worksheet,
-                CString::new(header).unwrap().as_c_str().as_ptr(),
+                CString::new(header)?.as_c_str().as_ptr(),
             );
 
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1514,7 +1510,7 @@ impl<'a> Worksheet<'a> {
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_footer(
                 self.worksheet,
-                CString::new(footer).unwrap().as_c_str().as_ptr(),
+                CString::new(footer)?.as_c_str().as_ptr(),
             );
 
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {
@@ -1533,7 +1529,7 @@ impl<'a> Worksheet<'a> {
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_header_opt(
                 self.worksheet,
-                CString::new(header).unwrap().as_c_str().as_ptr(),
+                CString::new(header)?.as_c_str().as_ptr(),
                 &mut options.into(),
             );
 
@@ -1553,7 +1549,7 @@ impl<'a> Worksheet<'a> {
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_footer_opt(
                 self.worksheet,
-                CString::new(footer).unwrap().as_c_str().as_ptr(),
+                CString::new(footer)?.as_c_str().as_ptr(),
                 &mut options.into(),
             );
 
@@ -1768,7 +1764,7 @@ impl<'a> Worksheet<'a> {
         unsafe {
             let result = libxlsxwriter_sys::worksheet_set_vba_name(
                 self.worksheet,
-                CString::new(name).unwrap().as_c_str().as_ptr(),
+                CString::new(name)?.as_c_str().as_ptr(),
             );
 
             if result == libxlsxwriter_sys::lxw_error_LXW_NO_ERROR {

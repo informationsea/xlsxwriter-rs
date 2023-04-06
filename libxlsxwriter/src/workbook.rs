@@ -48,7 +48,7 @@ impl Workbook {
         format: Option<&Format>,
     ) -> Result<*mut libxlsxwriter_sys::lxw_format, XlsxError> {
         if let Some(format) = format {
-            Ok(self.get_internal_format(format)?)
+            self.get_internal_format(format)
         } else {
             Ok(std::ptr::null_mut())
         }

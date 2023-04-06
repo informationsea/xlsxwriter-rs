@@ -1,4 +1,4 @@
-use crate::{convert_bool, XlsxError};
+use crate::convert_bool;
 
 use super::ConditionalFormat;
 
@@ -135,14 +135,12 @@ impl ConditionalIconSet {
     pub(crate) fn to_internal_value(
         self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
-    ) -> Result<(), XlsxError> {
+    ) {
         conditional_format.type_ =
             libxlsxwriter_sys::lxw_conditional_format_types_LXW_CONDITIONAL_TYPE_ICON_SETS as u8;
         conditional_format.icon_style = self.style.into_internal_type();
         conditional_format.reverse_icons = convert_bool(self.reverse_icons);
         conditional_format.icons_only = convert_bool(self.icons_only);
-
-        Ok(())
     }
 }
 

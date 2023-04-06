@@ -252,12 +252,10 @@ impl<'a> Worksheet<'a> {
                                     total_function: y.total_function.into(),
                                     header_format: self
                                         ._workbook
-                                        .get_internal_option_format(y.header_format.as_ref())
-                                        .unwrap(), // fix here
+                                        .get_internal_option_format(y.header_format.as_ref())?,
                                     format: self
                                         ._workbook
-                                        .get_internal_option_format(y.format.as_ref())
-                                        .unwrap(), // fix here
+                                        .get_internal_option_format(y.format.as_ref())?,
                                     total_value: y.total_value,
                                 })
                             },

@@ -137,7 +137,7 @@ impl CStringHelper {
     }
 
     pub fn add(&mut self, s: &str) -> Result<*const c_char, XlsxError> {
-        let s = Box::pin(CString::new(s).unwrap());
+        let s = Box::pin(CString::new(s)?);
         let p = s.as_ptr();
         self.strings.push(s);
         Ok(p)

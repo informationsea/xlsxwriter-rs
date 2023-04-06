@@ -1,5 +1,3 @@
-use crate::XlsxError;
-
 /// The Average type is used to specify Excel's "Average" style conditional format.
 ///
 /// See [`super::ConditionalFormat::average`] to learn usage.
@@ -31,7 +29,7 @@ impl ConditionalFormatAverageCriteria {
     pub(crate) fn to_internal_value(
         self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
-    ) -> Result<(), XlsxError> {
+    ) {
         conditional_format.type_ =
             libxlsxwriter_sys::lxw_conditional_format_types_LXW_CONDITIONAL_TYPE_AVERAGE as u8;
         match self {
@@ -66,7 +64,6 @@ impl ConditionalFormatAverageCriteria {
                 conditional_format.criteria = libxlsxwriter_sys::lxw_conditional_criteria_LXW_CONDITIONAL_CRITERIA_AVERAGE_3_STD_DEV_BELOW as u8;
             }
         }
-        Ok(())
     }
 }
 

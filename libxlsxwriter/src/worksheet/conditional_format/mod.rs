@@ -209,10 +209,10 @@ impl ConditionalFormatTypes {
                 criteria.to_internal_value(c_string_helper, conditional_format)?;
             }
             ConditionalFormatTypes::TimePeriod(criteria) => {
-                criteria.to_internal_value(conditional_format)?;
+                criteria.to_internal_value(conditional_format);
             }
             ConditionalFormatTypes::Average(criteria) => {
-                criteria.to_internal_value(conditional_format)?;
+                criteria.to_internal_value(conditional_format);
             }
             ConditionalFormatTypes::Duplicate => {
                 conditional_format.type_ =
@@ -641,7 +641,7 @@ impl ConditionalFormat {
                 val.to_internal_value(&mut conditional_format, c_string_helper)?;
             }
             ConditionalFormat::IconSet(val) => {
-                val.to_internal_value(&mut conditional_format)?;
+                val.to_internal_value(&mut conditional_format);
             }
         }
 
