@@ -161,7 +161,7 @@ impl ConditionalFormatRuleTypes {
 /// See [`ConditionalFormat`] to learn more
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum ConditionalFormatTypes {
-    /// The Cell type is the most common conditional formatting type. It is used when a format is applied to a cell based on a simple criterion.     
+    /// The Cell type is the most common conditional formatting type. It is used when a format is applied to a cell based on a simple criterion.
     Cell(ConditionalFormatCellCriteria),
     /// The Text type is used to specify Excel's "Specific Text" style conditional format.
     Text(ConditionalFormatTextCriteria),
@@ -189,30 +189,30 @@ pub enum ConditionalFormatTypes {
     Formula(String),
 }
 
-impl Into<ConditionalFormatTypes> for ConditionalFormatCellCriteria {
-    fn into(self) -> ConditionalFormatTypes {
-        ConditionalFormatTypes::Cell(self)
+impl From<ConditionalFormatCellCriteria> for ConditionalFormatTypes {
+    fn from(val: ConditionalFormatCellCriteria) -> Self {
+        ConditionalFormatTypes::Cell(val)
     }
 }
 
 impl ConditionalFormatTypes {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         c_string_helper: &mut CStringHelper,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
     ) -> Result<(), XlsxError> {
         match self {
             ConditionalFormatTypes::Cell(criteria) => {
-                criteria.into_internal_value(c_string_helper, conditional_format)?;
+                criteria.to_internal_value(c_string_helper, conditional_format)?;
             }
             ConditionalFormatTypes::Text(criteria) => {
-                criteria.into_internal_value(c_string_helper, conditional_format)?;
+                criteria.to_internal_value(c_string_helper, conditional_format)?;
             }
             ConditionalFormatTypes::TimePeriod(criteria) => {
-                criteria.into_internal_value(conditional_format)?;
+                criteria.to_internal_value(conditional_format);
             }
             ConditionalFormatTypes::Average(criteria) => {
-                criteria.into_internal_value(conditional_format)?;
+                criteria.to_internal_value(conditional_format);
             }
             ConditionalFormatTypes::Duplicate => {
                 conditional_format.type_ =
@@ -325,6 +325,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn average(
         average: ConditionalFormatAverageCriteria,
         format: &Format,
@@ -354,7 +355,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
+    #[must_use]
     pub fn duplicate(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Duplicate,
@@ -381,7 +383,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```       
+    /// ```
+    #[must_use]
     pub fn unique(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Unique,
@@ -409,7 +412,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
+    #[must_use]
     pub fn top_num(num: u32, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Top(TopOrBottomCriteria::TopOrBottomNum(num)),
@@ -437,7 +441,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
+    #[must_use]
     pub fn top_percent(percent: f64, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Top(TopOrBottomCriteria::TopOrBottomPercent(percent)),
@@ -464,7 +469,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
+    #[must_use]
     pub fn blanks(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Blanks,
@@ -491,7 +497,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
+    #[must_use]
     pub fn no_blanks(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::NoBlanks,
@@ -520,6 +527,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn errors(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Errors,
@@ -548,6 +556,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn no_errors(format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::NoErrors,
@@ -575,7 +584,8 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```      
+    /// ```
+    #[must_use]
     pub fn formula(formula: &str, format: &Format) -> ConditionalFormat {
         ConditionalFormat::ConditionType {
             criteria: ConditionalFormatTypes::Formula(formula.to_string()),
@@ -583,7 +593,7 @@ impl ConditionalFormat {
         }
     }
 
-    pub(crate) fn into_internal_type(
+    pub(crate) fn to_internal_type(
         &self,
         workbook: &Workbook,
         c_string_helper: &mut CStringHelper,
@@ -629,19 +639,19 @@ impl ConditionalFormat {
             ConditionalFormat::ConditionType { criteria, format } => {
                 let internal_format = workbook.get_internal_format(format)?;
                 conditional_format.format = internal_format;
-                criteria.into_internal_value(c_string_helper, &mut conditional_format)?;
+                criteria.to_internal_value(c_string_helper, &mut conditional_format)?;
             }
             ConditionalFormat::TwoColorScale(criteria) => {
-                criteria.into_internal_value(c_string_helper, &mut conditional_format)?;
+                criteria.to_internal_value(c_string_helper, &mut conditional_format)?;
             }
             ConditionalFormat::ThreeColorScale(criteria) => {
-                criteria.into_internal_value(c_string_helper, &mut conditional_format)?;
+                criteria.to_internal_value(c_string_helper, &mut conditional_format)?;
             }
             ConditionalFormat::DataBar(val) => {
-                val.into_internal_value(&mut conditional_format, c_string_helper)?;
+                val.to_internal_value(&mut conditional_format, c_string_helper)?;
             }
             ConditionalFormat::IconSet(val) => {
-                val.into_internal_value(&mut conditional_format)?;
+                val.to_internal_value(&mut conditional_format);
             }
         }
 
@@ -659,7 +669,7 @@ impl<'a> Worksheet<'a> {
         let mut c_string_helper = CStringHelper::new();
         unsafe {
             let mut conditional_format =
-                conditional_format.into_internal_type(self._workbook, &mut c_string_helper)?;
+                conditional_format.to_internal_type(self._workbook, &mut c_string_helper)?;
             let result = libxlsxwriter_sys::worksheet_conditional_format_cell(
                 self.worksheet,
                 row,
@@ -687,7 +697,7 @@ impl<'a> Worksheet<'a> {
         let mut c_string_helper = CStringHelper::new();
         unsafe {
             let mut conditional_format =
-                conditional_format.into_internal_type(self._workbook, &mut c_string_helper)?;
+                conditional_format.to_internal_type(self._workbook, &mut c_string_helper)?;
             let result = libxlsxwriter_sys::worksheet_conditional_format_range(
                 self.worksheet,
                 first_row,

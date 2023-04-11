@@ -11,7 +11,7 @@ fn test_simple1() -> Result<(), XlsxError> {
         0,
         0,
         "Red text",
-        Some(&Format::new().set_font_color(FormatColor::Red)),
+        Some(Format::new().set_font_color(FormatColor::Red)),
     )?;
     sheet1.write_number(0, 1, 20., None)?;
     sheet1.write_formula_num(1, 0, "=10+B1", None, 30.)?;
@@ -20,7 +20,7 @@ fn test_simple1() -> Result<(), XlsxError> {
         1,
         "https://github.com/informationsea/xlsxwriter-rs",
         Some(
-            &Format::new()
+            Format::new()
                 .set_font_color(FormatColor::Blue)
                 .set_underline(FormatUnderline::Single),
         ),
@@ -32,7 +32,7 @@ fn test_simple1() -> Result<(), XlsxError> {
         2,
         "Hello, world",
         Some(
-            &Format::new()
+            Format::new()
                 .set_font_color(FormatColor::Green)
                 .set_align(FormatAlignment::CenterAcross)
                 .set_vertical_align(FormatVerticalAlignment::VerticalCenter),

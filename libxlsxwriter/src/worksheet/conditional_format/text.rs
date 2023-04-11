@@ -8,7 +8,7 @@ use std::os::raw::c_char;
 /// [`ConditionalFormat::text_begins_with`], [`ConditionalFormat::text_ends_with`] to learn usage.
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum ConditionalFormatTextCriteria {
-    /// Format cells that contain the specified text.     
+    /// Format cells that contain the specified text.
     Containing(String),
     /// Format cells that don't contain the specified text.
     NotContaining(String),
@@ -19,7 +19,7 @@ pub enum ConditionalFormatTextCriteria {
 }
 
 impl ConditionalFormatTextCriteria {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         c_string_helper: &mut CStringHelper,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,

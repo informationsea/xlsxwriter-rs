@@ -2,9 +2,9 @@ use super::{ChartFill, ChartLine, ChartMarkerType, ChartPattern, ChartSeries};
 use crate::{convert_bool, WorksheetCol, WorksheetRow, XlsxError};
 
 impl<'a> ChartSeries<'a> {
-    /// The categories and values of a chart data series are generally set using the chart_add_series() function and Excel range formulas like "=Sheet1!$A$2:$A$7".
+    /// The categories and values of a chart data series are generally set using the `chart_add_series` function and Excel range formulas like "=Sheet1!$A$2:$A$7".
     ///
-    /// The `ChartSeries.set_categories()` function is an alternative method that is easier to generate programmatically. It requires that you set the categories and values parameters in Chart.add_series() to `None` and then set them using row and column values in ChartSeries.set_categories() and ChartSeries.set_values():
+    /// The `ChartSeries.set_categories()` function is an alternative method that is easier to generate programmatically. It requires that you set the categories and values parameters in `Chart.add_series` to `None` and then set them using row and column values in `ChartSeries.set_categories` and `ChartSeries.set_values`:
     /// ```rust
     /// # use xlsxwriter::prelude::*;
     /// # fn main() -> Result<(), XlsxError> {
@@ -336,7 +336,7 @@ impl<'a> ChartSeries<'a> {
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-chart_series-set_pattern-1.png)
     pub fn set_pattern(&mut self, pattern: &ChartPattern) {
         unsafe {
-            libxlsxwriter_sys::chart_series_set_pattern(self.chart_series, &mut pattern.value())
+            libxlsxwriter_sys::chart_series_set_pattern(self.chart_series, &mut pattern.value());
         }
     }
 
@@ -366,7 +366,7 @@ impl<'a> ChartSeries<'a> {
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-chart_series-set_marker_type-1.png)
     pub fn set_marker_type(&mut self, maker_type: ChartMarkerType) {
         unsafe {
-            libxlsxwriter_sys::chart_series_set_marker_type(self.chart_series, maker_type.value())
+            libxlsxwriter_sys::chart_series_set_marker_type(self.chart_series, maker_type.value());
         }
     }
 
@@ -430,7 +430,7 @@ impl<'a> ChartSeries<'a> {
             libxlsxwriter_sys::chart_series_set_marker_line(
                 self.chart_series,
                 &mut chart_line.value(),
-            )
+            );
         }
     }
 
@@ -469,7 +469,7 @@ impl<'a> ChartSeries<'a> {
             libxlsxwriter_sys::chart_series_set_marker_fill(
                 self.chart_series,
                 &mut chart_fill.value(),
-            )
+            );
         }
     }
 
@@ -501,7 +501,7 @@ impl<'a> ChartSeries<'a> {
     /// ![Result Image](https://github.com/informationsea/xlsxwriter-rs/raw/master/images/test-chart_series-set_smooth-1.png)
     pub fn set_smooth(&mut self, smooth: bool) {
         unsafe {
-            libxlsxwriter_sys::chart_series_set_smooth(self.chart_series, convert_bool(smooth))
+            libxlsxwriter_sys::chart_series_set_smooth(self.chart_series, convert_bool(smooth));
         }
     }
 

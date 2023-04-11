@@ -137,7 +137,7 @@ impl CStringHelper {
     }
 
     pub fn add(&mut self, s: &str) -> Result<*const c_char, XlsxError> {
-        let s = Box::pin(CString::new(s).unwrap());
+        let s = Box::pin(CString::new(s)?);
         let p = s.as_ptr();
         self.strings.push(s);
         Ok(p)
@@ -177,6 +177,7 @@ impl Default for StringOrFloat {
 }
 
 impl StringOrFloat {
+    #[must_use]
     pub fn to_string(self) -> Option<String> {
         match self {
             StringOrFloat::String(x) => Some(x),
@@ -184,6 +185,7 @@ impl StringOrFloat {
         }
     }
 
+    #[must_use]
     pub fn to_str(&self) -> Option<&str> {
         match self {
             StringOrFloat::String(x) => Some(x.as_str()),
@@ -191,6 +193,7 @@ impl StringOrFloat {
         }
     }
 
+    #[must_use]
     pub fn to_f64(&self) -> Option<f64> {
         match self {
             StringOrFloat::String(_) => None,

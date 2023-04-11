@@ -3,16 +3,11 @@ use crate::{
 };
 
 /// And/or operator conditions when using 2 filter rules with `filter_column2`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum FilterOperator {
+    #[default]
     FilterAnd,
     FilterOr,
-}
-
-impl Default for FilterOperator {
-    fn default() -> Self {
-        FilterOperator::FilterAnd
-    }
 }
 
 impl FilterOperator {
@@ -25,9 +20,10 @@ impl FilterOperator {
 }
 
 /// Criteria used to define an autofilter rule condition.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum FilterCriteria {
     /// Filter cells equal to a value.
+    #[default]
     EqualTo,
     /// Filter cells not equal to a value.
     NotEqualTo,
@@ -43,12 +39,6 @@ pub enum FilterCriteria {
     Blanks,
     /// Filter cells that are not blank.
     NonBlanks,
-}
-
-impl Default for FilterCriteria {
-    fn default() -> Self {
-        FilterCriteria::EqualTo
-    }
 }
 
 impl FilterCriteria {
@@ -99,7 +89,7 @@ impl FilterRule {
         }
     }
 
-    pub(crate) fn into_internal(
+    pub(crate) fn to_internal(
         &self,
         c_string_helper: &mut CStringHelper,
     ) -> Result<libxlsxwriter_sys::lxw_filter_rule, XlsxError> {
@@ -174,7 +164,7 @@ impl<'a> Worksheet<'a> {
     ) -> Result<(), XlsxError> {
         unsafe {
             let mut c_string_helper = CStringHelper::new();
-            let mut rule_converted = rule.into_internal(&mut c_string_helper)?;
+            let mut rule_converted = rule.to_internal(&mut c_string_helper)?;
             let e = libxlsxwriter_sys::worksheet_filter_column(
                 self.worksheet,
                 col,
@@ -221,8 +211,8 @@ impl<'a> Worksheet<'a> {
     ) -> Result<(), XlsxError> {
         unsafe {
             let mut c_string_helper = CStringHelper::new();
-            let mut rule_converted1 = rule1.into_internal(&mut c_string_helper)?;
-            let mut rule_converted2 = rule2.into_internal(&mut c_string_helper)?;
+            let mut rule_converted1 = rule1.to_internal(&mut c_string_helper)?;
+            let mut rule_converted2 = rule2.to_internal(&mut c_string_helper)?;
             let e = libxlsxwriter_sys::worksheet_filter_column2(
                 self.worksheet,
                 col,
@@ -262,7 +252,7 @@ impl<'a> Worksheet<'a> {
     ///
     /// ```
     ///
-    /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.    
+    /// It isn't sufficient to just specify the filter condition. You must also hide any rows that don't match the filter condition.
     pub fn filter_list(
         &mut self,
         col: crate::WorksheetCol,
@@ -319,9 +309,9 @@ mod test {
         create_sheet(&mut worksheet1)?;
         let worksheet1_criteria = FilterRule::new(FilterCriteria::GreaterThan, 10.0);
         worksheet1.filter_column(0, &worksheet1_criteria)?;
-        let mut hidden_row = RowColOptions::new(true, 0, false);
+        let hidden_row = RowColOptions::new(true, 0, false);
         for i in 1..=10 {
-            worksheet1.set_row_opt(i, 13.2, None, &mut hidden_row)?;
+            worksheet1.set_row_opt(i, 13.2, None, &hidden_row)?;
         }
         // ------------
         let mut worksheet2 = workbook.add_worksheet(Some("Sheet 2"))?;
@@ -337,7 +327,7 @@ mod test {
         for i in 1..20 {
             let value: f64 = i.into();
             if (value / 2.0) < 3. || 5.5 <= (value / 2.0) {
-                worksheet2.set_row_opt(i, 13.2, None, &mut hidden_row)?;
+                worksheet2.set_row_opt(i, 13.2, None, &hidden_row)?;
             }
         }
         // --------------
@@ -346,7 +336,7 @@ mod test {
         worksheet3.filter_list(2, &["TEXT02", "TEXT03"])?;
         for i in 1..20 {
             if i != 2 && i != 3 {
-                worksheet3.set_row_opt(i, 13.2, None, &mut hidden_row)?;
+                worksheet3.set_row_opt(i, 13.2, None, &hidden_row)?;
             }
         }
 

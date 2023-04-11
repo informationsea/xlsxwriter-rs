@@ -3,20 +3,15 @@ use crate::{convert_bool, prelude::FormatColor, CStringHelper, StringOrFloat, Xl
 use super::{set_max_value, set_min_value, ConditionalFormat, ConditionalFormatRuleTypes};
 
 /// Values used to set the bar direction of a conditional format data bar.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum ConditionalFormatBarDirection {
-    /// Data bar direction is set by Excel based on the context of the data displayed.    
+    /// Data bar direction is set by Excel based on the context of the data displayed.
+    #[default]
     Context,
     /// Data bar direction is from right to left.
     RightToLeft,
     /// Data bar direction is from left to right.
     LeftToRight,
-}
-
-impl Default for ConditionalFormatBarDirection {
-    fn default() -> Self {
-        ConditionalFormatBarDirection::Context
-    }
 }
 
 impl ConditionalFormatBarDirection {
@@ -31,20 +26,15 @@ impl ConditionalFormatBarDirection {
 }
 
 /// Values used to set the position of the axis in a conditional format data bar.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 pub enum ConditionalBarAxisPosition {
-    /// Data bar axis position is set by Excel based on the context of the data displayed.    
+    /// Data bar axis position is set by Excel based on the context of the data displayed.
+    #[default]
     Automatic,
     /// Data bar axis position is set at the midpoint.
     Midpoint,
     /// Data bar axis is turned off.
     None,
-}
-
-impl Default for ConditionalBarAxisPosition {
-    fn default() -> Self {
-        ConditionalBarAxisPosition::Automatic
-    }
 }
 
 impl ConditionalBarAxisPosition {
@@ -109,7 +99,7 @@ impl From<ConditionalDataBar> for ConditionalFormat {
 }
 
 impl ConditionalDataBar {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
         c_string_helper: &mut CStringHelper,
@@ -121,22 +111,23 @@ impl ConditionalDataBar {
         set_min_value(conditional_format, &self.min_value, c_string_helper)?;
         set_max_value(conditional_format, &self.max_value, c_string_helper)?;
         conditional_format.bar_only = convert_bool(self.bar_only);
-        conditional_format.bar_color = self.color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_color = self.color.map_or(0, FormatColor::value);
         conditional_format.bar_solid = convert_bool(self.solid);
-        conditional_format.bar_negative_color = self.negative_color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_negative_color = self.negative_color.map_or(0, FormatColor::value);
         conditional_format.bar_negative_color_same = convert_bool(self.negative_color_same);
-        conditional_format.bar_border_color = self.border_color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_border_color = self.border_color.map_or(0, FormatColor::value);
         conditional_format.bar_negative_border_color =
-            self.negative_border_color.map(|x| x.value()).unwrap_or(0);
+            self.negative_border_color.map_or(0, FormatColor::value);
         conditional_format.bar_negative_border_color_same =
             convert_bool(self.negative_border_color_same);
         conditional_format.bar_no_border = convert_bool(self.no_border);
         conditional_format.bar_direction = self.direction.into_internal_type();
         conditional_format.bar_axis_position = self.axis_position.into_internal_type();
-        conditional_format.bar_axis_color = self.axis_color.map(|x| x.value()).unwrap_or(0);
+        conditional_format.bar_axis_color = self.axis_color.map_or(0, FormatColor::value);
         Ok(())
     }
 
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
@@ -272,8 +263,9 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
 
+    #[must_use]
     pub fn data_bar(data_bar: &ConditionalDataBar) -> ConditionalFormat {
         ConditionalFormat::DataBar(data_bar.clone())
     }

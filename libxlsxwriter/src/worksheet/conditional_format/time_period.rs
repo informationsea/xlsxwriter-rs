@@ -1,12 +1,12 @@
 use super::{ConditionalFormat, ConditionalFormatTypes};
-use crate::{Format, XlsxError};
+use crate::Format;
 
 /// The Time Period type is used to specify Excel's "Dates Occurring" style conditional format.
 ///
 /// See [`ConditionalFormat::time_period`] to learn more
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ConditionalFormatTimePeriodCriteria {
-    /// Format cells with a date of yesterday.    
+    /// Format cells with a date of yesterday.
     Yesterday,
     /// Format cells with a date of today.
     Today,
@@ -29,10 +29,10 @@ pub enum ConditionalFormatTimePeriodCriteria {
 }
 
 impl ConditionalFormatTimePeriodCriteria {
-    pub(crate) fn into_internal_value(
-        &self,
+    pub(crate) fn to_internal_value(
+        self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
-    ) -> Result<(), XlsxError> {
+    ) {
         conditional_format.type_ =
             libxlsxwriter_sys::lxw_conditional_format_types_LXW_CONDITIONAL_TYPE_TIME_PERIOD as u8;
         match self {
@@ -67,7 +67,6 @@ impl ConditionalFormatTimePeriodCriteria {
                 conditional_format.criteria = libxlsxwriter_sys::lxw_conditional_criteria_LXW_CONDITIONAL_CRITERIA_TIME_PERIOD_NEXT_MONTH as u8;
             }
         }
-        Ok(())
     }
 }
 
@@ -93,6 +92,7 @@ impl ConditionalFormat {
     /// # Ok(())
     /// # }
     /// ```
+    #[must_use]
     pub fn time_period(
         time_period: ConditionalFormatTimePeriodCriteria,
         format: &Format,

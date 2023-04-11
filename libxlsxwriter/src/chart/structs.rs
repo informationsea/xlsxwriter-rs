@@ -2,6 +2,7 @@ use super::super::{convert_bool, FormatColor};
 use super::{ChartDashType, ChartFill, ChartLine, ChartPattern, ChartPatternType};
 
 impl ChartPattern {
+    #[must_use]
     pub fn new(fg_color: FormatColor, bg_color: FormatColor, pattern: ChartPatternType) -> Self {
         ChartPattern {
             fg_color,
@@ -20,6 +21,7 @@ impl ChartPattern {
 }
 
 impl ChartLine {
+    #[must_use]
     pub fn new() -> Self {
         ChartLine::default()
     }
@@ -48,6 +50,7 @@ impl Default for ChartLine {
 }
 
 impl ChartFill {
+    #[must_use]
     pub fn new() -> Self {
         ChartFill::default()
     }

@@ -1,11 +1,9 @@
-use crate::XlsxError;
-
 /// The Average type is used to specify Excel's "Average" style conditional format.
 ///
 /// See [`super::ConditionalFormat::average`] to learn usage.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ConditionalFormatAverageCriteria {
-    /// Format cells above the average for the range.     
+    /// Format cells above the average for the range.
     AverageAbove,
     /// Format cells below the average for the range.
     AverageBelow,
@@ -28,10 +26,10 @@ pub enum ConditionalFormatAverageCriteria {
 }
 
 impl ConditionalFormatAverageCriteria {
-    pub(crate) fn into_internal_value(
-        &self,
+    pub(crate) fn to_internal_value(
+        self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
-    ) -> Result<(), XlsxError> {
+    ) {
         conditional_format.type_ =
             libxlsxwriter_sys::lxw_conditional_format_types_LXW_CONDITIONAL_TYPE_AVERAGE as u8;
         match self {
@@ -66,7 +64,6 @@ impl ConditionalFormatAverageCriteria {
                 conditional_format.criteria = libxlsxwriter_sys::lxw_conditional_criteria_LXW_CONDITIONAL_CRITERIA_AVERAGE_3_STD_DEV_BELOW as u8;
             }
         }
-        Ok(())
     }
 }
 

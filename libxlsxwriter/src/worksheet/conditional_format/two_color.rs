@@ -20,7 +20,7 @@ pub struct TwoColorScaleCriteria {
 }
 
 impl TwoColorScaleCriteria {
-    pub(crate) fn into_internal_value(
+    pub(crate) fn to_internal_value(
         &self,
         c_string_helper: &mut CStringHelper,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
@@ -108,7 +108,7 @@ impl ConditionalFormat {
     /// # )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
 
     pub fn two_color_scale<V1: Into<StringOrFloat>, V2: Into<StringOrFloat>>(
         min_rule_type: ConditionalFormatRuleTypes,

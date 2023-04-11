@@ -35,18 +35,13 @@ pub struct TableColumn {
 }
 
 /// The type of table style (Light, Medium or Dark).
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
 pub enum TableStyleType {
+    #[default]
     Default,
     Light,
     Medium,
     Dark,
-}
-
-impl Default for TableStyleType {
-    fn default() -> TableStyleType {
-        TableStyleType::Default
-    }
 }
 
 impl From<TableStyleType> for u8 {
@@ -71,8 +66,9 @@ impl From<TableStyleType> for u8 {
 /// Definitions for the standard Excel functions that are available via the dropdown in the total row of an Excel table.
 ///
 /// Please read [libxslxwriter document](https://libxlsxwriter.github.io/working_with_tables.html) to learn more.
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
 pub enum TableTotalFunction {
+    #[default]
     None,
 
     /// Use the average function as the table total.
@@ -98,12 +94,6 @@ pub enum TableTotalFunction {
 
     /// Use the var function as the table total.
     Var,
-}
-
-impl Default for TableTotalFunction {
-    fn default() -> TableTotalFunction {
-        TableTotalFunction::None
-    }
 }
 
 impl From<TableTotalFunction> for u8 {
@@ -166,10 +156,10 @@ pub struct TableOptions {
      */
     pub name: Option<String>,
 
-    /// The `no_header_row` parameter can be used to turn off the header row in the table. It is on by default.    
+    /// The `no_header_row` parameter can be used to turn off the header row in the table. It is on by default.
     pub no_header_row: bool,
 
-    /// The `no_autofilter` parameter can be used to turn off the autofilter in the header row. It is on by default.    
+    /// The `no_autofilter` parameter can be used to turn off the autofilter in the header row. It is on by default.
     pub no_autofilter: bool,
 
     /// The `no_banded_rows` parameter can be used to turn off the rows of alternating color in the table. It is on by default.
@@ -187,7 +177,7 @@ pub struct TableOptions {
     /// The `style_type` parameter can be used to set the style of the table, in conjunction with the style_type_number parameter.
     pub style_type: TableStyleType,
 
-    /// The `style_type_number` parameter is used with style_type to set the style of a worksheet table.     
+    /// The `style_type_number` parameter is used with style_type to set the style of a worksheet table.
     pub style_type_number: u8,
 
     /// The `total_row` parameter can be used to turn on the total row in the last row of a table. It is distinguished from the other rows by a different formatting and also with dropdown SUBTOTAL functions.
@@ -234,10 +224,10 @@ impl<'a> Worksheet<'a> {
 
         if options
             .as_ref()
-            .map(|x| x.columns.as_ref())
-            .flatten()
-            .map(|x| x.len() as WorksheetCol != last_col - first_col + 1)
-            .unwrap_or(false)
+            .and_then(|x| x.columns.as_ref())
+            .map_or(false, |x| {
+                x.len() as WorksheetCol != last_col - first_col + 1
+            })
         {
             return Err(XlsxError {
                 source: XlsxErrorSource::NumberOfColumnsIsNotMatched,
@@ -246,8 +236,7 @@ impl<'a> Worksheet<'a> {
 
         let columns: Option<Vec<_>> = options
             .as_ref()
-            .map(|x| x.columns.as_ref())
-            .flatten()
+            .and_then(|x| x.columns.as_ref())
             .map(|x| {
                 try_to_vec(
                     x.iter()
@@ -264,17 +253,15 @@ impl<'a> Worksheet<'a> {
                                     total_function: y.total_function.into(),
                                     header_format: self
                                         ._workbook
-                                        .get_internal_option_format(y.header_format.as_ref())
-                                        .unwrap(), // fix here
+                                        .get_internal_option_format(y.header_format.as_ref())?,
                                     format: self
                                         ._workbook
-                                        .get_internal_option_format(y.format.as_ref())
-                                        .unwrap(), // fix here
+                                        .get_internal_option_format(y.format.as_ref())?,
                                     total_value: y.total_value,
                                 })
                             },
                         )
-                        .map(|x| x.map(|y| Box::pin(y))),
+                        .map(|x| x.map(Box::pin)),
                 )
             })
             .transpose()?;
@@ -301,10 +288,9 @@ impl<'a> Worksheet<'a> {
                 style_type: options.style_type.into(),
                 style_type_number: options.style_type_number,
                 total_row: convert_bool(options.total_row),
-                columns: columns_ptr
-                    .as_ref()
-                    .map(|x| x.as_ptr() as *mut *mut libxlsxwriter_sys::lxw_table_column)
-                    .unwrap_or(std::ptr::null_mut()),
+                columns: columns_ptr.as_ref().map_or_else(std::ptr::null_mut, |x| {
+                    x.as_ptr() as *mut *mut libxlsxwriter_sys::lxw_table_column
+                }),
             })
         } else {
             None
@@ -317,12 +303,11 @@ impl<'a> Worksheet<'a> {
                 first_col,
                 last_row,
                 last_col,
-                options
-                    .as_mut()
-                    .map(|x| x as *mut libxlsxwriter_sys::lxw_table_options)
-                    .unwrap_or(std::ptr::null_mut()),
+                options.as_mut().map_or_else(std::ptr::null_mut, |x| {
+                    x as *mut libxlsxwriter_sys::lxw_table_options
+                }),
             );
-            std::mem::drop(options);
+
             std::mem::drop(columns_ptr);
             std::mem::drop(columns);
 

@@ -4,6 +4,7 @@ use chrono::{Datelike, Timelike};
 use super::DateTime;
 
 impl DateTime {
+    #[must_use]
     pub fn new(year: i16, month: i8, day: i8, hour: i8, min: i8, second: f64) -> DateTime {
         DateTime {
             year,
@@ -15,6 +16,7 @@ impl DateTime {
         }
     }
 
+    #[must_use]
     pub fn date(year: i16, month: i8, day: i8) -> DateTime {
         DateTime {
             year,
@@ -26,6 +28,7 @@ impl DateTime {
         }
     }
 
+    #[must_use]
     pub fn time(hour: i8, min: i8, second: f64) -> DateTime {
         DateTime {
             year: 0,

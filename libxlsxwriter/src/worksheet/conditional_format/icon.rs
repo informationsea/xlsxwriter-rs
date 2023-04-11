@@ -1,4 +1,4 @@
-use crate::{convert_bool, XlsxError};
+use crate::convert_bool;
 
 use super::ConditionalFormat;
 
@@ -109,6 +109,7 @@ pub struct ConditionalIconSet {
 }
 
 impl ConditionalIconSet {
+    #[must_use]
     pub fn new() -> Self {
         ConditionalIconSet {
             style: ConditionalIconType::Icons5Rating,
@@ -117,32 +118,39 @@ impl ConditionalIconSet {
         }
     }
 
+    #[must_use]
     pub fn style(mut self, style: ConditionalIconType) -> Self {
         self.style = style;
         self
     }
 
+    #[must_use]
     pub fn reverse_icons(mut self, reverse_icons: bool) -> Self {
         self.reverse_icons = reverse_icons;
         self
     }
 
+    #[must_use]
     pub fn icons_only(mut self, icons_only: bool) -> Self {
         self.icons_only = icons_only;
         self
     }
 
-    pub(crate) fn into_internal_value(
-        &self,
+    pub(crate) fn to_internal_value(
+        self,
         conditional_format: &mut libxlsxwriter_sys::lxw_conditional_format,
-    ) -> Result<(), XlsxError> {
+    ) {
         conditional_format.type_ =
             libxlsxwriter_sys::lxw_conditional_format_types_LXW_CONDITIONAL_TYPE_ICON_SETS as u8;
         conditional_format.icon_style = self.style.into_internal_type();
         conditional_format.reverse_icons = convert_bool(self.reverse_icons);
         conditional_format.icons_only = convert_bool(self.icons_only);
+    }
+}
 
-        Ok(())
+impl Default for ConditionalIconSet {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -181,9 +189,10 @@ impl ConditionalFormat {
     /// )?;
     /// # Ok(())
     /// # }
-    /// ```    
+    /// ```
 
+    #[must_use]
     pub fn icon_set(icon_set: &ConditionalIconSet) -> ConditionalFormat {
-        ConditionalFormat::IconSet(icon_set.clone())
+        ConditionalFormat::IconSet(*icon_set)
     }
 }
