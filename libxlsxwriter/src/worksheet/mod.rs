@@ -277,20 +277,20 @@ impl CommentDisplayType {
 /// Options for modifying comments inserted via `write_comment_opt()`
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub struct CommentOptions {
-    visible: CommentDisplayType,
-    author: Option<String>,
-    width: Option<u16>,
-    height: Option<u16>,
-    x_scale: Option<f64>,
-    y_scale: Option<f64>,
-    color: FormatColor,
-    font_name: Option<String>,
-    font_size: Option<f64>,
-    font_family: Option<u8>,
-    start_row: WorksheetRow,
-    start_col: WorksheetCol,
-    x_offset: i32,
-    y_offset: i32,
+    pub visible: CommentDisplayType,
+    pub author: Option<String>,
+    pub width: Option<u16>,
+    pub height: Option<u16>,
+    pub x_scale: Option<f64>,
+    pub y_scale: Option<f64>,
+    pub color: FormatColor,
+    pub font_name: Option<String>,
+    pub font_size: Option<f64>,
+    pub font_family: Option<u8>,
+    pub start_row: WorksheetRow,
+    pub start_col: WorksheetCol,
+    pub x_offset: i32,
+    pub y_offset: i32,
 }
 
 impl CommentOptions {
@@ -314,6 +314,27 @@ impl CommentOptions {
             x_offset: self.x_offset,
             y_offset: self.y_offset,
         })
+    }
+}
+
+impl Default for CommentOptions {
+    fn default() -> Self {
+        Self {
+            visible: Default::default(),
+            author: Default::default(),
+            width: Default::default(),
+            height: Default::default(),
+            x_scale: Default::default(),
+            y_scale: Default::default(),
+            color: FormatColor::Custom(0xFFFFE1),
+            font_name: Default::default(),
+            font_size: Default::default(),
+            font_family: Default::default(),
+            start_row: Default::default(),
+            start_col: Default::default(),
+            x_offset: Default::default(),
+            y_offset: Default::default(),
+        }
     }
 }
 
