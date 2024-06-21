@@ -9,19 +9,59 @@ use std::os::raw::c_char;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum DataValidationType {
-    Integer{ignore_blank: bool, number_options: DataValidationNumberOptions<i64> },
-    IntegerFormula{ignore_blank: bool, formula: String },
-    Decimal{ignore_blank: bool, number_options: DataValidationNumberOptions<f64> },
-    DecimalFormula{ignore_blank: bool, formula: String },
-    List{ignore_blank: bool, dropdown: bool, values: Vec<String> },
-    ListFormula{ignore_blank: bool, formula: String },
-    Date{ignore_blank: bool, number_options: DataValidationNumberOptions<DateTime> },
-    DateFormula{ignore_blank: bool, formula: String },
-    Time{ignore_blank: bool, number_options: DataValidationNumberOptions<DateTime> },
-    TimeFormula{ignore_blank: bool, formula: String },
-    Length{ignore_blank: bool, number_options: DataValidationNumberOptions<usize> },
-    LengthFormula{ignore_blank: bool, formula: String },
-    CustomFormula{ignore_blank: bool, formula: String },
+    Integer {
+        ignore_blank: bool,
+        number_options: DataValidationNumberOptions<i64>,
+    },
+    IntegerFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
+    Decimal {
+        ignore_blank: bool,
+        number_options: DataValidationNumberOptions<f64>,
+    },
+    DecimalFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
+    List {
+        ignore_blank: bool,
+        dropdown: bool,
+        values: Vec<String>,
+    },
+    ListFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
+    Date {
+        ignore_blank: bool,
+        number_options: DataValidationNumberOptions<DateTime>,
+    },
+    DateFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
+    Time {
+        ignore_blank: bool,
+        number_options: DataValidationNumberOptions<DateTime>,
+    },
+    TimeFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
+    Length {
+        ignore_blank: bool,
+        number_options: DataValidationNumberOptions<usize>,
+    },
+    LengthFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
+    CustomFormula {
+        ignore_blank: bool,
+        formula: String,
+    },
     Any,
 }
 
@@ -173,11 +213,9 @@ impl DataValidation {
             }
             _ => None,
         };
-        let mut _value_list_ptr: Option<Vec<*mut c_char>> = match &self.validation_type {
+        let mut _value_list_ptr: Option<Vec<*const c_char>> = match &self.validation_type {
             DataValidationType::List { values, .. } => Some(try_to_vec(
-                values
-                    .iter()
-                    .map(|y| Ok(c_string_helper.add(y)? as *mut c_char)),
+                values.iter().map(|y| Ok(c_string_helper.add(y)?)),
             ))
             .transpose()?,
             _ => None,
@@ -185,25 +223,40 @@ impl DataValidation {
         if let Some(l) = _value_list_ptr.as_mut() {
             l.push(std::ptr::null_mut());
         }
-        let(minimum_number, maximum_number) = match self.validation_type {
-            DataValidationType::Integer { number_options: 
-                DataValidationNumberOptions::Between(x, y) | 
-                DataValidationNumberOptions::NotBetween(x, y), .. } => (x as f64, y as f64), 
-            DataValidationType::Decimal { number_options: 
-                DataValidationNumberOptions::Between(x, y) | 
-                DataValidationNumberOptions::NotBetween(x, y), .. } => (x, y), 
-            DataValidationType::Length { number_options: 
-                DataValidationNumberOptions::Between(x, y) | 
-                DataValidationNumberOptions::NotBetween(x, y), .. } => (x as f64, y as f64), 
-            _ => (0., 0.)
+        let (minimum_number, maximum_number) = match self.validation_type {
+            DataValidationType::Integer {
+                number_options:
+                    DataValidationNumberOptions::Between(x, y)
+                    | DataValidationNumberOptions::NotBetween(x, y),
+                ..
+            } => (x as f64, y as f64),
+            DataValidationType::Decimal {
+                number_options:
+                    DataValidationNumberOptions::Between(x, y)
+                    | DataValidationNumberOptions::NotBetween(x, y),
+                ..
+            } => (x, y),
+            DataValidationType::Length {
+                number_options:
+                    DataValidationNumberOptions::Between(x, y)
+                    | DataValidationNumberOptions::NotBetween(x, y),
+                ..
+            } => (x as f64, y as f64),
+            _ => (0., 0.),
         };
         let (minimum_datetime, maximum_datetime) = match &self.validation_type {
-            DataValidationType::Date { number_options:
-                DataValidationNumberOptions::Between(x, y)
-                | DataValidationNumberOptions::NotBetween(x, y), .. }
-            | DataValidationType::Time { number_options:
-                DataValidationNumberOptions::Between(x, y)
-                | DataValidationNumberOptions::NotBetween(x, y), .. } => (x.into(), y.into()),
+            DataValidationType::Date {
+                number_options:
+                    DataValidationNumberOptions::Between(x, y)
+                    | DataValidationNumberOptions::NotBetween(x, y),
+                ..
+            }
+            | DataValidationType::Time {
+                number_options:
+                    DataValidationNumberOptions::Between(x, y)
+                    | DataValidationNumberOptions::NotBetween(x, y),
+                ..
+            } => (x.into(), y.into()),
             _ => ((&DateTime::default()).into(), (&DateTime::default()).into()),
         };
         Ok(CDataValidation {
@@ -340,7 +393,7 @@ impl DataValidation {
 
 #[derive(Debug, Clone)]
 pub(crate) struct CDataValidation {
-    _value_list_ptr: Option<Vec<*mut c_char>>,
+    _value_list_ptr: Option<Vec<*const c_char>>,
     pub(crate) data_validation: libxlsxwriter_sys::lxw_data_validation,
 }
 

@@ -56,13 +56,13 @@ use std::os::raw::c_char;
 
 fn set_value_helper(
     float_value_store: &mut f64,
-    string_value_store: &mut *mut c_char,
+    string_value_store: &mut *const c_char,
     value: &StringOrFloat,
     c_string_helper: &mut CStringHelper,
 ) -> Result<(), XlsxError> {
     match value {
         StringOrFloat::Float(f) => *float_value_store = *f,
-        StringOrFloat::String(s) => *string_value_store = c_string_helper.add(s)? as *mut c_char,
+        StringOrFloat::String(s) => *string_value_store = c_string_helper.add(s)?,
     }
     Ok(())
 }

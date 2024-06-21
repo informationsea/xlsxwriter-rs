@@ -259,11 +259,8 @@ impl<'a> Worksheet<'a> {
         list: &[&str],
     ) -> Result<(), XlsxError> {
         let mut cstring_helper = crate::CStringHelper::new();
-        let mut cstr_list: Vec<_> = try_to_vec(
-            list.iter()
-                .map(|x| Ok(cstring_helper.add(x)? as *mut std::os::raw::c_char)),
-        )?;
-        cstr_list.push(std::ptr::null_mut());
+        let mut cstr_list: Vec<_> = try_to_vec(list.iter().map(|x| Ok(cstring_helper.add(x)?)))?;
+        cstr_list.push(std::ptr::null());
         unsafe {
             let result = libxlsxwriter_sys::worksheet_filter_list(
                 self.worksheet,

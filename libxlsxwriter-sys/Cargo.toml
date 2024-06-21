@@ -1,6 +1,6 @@
 [package]
 name = "libxlsxwriter-sys"
-version = "1.1.5"
+version = "1.1.7"
 authors = ["OKAMURA, Yasunobu <okamura@informationsea.info>"]
 edition = "2018"
 build = "build.rs"
@@ -13,7 +13,11 @@ keywords = ["excel", "xlsx", "ffi"]
 categories = ["external-ffi-bindings"]
 license = "MIT"
 
-exclude = ["third_party/libxlsxwriter/docs", "third_party/libxlsxwriter/test", "third_party/zlib/contrib"]
+exclude = [
+    "third_party/libxlsxwriter/docs",
+    "third_party/libxlsxwriter/test",
+    "third_party/zlib/contrib",
+]
 
 [dependencies]
 
@@ -24,4 +28,4 @@ system-zlib = []
 
 [build-dependencies]
 cc = "1.0"
-bindgen = "0.65"
+bindgen = "0.69.4"
