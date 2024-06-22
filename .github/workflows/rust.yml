@@ -1,128 +1,88 @@
-name: Build
-
+name: Rust Build
 on:
+  workflow_dispatch:
   push:
-    branches: [ master, action-test ]
+    branches: [main]
+    tags: ["v*"]
   pull_request:
-    branches: [ master ]
-
-env:
-  CARGO_TERM_COLOR: always
-
+    branches: [master]
+permissions:
+  contents: write
+  pull-requests: read
 jobs:
   build:
-    runs-on: ${{ matrix.config.os }}
+    name: Build
+    runs-on: ${{ matrix.config.runs-on }}
     strategy:
+      fail-fast: false
       matrix:
         config:
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
+          - runs-on: macos-latest
+            target: aarch64-apple-darwin
             test: true
             cross: false
-          - os: windows-latest
-            target: i686-pc-windows-msvc
-            test: true
-            cross: false
-          - os: macos-latest
+          - runs-on: macos-latest
             target: x86_64-apple-darwin
             test: true
             cross: false
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            test: false
-            cross: false
-          - os: ubuntu-latest
+          - runs-on: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             test: true
-            cross: false
-          - os: ubuntu-latest
-            target: aarch64-unknown-linux-gnu
-            test: false
             cross: true
-          - os: ubuntu-latest
-            target: armv7-unknown-linux-gnueabihf
-            test: false
-            cross: true
-          - os: ubuntu-latest
+          - runs-on: ubuntu-latest
             target: x86_64-unknown-linux-musl
             test: true
+            cross: true
+          - runs-on: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            test: true
+            cross: true
+          - runs-on: ubuntu-latest
+            target: aarch64-unknown-linux-musl
+            test: true
+            cross: true
+          - runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+            test: true
             cross: false
+          - runs-on: windows-latest
+            target: i686-pc-windows-msvc
+            test: true
+            cross: false
+          - runs-on: ubuntu-latest
+            target: x86_64-pc-windows-gnu
+            test: false
+            cross: true
+          - runs-on: windows-latest
+            target: aarch64-pc-windows-msvc
+            test: false
+            cross: false
+          - runs-on: ubuntu-latest
+            target: x86_64-unknown-freebsd
+            test: false
+            cross: true
+    env:
+      CARGO_CMD: ${{ matrix.config.cross && 'cross' || 'cargo' }}
+      ARTIFACT_SUFFIX: ${{ contains(matrix.config.target, 'windows') && '.exe' || '' }}
+      TAG: ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
     steps:
-    - name: Git config
-      if: ${{ matrix.config.os == 'windows-latest' }}
-      run: git config --global core.autocrlf input
-    - uses: actions/checkout@v2
-    - name: Install LLVM Windows
-      if: ${{ matrix.config.os == 'windows-latest' }}
-      run: choco install llvm
-    - name: Setup LLVM path
-      if: ${{ matrix.config.os == 'windows-latest' }}
-      run: |
-        echo "LIBCLANG_PATH=C:\Program Files\LLVM\bin" > $env:GITHUB_ENV
-    - name: Install LLVM Ubuntu
-      if: ${{ matrix.config.os == 'ubuntu-latest' }}
-      run: sudo apt-get install libclang-dev llvm-dev
-    - name: Install musl tools
-      if: ${{ matrix.config.target == 'x86_64-unknown-linux-musl' }}
-      run: sudo apt-get install musl-tools musl-dev
-    - name: Checkout submodule
-      run: git submodule update --init --recursive
-    - name: Install rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-        target: ${{ matrix.config.target }}
-        override: true
-        components: rustfmt, clippy
-    - name: Cache dependencies
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-cargo
-      with:
-        path: ~/.cargo/registry
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.crate') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-    - name: Cache target
-      uses: actions/cache@v2
-      env:
-        cache-name: cache-target
-      with:
-        path: target
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.config.target }}-${{ hashFiles('**/*.o') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-${{ matrix.config.target }}
-    - name: Build
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.config.cross }}
-        command: build
-        args: --release --target ${{ matrix.config.target }} --examples
-    - name: Test
-      if: ${{ matrix.config.test }}
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.config.cross }}
-        command: test
-        args: --release --target ${{ matrix.config.target }}
-    - name: Test No MD5
-      if: ${{ matrix.config.test }}
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.config.cross }}
-        command: test
-        args: --release --target ${{ matrix.config.target }} --features no-md5
-    - name: Test Use OpenSSL md5
-      if: ${{ matrix.config.test && matrix.config.target == 'x86_64-unknown-linux-gnu' }}
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.config.cross }}
-        command: test
-        args: --release --target ${{ matrix.config.target }} --features use-openssl-md5
-    - name: Test system zlib
-      if: ${{ matrix.config.test && matrix.config.target == 'x86_64-unknown-linux-gnu' }}
-      uses: actions-rs/cargo@v1
-      with:
-        use-cross: ${{ matrix.config.cross }}
-        command: test
-        args: --release --target ${{ matrix.config.target }} --features system-zlib
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-${{ matrix.config.target }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install cross
+        if: matrix.config.cross
+        run: type cross > /dev/null || cargo install cross
+      - name: Install toolchain
+        run: rustup target install ${{ matrix.config.target }}
+      - name: Build
+        run: ${{ env.CARGO_CMD }} build --verbose --release --target ${{ matrix.config.target }}
+      - name: Test
+        if: matrix.config.test
+        run: ${{ env.CARGO_CMD }} test --verbose --release --target ${{ matrix.config.target }}
